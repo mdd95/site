@@ -4,7 +4,8 @@ import { schema } from 'prosemirror-schema-basic';
 import { baseKeymap, toggleMark } from 'prosemirror-commands';
 import { history, redo, undo } from 'prosemirror-history';
 import { keymap } from 'prosemirror-keymap';
-import type { MarkType } from 'prosemirror-model';
+import { DOMSerializer, type MarkType } from 'prosemirror-model';
+import { createHTMLDocument, type VHTMLDocument } from 'zeed-dom';
 
 import { getActiveMarksPlugin } from './plugins/get-activemarks-plugin.js';
 import type { ActiveMarks } from './plugins/get-activemarks-plugin.svelte.js';
@@ -47,5 +48,16 @@ export class Editor {
 			this.view.focus();
 			toggleMark(fn(schema.marks))(this.view.state, this.view.dispatch, this.view);
 		};
+	}
+
+	renderHTML() {
+		if (this.view === undefined) return;
+
+		const doc = DOMSerializer.fromSchema(schema).serializeFragment(
+			this.view.state.doc.content,
+			{ document: createHTMLDocument() as unknown as Document }
+		) as unknown as VHTMLDocument;
+
+		return doc.render();
 	}
 }
