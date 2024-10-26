@@ -21,9 +21,14 @@ export class Editor {
 		this.state = EditorState.create({
 			schema,
 			plugins: [
+				keymap({
+					...baseKeymap,
+					'Mod-b': toggleMark(schema.marks.strong),
+					'Mod-i': toggleMark(schema.marks.em),
+					'Mod-z': undo,
+					'Mod-y': redo
+				}),
 				history(),
-				keymap({ 'Mod-z': undo, 'Mod-y': redo }),
-				keymap(baseKeymap),
 				getActiveMarksPlugin(this.activeMarks)
 			]
 		});
