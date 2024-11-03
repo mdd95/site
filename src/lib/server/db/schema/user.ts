@@ -1,16 +1,15 @@
 import { pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const tableUser = pgTable('user', {
-	id: varchar('id', { length: 255 }).primaryKey(),
-	email: varchar('email', { length: 255 }).notNull().unique(),
-	username: varchar('username', { length: 32 }).notNull().unique(),
+	id: text('id').primaryKey(),
+	email: text('email').unique(),
+	username: text('username').unique(),
 	passwordHash: text('password_hash'),
 	googleId: text('google_id').unique(),
-	name: text('name'),
-	avatarUrl: text('avatar_url'),
-	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'date' })
+	googleEmail: text('google_email').unique(),
+	googleName: text('google_name'),
+	googleAvatarUrl: text('google_avatar_url'),
+	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow()
 });
 
 export type User = typeof tableUser.$inferSelect;

@@ -90,13 +90,12 @@ export async function createUserFromGoogleId(
 	avatarUrl: string
 ) {
 	const userId = generateId(15);
-	const user = {
+	const user: Partial<User> & { id: string } = {
 		id: userId,
-		email,
-		username: userId,
 		googleId,
-		name,
-		avatarUrl
+		googleEmail: email,
+		googleName: name,
+		googleAvatarUrl: avatarUrl
 	};
 	await db.insert(tableUser).values(user);
 	return user;
