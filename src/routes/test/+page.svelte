@@ -11,6 +11,7 @@
 		DropdownMenuTrigger
 	} from '@/components/ui/dropdown-menu/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
+	import { Editor, ActiveMarks } from '$lib/prosemirror/index.js';
 	import type { PageServerData } from './$types';
 
 	interface Props {
@@ -18,6 +19,9 @@
 	}
 
 	let { data }: Props = $props();
+
+	const editor = new Editor();
+	editor.activeMarks = new ActiveMarks();
 </script>
 
 {#snippet avatar()}
@@ -64,3 +68,16 @@
 <div class="container flex h-16 items-center">
 	<Button>Create</Button>
 </div>
+
+<div class="container">
+	<div
+		class="text-editor rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
+		use:editor.bind
+	></div>
+</div>
+
+<style>
+	.text-editor :global(.ProseMirror:focus) {
+		outline: none;
+	}
+</style>
