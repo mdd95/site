@@ -13,6 +13,11 @@
 	import LightSwitch from '@/components/light-switch.svelte';
 	import { Editor, ActiveMarks } from '$lib/prosemirror/index.js';
 	import type { PageServerData } from './$types';
+	import {
+		Questionnaire,
+		QuestionnaireChoice,
+		QuestionnaireProblem
+	} from '@/components/questionnaire/index.js';
 
 	interface Props {
 		data: PageServerData;
@@ -22,6 +27,8 @@
 
 	const editor = new Editor();
 	editor.activeMarks = new ActiveMarks();
+
+	let questions: Array<any> = $state([]);
 </script>
 
 {#snippet avatar()}
@@ -69,15 +76,27 @@
 	<Button>Create</Button>
 </div>
 
-<div class="container">
-	<div
-		class="text-editor rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
-		use:editor.bind
-	></div>
+<div class="container space-y-4">
+	{#each questions as q, i}
+		<Questionnaire>
+			<QuestionnaireProblem item={i + 1} />
+
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<QuestionnaireChoice name="problem-1" value="A" />
+				<QuestionnaireChoice name="problem-1" value="B" />
+				<QuestionnaireChoice name="problem-1" value="C" />
+				<QuestionnaireChoice name="problem-1" value="D" />
+			</div>
+		</Questionnaire>
+	{/each}
+	<div class="flex justify-center gap-2">
+		<Button onclick={() => questions.push({})}>Add new</Button>
+		<Button>Save</Button>
+	</div>
 </div>
 
 <style>
-	.text-editor :global(.ProseMirror:focus) {
+	:global(.ProseMirror:focus) {
 		outline: none;
 	}
 </style>
