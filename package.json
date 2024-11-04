@@ -41,6 +41,14 @@
 	},
 	"dependencies": {
 		"inter-ui": "^4.0.2",
-		"mode-watcher": "^0.4.1"
+		"mode-watcher": "^0.4.1",
+		"prosemirror-commands": "^1.6.2",
+		"prosemirror-history": "^1.4.1",
+		"prosemirror-keymap": "^1.2.2",
+		"prosemirror-model": "^1.23.0",
+		"prosemirror-schema-basic": "^1.2.3",
+		"prosemirror-state": "^1.4.3",
+		"prosemirror-view": "^1.34.3",
+		"zeed-dom": "^0.15.1"
 	}
 }
