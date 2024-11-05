@@ -78,7 +78,17 @@
 	{#each questions as q, i}
 		<div class="rounded-md border p-4 shadow-sm">
 			<div class="mb-4 flex justify-end">
-				<Button variant="ghost" size="icon">
+				<Button
+					variant="ghost"
+					size="icon"
+					onclick={() => {
+						questions = questions.filter((i) => {
+							const a = $state.snapshot(i).id;
+							const b = $state.snapshot(q).id;
+							return a !== b;
+						});
+					}}
+				>
 					<Trash />
 				</Button>
 			</div>
@@ -91,24 +101,37 @@
 			</RichText>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-				{#each { length: 4 } as _, i}
-					{@const choices = ['A', 'B', 'C', 'D']}
-
+				{#each q.choices as c, i}
 					<div
 						class="grid grid-cols-[auto_1fr] rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
 					>
 						<div class="mr-4">
 							<input type="radio" name="problem-1" />
-							<label for="" class="text-muted-foreground">{choices[i]}</label>
+							<label for="" class="text-muted-foreground">{c.name}</label>
 						</div>
-						<RichText></RichText>
+						<RichText plugins={({ schema }) => [bindContentToProxy(schema, c)]}
+						></RichText>
 					</div>
 				{/each}
 			</div>
 		</div>
 	{/each}
 	<div class="flex justify-center gap-2">
-		<Button onclick={() => questions.push({ question: { value: '' } })}>Add new</Button>
+		<Button
+			onclick={() =>
+				questions.push({
+					id: crypto.randomUUID(),
+					question: { value: '' },
+					choices: [
+						{ name: 'A', value: '' },
+						{ name: 'B', value: '' },
+						{ name: 'C', value: '' },
+						{ name: 'D', value: '' }
+					]
+				})}
+		>
+			Add new
+		</Button>
 		<Button onclick={save}>Save</Button>
 	</div>
 </div>
