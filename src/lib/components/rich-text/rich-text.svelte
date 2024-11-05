@@ -8,11 +8,12 @@
 	import type { Schema } from 'prosemirror-model';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import 'prosemirror-view/style/prosemirror.css';
 
 	type Props = HTMLAttributes<HTMLDivElement> & {
 		ref?: HTMLDivElement;
 		plugins?: (params: { schema: Schema }) => Array<Plugin>;
-		children: Snippet;
+		children?: Snippet;
 	};
 
 	const noop = () => [];

@@ -11,13 +11,9 @@
 		DropdownMenuTrigger
 	} from '@/components/ui/dropdown-menu/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
-	import { Editor, ActiveMarks } from '$lib/prosemirror/index.js';
+	import { RichText, bindContentToProxy } from '@/components/rich-text/index.js';
+	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
-	import {
-		Questionnaire,
-		QuestionnaireChoice,
-		QuestionnaireProblem
-	} from '@/components/questionnaire/index.js';
 
 	interface Props {
 		data: PageServerData;
@@ -25,15 +21,7 @@
 
 	let { data }: Props = $props();
 
-	const editor = new Editor();
-	editor.activeMarks = new ActiveMarks();
-
-	class Question {
-		question = $state('');
-		choices: Array<string> = $state([]);
-		answer = $state('');
-	}
-	let questions: Array<Question> = $state([]);
+	let questions: Array<any> = $state([]);
 
 	function save() {
 		const q = $state.snapshot(questions);
@@ -88,19 +76,39 @@
 
 <div class="container space-y-4">
 	{#each questions as q, i}
-		<Questionnaire>
-			<QuestionnaireProblem item={i + 1} />
+		<div class="rounded-md border p-4 shadow-sm">
+			<div class="mb-4 flex justify-end">
+				<Button variant="ghost" size="icon">
+					<Trash />
+				</Button>
+			</div>
+
+			<RichText
+				class="mb-4 rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
+				plugins={({ schema }) => [bindContentToProxy(schema, q.question)]}
+			>
+				<p class="mb-2 text-muted-foreground">Problem {i + 1}</p>
+			</RichText>
 
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-				<QuestionnaireChoice name="problem-1" value="A" />
-				<QuestionnaireChoice name="problem-1" value="B" />
-				<QuestionnaireChoice name="problem-1" value="C" />
-				<QuestionnaireChoice name="problem-1" value="D" />
+				{#each { length: 4 } as _, i}
+					{@const choices = ['A', 'B', 'C', 'D']}
+
+					<div
+						class="grid grid-cols-[auto_1fr] rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
+					>
+						<div class="mr-4">
+							<input type="radio" name="problem-1" />
+							<label for="" class="text-muted-foreground">{choices[i]}</label>
+						</div>
+						<RichText></RichText>
+					</div>
+				{/each}
 			</div>
-		</Questionnaire>
+		</div>
 	{/each}
 	<div class="flex justify-center gap-2">
-		<Button onclick={() => questions.push(new Question())}>Add new</Button>
+		<Button onclick={() => questions.push({ question: { value: '' } })}>Add new</Button>
 		<Button onclick={save}>Save</Button>
 	</div>
 </div>
