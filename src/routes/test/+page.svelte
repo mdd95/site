@@ -28,7 +28,17 @@
 	const editor = new Editor();
 	editor.activeMarks = new ActiveMarks();
 
-	let questions: Array<any> = $state([]);
+	class Question {
+		question = $state('');
+		choices: Array<string> = $state([]);
+		answer = $state('');
+	}
+	let questions: Array<Question> = $state([]);
+
+	function save() {
+		const q = $state.snapshot(questions);
+		console.log(q);
+	}
 </script>
 
 {#snippet avatar()}
@@ -90,8 +100,8 @@
 		</Questionnaire>
 	{/each}
 	<div class="flex justify-center gap-2">
-		<Button onclick={() => questions.push({})}>Add new</Button>
-		<Button>Save</Button>
+		<Button onclick={() => questions.push(new Question())}>Add new</Button>
+		<Button onclick={save}>Save</Button>
 	</div>
 </div>
 
