@@ -1,6 +1,25 @@
 <script lang="ts">
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle
+	} from '@/components/ui/alert-dialog/index.js';
 	import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar/index.js';
 	import { Button } from '@/components/ui/button/index.js';
+	import {
+		Dialog,
+		DialogContent,
+		DialogDescription,
+		DialogFooter,
+		DialogHeader,
+		DialogTitle,
+		DialogTrigger
+	} from '@/components/ui/dialog/index.js';
 	import {
 		DropdownMenu,
 		DropdownMenuContent,
@@ -10,6 +29,7 @@
 		DropdownMenuSeparator,
 		DropdownMenuTrigger
 	} from '@/components/ui/dropdown-menu/index.js';
+	import { ScrollArea } from '@/components/ui/scroll-area/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
 	import { RichText, bindContentToProxy } from '@/components/rich-text/index.js';
 	import Trash from 'svelte-radix/Trash.svelte';
@@ -27,6 +47,8 @@
 		const q = $state.snapshot(questions);
 		console.log(q);
 	}
+
+	let openAlertDialog = $state(false);
 </script>
 
 {#snippet avatar()}
@@ -70,13 +92,9 @@
 	</div>
 </header>
 
-<div class="container flex h-16 items-center">
-	<Button>Create</Button>
-</div>
-
-<div class="container space-y-4">
+{#snippet createForm()}
 	{#each questions as q, i}
-		<div class="rounded-md border p-4 shadow-sm">
+		<div class="px-2">
 			<div class="mb-4 flex justify-end">
 				<Button
 					variant="ghost"
@@ -116,24 +134,75 @@
 			</div>
 		</div>
 	{/each}
-	<div class="flex justify-center gap-2">
-		<Button
-			onclick={() =>
-				questions.push({
-					id: crypto.randomUUID(),
-					question: { value: '' },
-					choices: [
-						{ name: 'A', value: '' },
-						{ name: 'B', value: '' },
-						{ name: 'C', value: '' },
-						{ name: 'D', value: '' }
-					]
-				})}
+{/snippet}
+
+{#snippet alertOnClose()}
+	<AlertDialog bind:open={openAlertDialog}>
+		<AlertDialogContent>
+			<AlertDialogHeader>
+				<AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+				<AlertDialogDescription>
+					You have unsaved changes. Are you sure you want to leave this page?
+				</AlertDialogDescription>
+			</AlertDialogHeader>
+			<AlertDialogFooter>
+				<AlertDialogCancel>Cancel</AlertDialogCancel>
+				<AlertDialogAction>Leave</AlertDialogAction>
+			</AlertDialogFooter>
+		</AlertDialogContent>
+	</AlertDialog>
+{/snippet}
+
+{#snippet createDialog()}
+	<Dialog>
+		<DialogTrigger>
+			{#snippet child({ props })}
+				<Button {...props}>Create</Button>
+			{/snippet}
+		</DialogTrigger>
+		<DialogContent
+			class="w-[calc(100%-2rem)] max-w-2xl"
+			onInteractOutside={(e) => {
+				e.preventDefault();
+				openAlertDialog = true;
+			}}
+			onEscapeKeydown={(e) => {
+				e.preventDefault();
+				openAlertDialog = true;
+			}}
 		>
-			Add new
-		</Button>
-		<Button onclick={save}>Save</Button>
-	</div>
+			<DialogHeader>
+				<DialogTitle>New problem set</DialogTitle>
+				<DialogDescription>Create a new set of problems</DialogDescription>
+			</DialogHeader>
+			<ScrollArea class="px-4">
+				{@render createForm()}
+			</ScrollArea>
+			<DialogFooter>
+				<Button
+					onclick={() =>
+						questions.push({
+							id: crypto.randomUUID(),
+							question: { value: '' },
+							choices: [
+								{ name: 'A', value: '' },
+								{ name: 'B', value: '' },
+								{ name: 'C', value: '' },
+								{ name: 'D', value: '' }
+							]
+						})}
+				>
+					Add new
+				</Button>
+				<Button onclick={save}>Save</Button>
+			</DialogFooter>
+		</DialogContent>
+		{@render alertOnClose()}
+	</Dialog>
+{/snippet}
+
+<div class="container flex h-16 items-center">
+	{@render createDialog()}
 </div>
 
 <style>
