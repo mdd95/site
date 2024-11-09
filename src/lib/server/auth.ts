@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { encodeHexLowerCase } from '@oslojs/encoding';
+import { generateId } from './utils.js';
 import { db } from './db/index.js';
 import * as table from './db/schema.js';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -8,10 +9,6 @@ import type { RequestEvent } from '@sveltejs/kit';
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
 export const sessionCookieName = 'auth_session';
-
-export function generateId(length: number): string {
-	return encodeBase64url(crypto.getRandomValues(new Uint8Array(length)));
-}
 
 export function generateSessionToken(): string {
 	return generateId(18);
@@ -32,7 +29,7 @@ export async function validateSessionToken(token: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
-			user: { id: table.user.id, username: table.user.username },
+			user: { id: table.user.id },
 			session: table.session
 		})
 		.from(table.session)

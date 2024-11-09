@@ -203,6 +203,10 @@
 
 <div class="container flex h-16 items-center">
 	{@render createDialog()}
+
+	<form method="post">
+		<Button type="submit">Create</Button>
+	</form>
 </div>
 
 <style>
