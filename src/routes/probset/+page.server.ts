@@ -1,10 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { createProblemSet } from '@/server/db';
+import { createProblemSet, getProblemSetList } from '@/server/db';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user;
-	return { user };
+	if (locals.user !== null) {
+		const result = await getProblemSetList(locals.user.id);
+		return { user, result };
+	}
+	return { user: null, result: null };
 };
 
 export const actions: Actions = {

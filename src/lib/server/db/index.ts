@@ -14,7 +14,19 @@ export async function createProblemSet(userId: string, content: any): Promise<{ 
 	return { id };
 }
 
+export async function getProblemSetList(userId: string): Promise<table.ProblemSet[]> {
+	const result = await db
+		.select()
+		.from(table.problemSet)
+		.where(eq(table.problemSet.userId, userId));
+	return result;
+}
+
 export async function getProblemSetById(id: string): Promise<table.ProblemSet | undefined> {
 	const [result] = await db.select().from(table.problemSet).where(eq(table.problemSet.id, id));
 	return result;
+}
+
+export async function updateProblemSet(id: string, content: any): Promise<void> {
+	await db.update(table.problemSet).set({ content }).where(eq(table.problemSet.id, id));
 }
