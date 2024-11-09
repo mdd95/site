@@ -1,11 +1,9 @@
-import type { RequestEvent } from '@sveltejs/kit';
-
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { db } from '$lib/server/db/index.js';
-import { tableUser, type User } from './db/schema/user.js';
-import { tableSession, type Session } from './db/schema/session.js';
+import { db } from './db/index.js';
+import * as table from './db/schema.js';
+import type { RequestEvent } from '@sveltejs/kit';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -21,12 +19,12 @@ export function generateSessionToken(): string {
 
 export async function createSession(token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: Session = {
+	const session: table.Session = {
 		id: sessionId,
 		userId,
 		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
 	};
-	await db.insert(tableSession).values(session);
+	await db.insert(table.session).values(session);
 	return session;
 }
 
@@ -34,12 +32,12 @@ export async function validateSessionToken(token: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
-			user: { id: tableUser.id, username: tableUser.username },
-			session: tableSession
+			user: { id: table.user.id, username: table.user.username },
+			session: table.session
 		})
-		.from(tableSession)
-		.innerJoin(tableUser, eq(tableSession.userId, tableUser.id))
-		.where(eq(tableSession.id, sessionId));
+		.from(table.session)
+		.innerJoin(table.user, eq(table.session.userId, table.user.id))
+		.where(eq(table.session.id, sessionId));
 
 	if (!result) {
 		return { session: null, user: null };
@@ -48,7 +46,7 @@ export async function validateSessionToken(token: string) {
 
 	const sessionExpired = Date.now() >= session.expiresAt.getTime();
 	if (sessionExpired) {
-		await db.delete(tableSession).where(eq(tableSession.id, session.id));
+		await db.delete(table.session).where(eq(table.session.id, session.id));
 		return { session: null, user: null };
 	}
 
@@ -56,9 +54,9 @@ export async function validateSessionToken(token: string) {
 	if (renewSession) {
 		session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
 		await db
-			.update(tableSession)
+			.update(table.session)
 			.set({ expiresAt: session.expiresAt })
-			.where(eq(tableSession.id, session.id));
+			.where(eq(table.session.id, session.id));
 	}
 
 	return { session, user };
@@ -67,7 +65,7 @@ export async function validateSessionToken(token: string) {
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
 
 export async function invalidateSession(sessionId: string) {
-	await db.delete(tableSession).where(eq(tableSession.id, sessionId));
+	await db.delete(table.session).where(eq(table.session.id, sessionId));
 }
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
@@ -90,19 +88,19 @@ export async function createUserFromGoogleId(
 	avatarUrl: string
 ) {
 	const userId = generateId(15);
-	const user: Partial<User> & { id: string } = {
+	const user: Partial<table.User> & { id: string } = {
 		id: userId,
 		googleId,
 		googleEmail: email,
 		googleName: name,
 		googleAvatarUrl: avatarUrl
 	};
-	await db.insert(tableUser).values(user);
+	await db.insert(table.user).values(user);
 	return user;
 }
 
-export async function getUserFromGoogleId(googleId: string): Promise<User | null> {
-	const [result] = await db.select().from(tableUser).where(eq(tableUser.googleId, googleId));
+export async function getUserFromGoogleId(googleId: string): Promise<table.User | null> {
+	const [result] = await db.select().from(table.user).where(eq(table.user.googleId, googleId));
 	if (!result) return null;
 	return result;
 }
