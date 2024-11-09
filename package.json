@@ -50,6 +50,7 @@
 		"clsx": "^2.1.1",
 		"drizzle-orm": "^0.33.0",
 		"inter-ui": "^4.0.2",
+		"just-omit": "^2.2.0",
 		"mode-watcher": "^0.4.1",
 		"postgres": "^3.4.4",
 		"prosemirror-commands": "^1.6.2",

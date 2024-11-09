@@ -4,6 +4,7 @@ import { encodeHexLowerCase } from '@oslojs/encoding';
 import { generateId } from './utils.js';
 import { db } from './db/index.js';
 import * as table from './db/schema.js';
+import omit from 'just-omit';
 import type { RequestEvent } from '@sveltejs/kit';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -29,7 +30,7 @@ export async function validateSessionToken(token: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
-			user: { id: table.user.id },
+			user: table.user,
 			session: table.session
 		})
 		.from(table.session)
@@ -39,7 +40,8 @@ export async function validateSessionToken(token: string) {
 	if (!result) {
 		return { session: null, user: null };
 	}
-	const { session, user } = result;
+	const user = omit(result.user, 'passwordHash');
+	const session = result.session;
 
 	const sessionExpired = Date.now() >= session.expiresAt.getTime();
 	if (sessionExpired) {

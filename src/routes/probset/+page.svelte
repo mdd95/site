@@ -34,6 +34,7 @@
 	import { RichText, bindContentToProxy } from '@/components/rich-text/index.js';
 	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
+	import { cn } from '@/utils';
 
 	interface Props {
 		data: PageServerData;
@@ -49,28 +50,46 @@
 	}
 
 	let openAlertDialog = $state(false);
+
+	function getUsernameFromEmail(email: string) {
+		return email.split('@')[0];
+	}
+
+	type AvatarProps = {
+		username: string;
+		imgUrl: string;
+	};
 </script>
 
-{#snippet avatar()}
+{#snippet avatar({ imgUrl, username }: AvatarProps)}
 	<Avatar>
-		<AvatarImage src="" alt="user" />
-		<AvatarFallback>JD</AvatarFallback>
+		<AvatarImage src={imgUrl} alt={username} />
+		<AvatarFallback class="uppercase">{username.slice(0, 2)}</AvatarFallback>
 	</Avatar>
 {/snippet}
 
 {#snippet dropdown()}
 	<DropdownMenu>
 		<DropdownMenuTrigger>
-			{@render avatar()}
+			{@render avatar({
+				imgUrl: data.user?.googleAvatarUrl || '',
+				username: getUsernameFromEmail(data.user?.googleEmail || '')
+			})}
 		</DropdownMenuTrigger>
 		<DropdownMenuContent align="end" class="w-56">
 			<DropdownMenuGroup>
 				<DropdownMenuGroupHeading>
-					<p>John Doe</p>
-					<p class="text-muted-foreground">username@gmail.com</p>
+					<p>{data.user!.googleName}</p>
+					<p class="text-muted-foreground">{data.user!.googleEmail}</p>
 				</DropdownMenuGroupHeading>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem>Sign out</DropdownMenuItem>
+				<DropdownMenuItem class="w-full">
+					{#snippet child({ props })}
+						<form method="POST" action="/logout" style="display: contents;">
+							<button type="submit" {...props}>Sign out</button>
+						</form>
+					{/snippet}
+				</DropdownMenuItem>
 			</DropdownMenuGroup>
 		</DropdownMenuContent>
 	</DropdownMenu>
@@ -84,9 +103,9 @@
 		<div class="flex items-center">
 			<LightSwitch />
 			{#if data.user === null}
-				{@render dropdown()}
+				<Button href="/login/google" variant="ghost">Sign in with Google</Button>
 			{:else}
-				<Button variant="ghost">Sign in with Google</Button>
+				{@render dropdown()}
 			{/if}
 		</div>
 	</div>

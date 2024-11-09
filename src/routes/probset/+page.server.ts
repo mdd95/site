@@ -1,9 +1,10 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { createProblemSet } from '@/server/db';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = (event) => {
-	return { user: null };
+export const load: PageServerLoad = ({ locals }) => {
+	const user = locals.user;
+	return { user };
 };
 
 export const actions: Actions = {
@@ -11,6 +12,7 @@ export const actions: Actions = {
 		const user = event.locals.user;
 		if (!user) return fail(401);
 
-		await createProblemSet(user.id, []);
+		const { id } = await createProblemSet(user.id, []);
+		redirect(302, `/probset/${id}`);
 	}
 };
