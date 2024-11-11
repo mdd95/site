@@ -1,8 +1,18 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { bindContentToProxy, ProseMirror } from '@/components/prosemirror';
+	import {
+		createMathSchema,
+		insertMathCommand,
+		makeMathDisplayInputRule,
+		makeMathInlineInputRule,
+		mathPlugin,
+		REGEX_MATH_DISPLAY,
+		REGEX_MATH_INLINE
+	} from '@/components/prosemirror/plugins/math.js';
 	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
+	import { inputRules } from 'prosemirror-inputrules';
 
 	type Props = {
 		data: PageServerData;
@@ -45,7 +55,18 @@
 		<ProseMirror
 			class="mb-4 rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
 			content={prob.question.value}
-			plugins={({ schema }) => [bindContentToProxy(schema, prob.question)]}
+			extend={{ nodes: createMathSchema() }}
+			keymap={({ schema }) => ({ 'Alt-=': insertMathCommand(schema.nodes.math_inline) })}
+			plugins={({ schema }) => [
+				bindContentToProxy(schema, prob.question),
+				mathPlugin,
+				inputRules({
+					rules: [
+						makeMathInlineInputRule(REGEX_MATH_INLINE, schema.nodes.math_inline),
+						makeMathDisplayInputRule(REGEX_MATH_DISPLAY, schema.nodes.math_display)
+					]
+				})
+			]}
 		/>
 
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">

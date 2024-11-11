@@ -1,9 +1,17 @@
-import { NodeSelection, Plugin, PluginKey, TextSelection } from 'prosemirror-state';
-import { InputRule } from 'prosemirror-inputrules';
+import katex, { type KatexOptions } from 'katex';
+import 'katex/dist/katex.css';
+import './math.css';
 
-import type { NodeSpec, NodeType } from 'prosemirror-model';
-import type { Command, PluginSpec } from 'prosemirror-state';
-import type { EditorView, NodeView } from 'prosemirror-view';
+import { chainCommands, deleteSelection, newlineInCode } from 'prosemirror-commands';
+import { InputRule } from 'prosemirror-inputrules';
+import { keymap } from 'prosemirror-keymap';
+import { EditorState, NodeSelection, Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import { StepMap } from 'prosemirror-transform';
+import { EditorView } from 'prosemirror-view';
+
+import type { Node, NodeSpec, NodeType } from 'prosemirror-model';
+import type { Command, PluginSpec, Transaction } from 'prosemirror-state';
+import type { NodeView, NodeViewConstructor } from 'prosemirror-view';
 
 export interface MathPluginState {
 	macros: Record<string, string>;
@@ -19,33 +27,283 @@ export function createMathSchema(): Record<string, NodeSpec> {
 			content: 'text*',
 			inline: true,
 			atom: true,
-			toDOM: () => ['span', { 'data-node-type': 'math', 'data-display': 'inline' }, 0],
-			parseDOM: [{ tag: 'span' }]
+			toDOM: () => ['math-inline', { class: 'math-node' }, 0],
+			parseDOM: [{ tag: 'math-inline' }]
 		},
 		math_display: {
 			group: 'block math',
 			content: 'text*',
 			atom: true,
 			code: true,
-			toDOM: () => ['span', { 'data-node-type': 'math', 'data-display': 'block' }, 0],
-			parseDOM: [{ tag: '' }]
+			toDOM: () => ['math-display', { class: 'math-node' }, 0],
+			parseDOM: [{ tag: 'math-display' }]
 		}
 	};
 }
 
-export class MathView implements NodeView {
-	dom: HTMLElement;
+interface MathViewOptions {
+	tagName?: string;
+	katexOptions?: KatexOptions;
+}
 
-	constructor() {
-		this.dom = document.createElement('span');
-		this.dom.dataset.nodeType = 'math';
-		this.dom.dataset.display = 'inline';
+export class MathView implements NodeView {
+	#node: Node;
+	#outerView: EditorView;
+	#getPos: () => number | undefined;
+	#mathPluginKey: PluginKey<MathPluginState>;
+	#tagName: string;
+	#katexOptions: KatexOptions;
+
+	dom: HTMLElement;
+	#innerView: EditorView | undefined;
+	#mathRenderEl: HTMLElement | undefined;
+	#mathSrcEl: HTMLElement | undefined;
+
+	#isEditing: boolean;
+
+	constructor(
+		node: Node,
+		view: EditorView,
+		getPos: () => number | undefined,
+		options: MathViewOptions = {},
+		mathPluginKey: PluginKey<MathPluginState>
+	) {
+		this.#node = node;
+		this.#outerView = view;
+		this.#getPos = getPos;
+		this.#mathPluginKey = mathPluginKey;
+		this.#tagName = options.tagName || this.#node.type.name.replace('_', '-');
+		this.#katexOptions = Object.assign(
+			{ globalGroup: true, throwOnError: false },
+			options.katexOptions
+		);
+
+		this.dom = document.createElement(this.#tagName);
+		this.dom.classList.add('math-node');
+
+		this.#mathRenderEl = document.createElement('span');
+		this.#mathRenderEl.textContent = '';
+		this.#mathRenderEl.classList.add('math-render');
+		this.dom.appendChild(this.#mathRenderEl);
+
+		this.#mathSrcEl = document.createElement('span');
+		this.#mathSrcEl.classList.add('math-src');
+		this.#mathSrcEl.spellcheck = false;
+		this.dom.appendChild(this.#mathSrcEl);
+
+		this.#isEditing = false;
+
+		this.dom.addEventListener('click', this.ensureFocus.bind(this));
+		this.renderMath();
+	}
+
+	destroy() {
+		this.closeEditor(false);
+		if (this.#mathRenderEl) {
+			this.#mathRenderEl.remove();
+			this.#mathRenderEl = undefined;
+		}
+		if (this.#mathSrcEl) {
+			this.#mathSrcEl.remove();
+			this.#mathSrcEl = undefined;
+		}
+		this.dom.remove();
+	}
+
+	update(node: Node) {
+		if (!node.sameMarkup(this.#node)) return false;
+		this.#node = node;
+
+		if (this.#innerView) {
+			const state = this.#innerView.state;
+			let start = node.content.findDiffStart(state.doc.content);
+
+			if (start !== null) {
+				let diff = node.content.findDiffEnd(state.doc.content);
+				if (diff) {
+					let { a, b } = diff;
+					let overlap = start - Math.min(a, b);
+					if (overlap > 0) {
+						a += overlap;
+						b += overlap;
+					}
+					this.#innerView.dispatch(
+						state.tr
+							.replace(start, b, node.slice(start, a))
+							.setMeta('fromOutside', true)
+					);
+				}
+			}
+		}
+
+		if (!this.#isEditing) {
+			this.renderMath();
+		}
+		return true;
+	}
+
+	selectNode() {
+		if (!this.#outerView.editable) return;
+		this.dom.classList.add('ProseMirror-selectednode');
+		if (!this.#isEditing) this.openEditor();
+	}
+
+	deselectNode() {
+		this.dom.classList.remove('ProseMirror-selectednode');
+		if (this.#isEditing) this.closeEditor();
+	}
+
+	stopEvent(event: Event): boolean {
+		return (
+			event.target !== undefined &&
+			this.#innerView !== undefined &&
+			this.#innerView.dom.contains(event.target as globalThis.Node)
+		);
+	}
+
+	ignoreMutation() {
+		return true;
+	}
+
+	ensureFocus() {
+		if (this.#innerView && this.#outerView.hasFocus()) {
+			this.#innerView.focus();
+		}
+	}
+
+	renderMath() {
+		if (!this.#mathRenderEl) return;
+		const content = this.#node.content.firstChild;
+		const tex = content !== null ? content.textContent.trim() : '';
+
+		if (tex.length === 0) {
+			this.dom.classList.add('math-empty');
+
+			while (this.#mathRenderEl.firstChild) {
+				this.#mathRenderEl.firstChild.remove();
+			}
+			return;
+		} else {
+			this.dom.classList.remove('math-empty');
+		}
+
+		try {
+			katex.render(tex, this.#mathRenderEl, this.#katexOptions);
+			this.#mathRenderEl.classList.remove('parse-error');
+			this.dom.setAttribute('title', '');
+		} catch (err) {
+			this.#mathRenderEl.classList.add('parse-error');
+			this.dom.setAttribute('title', (err as any).message);
+		}
+	}
+
+	dispatchInner(tr: Transaction) {
+		if (!this.#innerView) return;
+		const { state, transactions } = this.#innerView.state.applyTransaction(tr);
+		this.#innerView.updateState(state);
+
+		if (!tr.getMeta('fromOutside')) {
+			const tr = this.#outerView.state.tr;
+			const offsetMap = StepMap.offset(this.#getPos()! + 1);
+
+			for (let i = 0; i < transactions.length; i++) {
+				const steps = transactions[i].steps;
+
+				for (let j = 0; j < steps.length; j++) {
+					const mapped = steps[j].map(offsetMap);
+					if (!mapped) throw Error('step discarded!');
+					tr.step(mapped);
+				}
+			}
+			if (tr.docChanged) this.#outerView.dispatch(tr);
+		}
+	}
+
+	openEditor() {
+		if (this.#innerView) {
+			console.warn('Math editor already open');
+		}
+
+		this.#innerView = new EditorView(this.#mathSrcEl!, {
+			state: EditorState.create({
+				doc: this.#node,
+				plugins: [
+					keymap({
+						Tab: (state, dispatch) => {
+							if (dispatch) {
+								dispatch(state.tr.insertText('\t'));
+							}
+							return true;
+						},
+						Backspace: chainCommands(deleteSelection, (state) => {
+							if (!state.selection.empty) return false;
+							if (this.#node.textContent.length > 0) return false;
+							this.#outerView.dispatch(this.#outerView.state.tr.insertText(''));
+							this.#outerView.focus();
+							return true;
+						}),
+						'Mod-Backspace': () => {
+							this.#outerView.dispatch(this.#outerView.state.tr.insertText(''));
+							this.#outerView.focus();
+							return true;
+						},
+						Enter: chainCommands(
+							newlineInCode,
+							collapseMathCommand(this.#outerView, 1, false)
+						),
+						'Mod-Enter': collapseMathCommand(this.#outerView, 1, false),
+						ArrowLeft: collapseMathCommand(this.#outerView, -1, true),
+						ArrowRight: collapseMathCommand(this.#outerView, 1, true),
+						ArrowUp: collapseMathCommand(this.#outerView, -1, true),
+						ArrowDown: collapseMathCommand(this.#outerView, 1, true)
+					})
+				]
+			}),
+			dispatchTransaction: this.dispatchInner.bind(this)
+		});
+
+		this.#innerView.focus();
+
+		const innerState = this.#innerView.state;
+		let prevCursorPos = this.#mathPluginKey.getState(this.#outerView.state)?.prevCursorPos;
+
+		if (prevCursorPos === undefined) {
+			console.warn('Unable to get previous cursor position');
+		}
+		prevCursorPos = prevCursorPos || 0;
+
+		const innerPos = prevCursorPos <= this.#getPos()! ? 0 : this.#node.nodeSize - 2;
+		this.#innerView.dispatch(
+			innerState.tr.setSelection(TextSelection.create(innerState.doc, innerPos))
+		);
+
+		this.#isEditing = true;
+	}
+
+	closeEditor(render = true) {
+		if (this.#innerView) {
+			this.#innerView.destroy();
+			this.#innerView = undefined;
+		}
+		if (render) this.renderMath();
+		this.#isEditing = false;
 	}
 }
 
-export function createMathView() {
-	return (): MathView => {
-		return new MathView();
+export function createMathView(displayMode: boolean): NodeViewConstructor {
+	return (node, view, getPos) => {
+		const pluginState = MATH_PLUGIN_KEY.getState(view.state);
+
+		if (!pluginState) {
+			throw new Error('Math plugin is not initialized');
+		}
+
+		const katexOptions: KatexOptions = {
+			displayMode,
+			macros: pluginState.macros
+		};
+
+		return new MathView(node, view, getPos, { katexOptions }, MATH_PLUGIN_KEY);
 	};
 }
 
@@ -61,13 +319,14 @@ export const mathPluginSpec: PluginSpec<MathPluginState> = {
 		apply(tr, value, oldState, newState) {
 			return {
 				macros: value.macros,
-				prevCursorPos: value.prevCursorPos
+				prevCursorPos: oldState.selection.from
 			};
 		}
 	},
 	props: {
 		nodeViews: {
-			math_inline: createMathView()
+			math_inline: createMathView(false),
+			math_display: createMathView(true)
 		}
 	}
 };

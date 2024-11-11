@@ -1,0 +1,86 @@
+.math-node {
+	min-width: 1em;
+	min-height: 1em;
+	font-size: 0.95em;
+	font-family: theme(fontFamily.mono);
+	cursor: auto;
+}
+
+.math-node.empty-math .math-render::before {
+	content: '(empty)';
+	color: theme(colors.red.500);
+}
+
+.math-node .math-render.parse-error::before {
+	content: '(math error)';
+	color: theme(colors.red.500);
+	cursor: help;
+}
+
+.math-node.ProseMirror-selectednode {
+	outline: none;
+}
+
+.math-node .math-src {
+	display: none;
+	color: theme(colors.accent.foreground);
+	tab-size: 4;
+}
+
+.math-node.ProseMirror-selectednode .math-src {
+	display: inline;
+}
+.math-node.ProseMirror-selectednode .math-render {
+	display: none;
+}
+
+math-inline {
+	display: inline;
+	white-space: nowrap;
+}
+
+math-inline .math-render {
+	display: inline-block;
+	font-size: 0.85em;
+	cursor: pointer;
+}
+
+math-inline .math-src .ProseMirror {
+	display: inline;
+	border-right: 1px solid transparent;
+	border-left: 1px solid transparent;
+}
+
+math-inline .math-src::after,
+math-inline .math-src::before {
+	content: '$';
+	color: theme(colors.muted.foreground);
+}
+
+math-display {
+	display: block;
+}
+
+math-display .math-render {
+	display: block;
+}
+
+math-display.ProseMirror-selectednode {
+	background-color: theme(colors.muted.DEFAULT);
+}
+
+math-display .math-src .ProseMirror {
+	width: 100%;
+	display: block;
+}
+
+math-display .math-src::after,
+math-display .math-src::before {
+	content: '$$';
+	text-align: left;
+	color: #b0b0b0;
+}
+
+math-display .katex-display {
+	margin: 0;
+}
