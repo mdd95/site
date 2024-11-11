@@ -6,7 +6,6 @@
 	import { baseKeymap, toggleMark } from 'prosemirror-commands';
 	import { history, redo, undo } from 'prosemirror-history';
 	import { DOMParser, type Schema } from 'prosemirror-model';
-	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import 'prosemirror-view/style/prosemirror.css';
 
@@ -14,7 +13,6 @@
 		ref?: HTMLDivElement;
 		content?: string;
 		plugins?: (params: { schema: Schema }) => Array<Plugin>;
-		children?: Snippet;
 	};
 
 	const noop = () => [];
@@ -47,9 +45,7 @@
 </script>
 
 <div bind:this={initial} hidden>{@html content}</div>
-<div bind:this={ref} {...restProps}>
-	{@render children?.()}
-</div>
+<div bind:this={ref} {...restProps}></div>
 
 <style>
 	:global(.ProseMirror:focus) {

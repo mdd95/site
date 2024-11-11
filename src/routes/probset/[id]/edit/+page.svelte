@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { bindContentToProxy, RichText } from '@/components/rich-text';
+	import { bindContentToProxy, ProseMirror } from '@/components/prosemirror';
 	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
 
@@ -42,13 +42,11 @@
 			</Button>
 		</div>
 
-		<RichText
+		<ProseMirror
 			class="mb-4 rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
 			content={prob.question.value}
 			plugins={({ schema }) => [bindContentToProxy(schema, prob.question)]}
-		>
-			<p class="mb-2 text-muted-foreground">Problem {i + 1}</p>
-		</RichText>
+		/>
 
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 			{#each prob.choices as choice}
@@ -59,10 +57,10 @@
 						<input type="radio" name="problem-1" />
 						<label for="" class="text-muted-foreground">{choice.name}</label>
 					</div>
-					<RichText
+					<ProseMirror
 						content={choice.value}
 						plugins={({ schema }) => [bindContentToProxy(schema, choice)]}
-					></RichText>
+					/>
 				</div>
 			{/each}
 		</div>
