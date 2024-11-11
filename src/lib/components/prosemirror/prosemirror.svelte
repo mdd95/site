@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EditorState, Plugin } from 'prosemirror-state';
+	import { EditorState, Plugin, type Command } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { marks, nodes } from 'prosemirror-schema-basic';
 	import { keymap } from 'prosemirror-keymap';
@@ -16,16 +16,16 @@
 			nodes?: Record<string, NodeSpec>;
 			marks?: Record<string, MarkSpec>;
 		};
+		keymap?: (params: { schema: Schema }) => Record<string, Command>;
 		plugins?: (params: { schema: Schema }) => Array<Plugin>;
 	};
 
-	const noop = () => [];
 	let {
 		ref = $bindable(),
 		content,
 		extend,
-		plugins = noop,
-		children,
+		keymap: customKeymap = () => ({}),
+		plugins = () => [],
 		...restProps
 	}: Props = $props();
 	let initial: HTMLDivElement;
@@ -45,7 +45,8 @@
 					'Mod-b': toggleMark(currentSchema.marks.strong),
 					'Mod-i': toggleMark(currentSchema.marks.em),
 					'Mod-z': undo,
-					'Mod-y': redo
+					'Mod-y': redo,
+					...customKeymap({ schema: currentSchema })
 				}),
 				history(),
 				...plugins({ schema: currentSchema })
