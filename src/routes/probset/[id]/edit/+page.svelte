@@ -2,6 +2,7 @@
 	import { Button } from '@/components/ui/button';
 	import { bindContentToProxy, ProseMirror } from '@/components/prosemirror';
 	import {
+		backspaceMathCommand,
 		createMathSchema,
 		insertMathCommand,
 		makeMathDisplayInputRule,
@@ -13,6 +14,13 @@
 	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
 	import { inputRules } from 'prosemirror-inputrules';
+	import { keymap } from 'prosemirror-keymap';
+	import {
+		chainCommands,
+		deleteSelection,
+		joinBackward,
+		selectNodeBackward
+	} from 'prosemirror-commands';
 
 	type Props = {
 		data: PageServerData;
@@ -60,6 +68,14 @@
 			plugins={({ schema }) => [
 				bindContentToProxy(schema, prob.question),
 				mathPlugin,
+				keymap({
+					Backspace: chainCommands(
+						deleteSelection,
+						backspaceMathCommand(),
+						joinBackward,
+						selectNodeBackward
+					)
+				}),
 				inputRules({
 					rules: [
 						makeMathInlineInputRule(REGEX_MATH_INLINE, schema.nodes.math_inline),

@@ -1,7 +1,6 @@
 .math-node {
 	min-width: 1em;
 	min-height: 1em;
-	font-size: 0.95em;
 	font-family: theme(fontFamily.mono);
 	cursor: auto;
 }
@@ -25,6 +24,7 @@
 	display: none;
 	color: theme(colors.accent.foreground);
 	tab-size: 4;
+	font-size: 0.85em;
 }
 
 .math-node.ProseMirror-selectednode .math-src {

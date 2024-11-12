@@ -33,8 +33,8 @@ export function createMathSchema(): Record<string, NodeSpec> {
 		math_display: {
 			group: 'block math',
 			content: 'text*',
+			inline: false,
 			atom: true,
-			code: true,
 			toDOM: () => ['math-display', { class: 'math-node' }, 0],
 			parseDOM: [{ tag: 'math-display' }]
 		}
@@ -386,21 +386,20 @@ export function collapseMathCommand(
 export function backspaceMathCommand(): Command {
 	return (state, dispatch) => {
 		const { $from } = state.selection;
-		const nodeBefore = $from.nodeBefore;
 
-		if (!nodeBefore) return false;
+		if (dispatch) {
+			if ($from.nodeBefore?.type.name === 'math_inline') {
+				const index = $from.index($from.depth);
+				const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
 
-		if (nodeBefore.type.name === 'math_inline') {
-			const index = $from.index($from.depth);
-			const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
-			if (dispatch) {
+				dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+			} else if ($from.parent.type.name === 'math_display') {
+				const index = $from.index($from.depth - 1);
+				const $beforePos = state.doc.resolve($from.posAtIndex(index, $from.depth - 1));
+
 				dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
 			}
-			return true;
-		} else if (nodeBefore.type.name === 'math_display') {
-			return false;
 		}
-
 		return false;
 	};
 }
