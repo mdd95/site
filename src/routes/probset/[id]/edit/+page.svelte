@@ -2,7 +2,7 @@
 	import { Button } from '@/components/ui/button';
 	import { bindContentToProxy, ProseMirror } from '@/components/prosemirror';
 	import {
-		backspaceMathCommand,
+		backspaceMath,
 		createMathSchema,
 		insertMathCommand,
 		makeMathDisplayInputRule,
@@ -14,7 +14,6 @@
 	import Trash from 'svelte-radix/Trash.svelte';
 	import type { PageServerData } from './$types';
 	import { inputRules } from 'prosemirror-inputrules';
-	import { keymap } from 'prosemirror-keymap';
 	import {
 		chainCommands,
 		deleteSelection,
@@ -64,18 +63,23 @@
 			class="mb-4 rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
 			content={prob.question.value}
 			extend={{ nodes: createMathSchema() }}
-			keymap={({ schema }) => ({ 'Alt-=': insertMathCommand(schema.nodes.math_inline) })}
+			keymap={({ schema }) => {
+				const backspace = chainCommands(
+					backspaceMath,
+					deleteSelection,
+					joinBackward,
+					selectNodeBackward
+				);
+				return {
+					Backspace: backspace,
+					'Mod-Backspace': backspace,
+					'Shift-Backspace': backspace,
+					'Alt-=': insertMathCommand(schema.nodes.math_inline)
+				};
+			}}
 			plugins={({ schema }) => [
 				bindContentToProxy(schema, prob.question),
 				mathPlugin,
-				keymap({
-					Backspace: chainCommands(
-						deleteSelection,
-						backspaceMathCommand(),
-						joinBackward,
-						selectNodeBackward
-					)
-				}),
 				inputRules({
 					rules: [
 						makeMathInlineInputRule(REGEX_MATH_INLINE, schema.nodes.math_inline),

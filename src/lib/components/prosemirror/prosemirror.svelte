@@ -3,7 +3,7 @@
 	import { EditorView } from 'prosemirror-view';
 	import { marks, nodes } from 'prosemirror-schema-basic';
 	import { keymap } from 'prosemirror-keymap';
-	import { baseKeymap, toggleMark } from 'prosemirror-commands';
+	import { pcBaseKeymap, toggleMark } from 'prosemirror-commands';
 	import { history, redo, undo } from 'prosemirror-history';
 	import { DOMParser, Schema, type MarkSpec, type NodeSpec } from 'prosemirror-model';
 	import type { HTMLAttributes } from 'svelte/elements';
@@ -41,7 +41,7 @@
 			schema: currentSchema,
 			plugins: [
 				keymap({
-					...baseKeymap,
+					...pcBaseKeymap,
 					'Mod-b': toggleMark(currentSchema.marks.strong),
 					'Mod-i': toggleMark(currentSchema.marks.em),
 					'Mod-z': undo,

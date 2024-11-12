@@ -401,26 +401,33 @@ export function collapseMathCommand(
 	};
 }
 
-export function backspaceMathCommand(): Command {
-	return (state, dispatch) => {
-		const { $from } = state.selection;
+export const backspaceMath: Command = (state, dispatch) => {
+	const { empty, $from, from } = state.selection;
 
-		if (dispatch) {
-			if ($from.nodeBefore?.type.name === 'math_inline') {
-				const index = $from.index($from.depth);
-				const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
+	if (empty && dispatch) {
+		if ($from.nodeBefore?.type.name === 'math_inline') {
+			const index = $from.index($from.depth);
+			const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
 
-				dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
-			} else if ($from.parent.type.name === 'math_display') {
-				const index = $from.index($from.depth - 1);
-				const $beforePos = state.doc.resolve($from.posAtIndex(index, $from.depth - 1));
+			dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+		} else if ($from.parent.type.name === 'math_display') {
+			const index = $from.index($from.depth - 1);
+			const $beforePos = state.doc.resolve($from.posAtIndex(index, $from.depth - 1));
 
-				dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
-			}
+			dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+		} else if (
+			$from.parentOffset === 0 &&
+			state.doc.resolve(from - 1).nodeBefore?.type.name === 'math_display'
+		) {
+			const index = $from.index($from.depth - 1);
+			const $beforePos = state.doc.resolve($from.posAtIndex(index - 1, $from.depth - 1));
+
+			dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+			return true;
 		}
-		return false;
-	};
-}
+	}
+	return false;
+};
 
 export const REGEX_MATH_INLINE = /\$(.+)\$/;
 export const REGEX_MATH_DISPLAY = /\$\$\s+$/;
