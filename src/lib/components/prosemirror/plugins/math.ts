@@ -255,7 +255,16 @@ export class MathView implements NodeView {
 						),
 						'Mod-Enter': chainCommands(
 							collapseMathCommand(this.#outerView, 1, false),
-							insertParagraphNode(this.#outerView)
+							(state) => {
+								if (!state.selection.empty) return false;
+
+								const view = this.#outerView;
+								const node = view.state.schema.nodes.paragraph.create();
+								const tr = view.state.tr.replaceSelectionWith(node);
+								view.dispatch(tr);
+
+								return true;
+							}
 						),
 						ArrowLeft: collapseMathCommand(this.#outerView, -1, true),
 						ArrowRight: collapseMathCommand(this.#outerView, 1, true),
@@ -379,12 +388,16 @@ export function collapseMathCommand(
 
 		if (dispatch) {
 			const targetPos = entry > 0 ? outerTo : outerFrom;
-			outerView.dispatch(
-				outerState.tr.setSelection(TextSelection.create(outerState.doc, targetPos))
-			);
+			const selection = TextSelection.create(outerState.doc, targetPos);
+			const tr = outerState.tr.setSelection(selection);
+
+			outerView.dispatch(tr);
 			outerView.focus();
+
+			const { $from } = outerView.state.selection;
+			if (!$from.nodeAfter) return false;
 		}
-		return false;
+		return true;
 	};
 }
 
@@ -406,18 +419,6 @@ export function backspaceMathCommand(): Command {
 			}
 		}
 		return false;
-	};
-}
-
-export function insertParagraphNode(view: EditorView): Command {
-	return (state) => {
-		if (!state.selection.empty) return false;
-
-		const node = view.state.schema.nodes.paragraph.create();
-		const tr = view.state.tr.replaceSelectionWith(node);
-		view.dispatch(tr);
-
-		return true;
 	};
 }
 
