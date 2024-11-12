@@ -35,6 +35,7 @@ export function createMathSchema(): Record<string, NodeSpec> {
 			content: 'text*',
 			inline: false,
 			atom: true,
+			code: true,
 			toDOM: () => ['math-display', { class: 'math-node' }, 0],
 			parseDOM: [{ tag: 'math-display' }]
 		}
@@ -73,10 +74,11 @@ export class MathView implements NodeView {
 		this.#getPos = getPos;
 		this.#mathPluginKey = mathPluginKey;
 		this.#tagName = options.tagName || this.#node.type.name.replace('_', '-');
-		this.#katexOptions = Object.assign(
-			{ globalGroup: true, throwOnError: false },
-			options.katexOptions
-		);
+		this.#katexOptions = {
+			globalGroup: true,
+			throwOnError: false,
+			...options.katexOptions
+		};
 
 		this.dom = document.createElement(this.#tagName);
 		this.dom.classList.add('math-node');
@@ -251,7 +253,10 @@ export class MathView implements NodeView {
 							newlineInCode,
 							collapseMathCommand(this.#outerView, 1, false)
 						),
-						'Mod-Enter': collapseMathCommand(this.#outerView, 1, false),
+						'Mod-Enter': chainCommands(
+							collapseMathCommand(this.#outerView, 1, false),
+							insertParagraphNode(this.#outerView)
+						),
 						ArrowLeft: collapseMathCommand(this.#outerView, -1, true),
 						ArrowRight: collapseMathCommand(this.#outerView, 1, true),
 						ArrowUp: collapseMathCommand(this.#outerView, -1, true),
@@ -379,7 +384,7 @@ export function collapseMathCommand(
 			);
 			outerView.focus();
 		}
-		return true;
+		return false;
 	};
 }
 
@@ -401,6 +406,18 @@ export function backspaceMathCommand(): Command {
 			}
 		}
 		return false;
+	};
+}
+
+export function insertParagraphNode(view: EditorView): Command {
+	return (state) => {
+		if (!state.selection.empty) return false;
+
+		const node = view.state.schema.nodes.paragraph.create();
+		const tr = view.state.tr.replaceSelectionWith(node);
+		view.dispatch(tr);
+
+		return true;
 	};
 }
 
