@@ -1,4 +1,4 @@
-import { json, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, json, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
 	id: varchar('id', { length: 255 }).primaryKey(),
@@ -18,6 +18,7 @@ export const session = pgTable('session', {
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
 		.references(() => user.id, { onDelete: 'cascade' }),
+	ipAddr: text('ip_addr'),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull()
 });
 export type Session = typeof session.$inferSelect;
@@ -26,8 +27,9 @@ export const problemSet = pgTable('problem_set', {
 	id: varchar('id', { length: 255 }).primaryKey(),
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
+		.references(() => user.id),
 	createAt: timestamp('create_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	content: json('content')
+	content: json('content'),
+	published: boolean('published').notNull().default(false)
 });
 export type ProblemSet = typeof problemSet.$inferSelect;
