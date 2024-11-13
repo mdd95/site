@@ -20,6 +20,7 @@
 		joinBackward,
 		selectNodeBackward
 	} from 'prosemirror-commands';
+	import { placeholder } from '@/prosemirror/plugins/placeholder.js';
 
 	type Props = {
 		data: PageServerData;
@@ -85,7 +86,8 @@
 						makeMathInlineInputRule(REGEX_MATH_INLINE, schema.nodes.math_inline),
 						makeMathDisplayInputRule(REGEX_MATH_DISPLAY, schema.nodes.math_display)
 					]
-				})
+				}),
+				placeholder('Enter your question...')
 			]}
 		/>
 
