@@ -1,38 +1,36 @@
-import { decodeIdToken, type OAuth2Tokens } from 'arctic';
+import { error, redirect } from '@sveltejs/kit';
 import { ObjectParser } from '@pilcrowjs/object-parser';
-import { google } from '$lib/server/oauth.js';
+import { decodeIdToken } from 'arctic';
+import { google } from '@/server/oauth.js';
 import {
-	createUserFromGoogleId,
-	getUserFromGoogleId,
 	createSession,
 	generateSessionToken,
-	setSessionTokenCookie
-} from '$lib/server/auth.js';
+	setSessionTokenCookie,
+	createUserFromGoogleId,
+	getUserIdFromGoogleId
+} from '@/server/auth.js';
 
-export async function GET(event) {
-	const storedState = event.cookies.get('google_oauth_state') ?? null;
-	const codeVerifier = event.cookies.get('google_code_verifier') ?? null;
+import type { OAuth2Tokens } from 'arctic';
+import type { RequestHandler } from './$types';
+
+export const GET: RequestHandler = async (event) => {
+	const storedState = event.cookies.get('google_oauth_state');
+	const codeVerifier = event.cookies.get('google_code_verifier');
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');
 
-	if (storedState === null || codeVerifier === null || code === null || state === null) {
-		return new Response('Please restart the process.', {
-			status: 400
-		});
+	if (!storedState || !codeVerifier || !code || !state) {
+		error(400, 'Please restart the process.');
 	}
 	if (storedState !== state) {
-		return new Response('Please restart the process.', {
-			status: 400
-		});
+		error(400, 'Please restart the process.');
 	}
 
 	let tokens: OAuth2Tokens;
 	try {
 		tokens = await google.validateAuthorizationCode(code, codeVerifier);
 	} catch (e) {
-		return new Response('Please restart the process.', {
-			status: 400
-		});
+		error(400, 'Please restart the process.');
 	}
 
 	const claims = decodeIdToken(tokens.idToken());
@@ -43,24 +41,15 @@ export async function GET(event) {
 	const picture = claimsParser.getString('picture');
 	const email = claimsParser.getString('email');
 
-	const existingUser = await getUserFromGoogleId(googleId);
-	if (existingUser !== null) {
-		const sessionToken = generateSessionToken();
-		const session = await createSession(sessionToken, existingUser.id);
-		setSessionTokenCookie(event, sessionToken, session.expiresAt);
-		return new Response(null, {
-			status: 302,
-			headers: { Location: '/' }
-		});
+	let userId = await getUserIdFromGoogleId(googleId);
+
+	if (!userId) {
+		userId = await createUserFromGoogleId(googleId, email, name, picture);
 	}
 
-	const user = await createUserFromGoogleId(googleId, email, name, picture);
 	const sessionToken = generateSessionToken();
-	const session = await createSession(sessionToken, user.id);
-	setSessionTokenCookie(event, sessionToken, session.expiresAt);
+	const session = await createSession(sessionToken, userId);
 
-	return new Response(null, {
-		status: 302,
-		headers: { Location: '/' }
-	});
-}
+	setSessionTokenCookie(event, sessionToken, session.expiresAt);
+	redirect(302, '/');
+};

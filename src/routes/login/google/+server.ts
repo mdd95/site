@@ -1,30 +1,24 @@
+import { redirect } from '@sveltejs/kit';
 import { generateCodeVerifier, generateState } from 'arctic';
-import { google } from '$lib/server/oauth.js';
+import { google } from '@/server/oauth.js';
 
-export function GET(event) {
+import type { CookieSerializeOptions } from 'cookie';
+import type { RequestHandler } from './$types';
+
+export const GET: RequestHandler = async (event) => {
 	const state = generateState();
 	const codeVerifier = generateCodeVerifier();
 	const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'profile', 'email']);
 
-	event.cookies.set('google_oauth_state', state, {
+	const cookieOptions = {
 		httpOnly: true,
 		maxAge: 60 * 10,
 		secure: import.meta.env.PROD,
 		path: '/',
 		sameSite: 'lax'
-	});
-	event.cookies.set('google_code_verifier', codeVerifier, {
-		httpOnly: true,
-		maxAge: 60 * 10,
-		secure: import.meta.env.PROD,
-		path: '/',
-		sameSite: 'lax'
-	});
+	} satisfies CookieSerializeOptions;
 
-	return new Response(null, {
-		status: 302,
-		headers: {
-			Location: url.toString()
-		}
-	});
-}
+	event.cookies.set('google_oauth_state', state, cookieOptions);
+	event.cookies.set('google_code_verifier', codeVerifier, cookieOptions);
+	redirect(302, url.toString());
+};

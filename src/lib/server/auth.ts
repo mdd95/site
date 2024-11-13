@@ -17,11 +17,13 @@ export function generateSessionToken(): string {
 
 export async function createSession(token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: table.Session = {
+	const session = {
 		id: sessionId,
 		userId,
-		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
+		expiresAt: new Date(Date.now() + DAY_IN_MS * 30),
+		ipAddr: ''
 	};
+
 	await db.insert(table.session).values(session);
 	return session;
 }
@@ -85,9 +87,9 @@ export async function createUserFromGoogleId(
 	email: string,
 	name: string,
 	avatarUrl: string
-) {
+): Promise<string> {
 	const userId = generateId(15);
-	const user: Partial<table.User> & { id: string } = {
+	const user = {
 		id: userId,
 		googleId,
 		googleEmail: email,
@@ -95,11 +97,10 @@ export async function createUserFromGoogleId(
 		googleAvatarUrl: avatarUrl
 	};
 	await db.insert(table.user).values(user);
-	return user;
+	return userId;
 }
 
-export async function getUserFromGoogleId(googleId: string): Promise<table.User | null> {
+export async function getUserIdFromGoogleId(googleId: string): Promise<string | undefined> {
 	const [result] = await db.select().from(table.user).where(eq(table.user.googleId, googleId));
-	if (!result) return null;
-	return result;
+	return result?.id;
 }
