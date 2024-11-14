@@ -29,7 +29,10 @@ export const problemSet = pgTable('problem_set', {
 		.notNull()
 		.references(() => user.id),
 	createAt: timestamp('create_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	title: text('title'),
 	content: json('content'),
-	published: boolean('published').notNull().default(false)
+	published: boolean('published').notNull().default(false),
+	encrypted: boolean('encrypted').notNull().default(false),
+	passwordHash: text('password_hash')
 });
 export type ProblemSet = typeof problemSet.$inferSelect;
