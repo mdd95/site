@@ -1,18 +1,11 @@
 <script lang="ts">
-	import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar/index.js';
 	import { Button } from '@/components/ui/button/index.js';
-	import {
-		DropdownMenu,
-		DropdownMenuContent,
-		DropdownMenuGroup,
-		DropdownMenuGroupHeading,
-		DropdownMenuItem,
-		DropdownMenuSeparator,
-		DropdownMenuTrigger
-	} from '@/components/ui/dropdown-menu/index.js';
+	import * as Avatar from '@/components/ui/avatar/index.js';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
 	import DataTable from './data-table.svelte';
 
+	import type { RowSelectionState } from '@tanstack/table-core';
 	import type { PageServerData } from './$types';
 
 	interface Props {
@@ -21,8 +14,20 @@
 
 	let { data }: Props = $props();
 
-	function getUsernameFromEmail(email: string) {
-		return email.split('@')[0];
+	let rowSelection = $state<RowSelectionState>({});
+	let items = $state.raw(data.result || []);
+
+	async function deleteSelected() {
+		if (items.length === 0) return;
+
+		const selectedId = Object.keys($state.snapshot(rowSelection)).map(Number);
+
+		for (const id of selectedId) {
+			const dataId = items[id].id;
+			await fetch(`/probset/${dataId}`, { method: 'DELETE' });
+		}
+		items = items.filter((_, i) => !selectedId.includes(i));
+		rowSelection = {};
 	}
 
 	type AvatarProps = {
@@ -32,37 +37,37 @@
 </script>
 
 {#snippet avatar({ imgUrl, username }: AvatarProps)}
-	<Avatar>
-		<AvatarImage src={imgUrl} alt={username} />
-		<AvatarFallback class="uppercase">{username.slice(0, 2)}</AvatarFallback>
-	</Avatar>
+	<Avatar.Root>
+		<Avatar.Image src={imgUrl} alt={username} />
+		<Avatar.Fallback class="uppercase">{username.slice(0, 2)}</Avatar.Fallback>
+	</Avatar.Root>
 {/snippet}
 
 {#snippet dropdown()}
-	<DropdownMenu>
-		<DropdownMenuTrigger>
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger>
 			{@render avatar({
 				imgUrl: data.user?.googleAvatarUrl || '',
-				username: getUsernameFromEmail(data.user?.googleEmail || '')
+				username: data.user?.googleEmail?.split('@')[0] || ''
 			})}
-		</DropdownMenuTrigger>
-		<DropdownMenuContent align="end" class="w-56">
-			<DropdownMenuGroup>
-				<DropdownMenuGroupHeading>
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content align="end" class="w-56">
+			<DropdownMenu.Group>
+				<DropdownMenu.GroupHeading>
 					<p>{data.user!.googleName}</p>
 					<p class="text-muted-foreground">{data.user!.googleEmail}</p>
-				</DropdownMenuGroupHeading>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem class="w-full">
+				</DropdownMenu.GroupHeading>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item class="w-full">
 					{#snippet child({ props })}
 						<form method="POST" action="/logout" style="display: contents;">
 							<button type="submit" {...props}>Sign out</button>
 						</form>
 					{/snippet}
-				</DropdownMenuItem>
-			</DropdownMenuGroup>
-		</DropdownMenuContent>
-	</DropdownMenu>
+				</DropdownMenu.Item>
+			</DropdownMenu.Group>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
 {/snippet}
 
 <header class="sticky top-0 z-50 border-b border-border/40 bg-background">
@@ -82,13 +87,17 @@
 </header>
 
 <div class="container">
-	<div class="py-4">
-		<form method="post">
+	<div class="flex justify-between py-4">
+		<form method="post" style="display: contents;">
 			<Button type="submit">Create</Button>
 		</form>
+
+		{#if Object.values(rowSelection).some((value) => value)}
+			<Button variant="destructive" onclick={deleteSelected}>Delete selected</Button>
+		{/if}
 	</div>
 
-	<DataTable data={data.result || []} />
+	<DataTable bind:data={items} bind:rowSelection />
 </div>
 
 <style>

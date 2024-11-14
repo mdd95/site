@@ -17,9 +17,10 @@
 
 	type Props = {
 		data: Array<ProblemSet>;
+		rowSelection: RowSelectionState;
 	};
 
-	let { data }: Props = $props();
+	let { data = $bindable(), rowSelection = $bindable({}) }: Props = $props();
 
 	const columns: ColumnDef<ProblemSet>[] = [
 		{
@@ -82,8 +83,6 @@
 			}
 		}
 	];
-
-	let rowSelection = $state<RowSelectionState>({});
 
 	const table = createSvelteTable({
 		get data() {
@@ -150,7 +149,20 @@
 				{/snippet}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item>Encrypt</DropdownMenu.Item>
-			<DropdownMenu.Item>Delete</DropdownMenu.Item>
+			<DropdownMenu.Item>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={async () => {
+							await fetch(`/probset/${id}`, { method: 'DELETE' });
+							data = data.filter((i) => i.id !== id);
+						}}
+						aria-label="Delete problem set"
+					>
+						Delete
+					</button>
+				{/snippet}
+			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 {/snippet}

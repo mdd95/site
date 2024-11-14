@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { DATABASE_URL } from '$env/static/private';
 import { generateId } from '../utils.js';
 import * as table from './schema.js';
+import { error } from '@sveltejs/kit';
 
 const client = postgres(DATABASE_URL);
 export const db = drizzle(client);
@@ -29,4 +30,15 @@ export async function getProblemSetById(id: string): Promise<table.ProblemSet | 
 
 export async function updateProblemSet(id: string, content: any): Promise<void> {
 	await db.update(table.problemSet).set({ content }).where(eq(table.problemSet.id, id));
+}
+
+export async function deleteProbSetById(user: any, id: string) {
+	const result = await db.select().from(table.problemSet).where(eq(table.problemSet.id, id));
+
+	if (result.length === 0) error(404, 'Not found');
+
+	const data = result[0];
+	if (data.userId !== user.id) error(401, 'Unauthorized');
+
+	await db.delete(table.problemSet).where(eq(table.problemSet.id, id));
 }
