@@ -10,7 +10,7 @@ export function placeholder(text = '') {
 
 				if (
 					doc.childCount === 1 &&
-					doc.firstChild!.isTextblock &&
+					doc.firstChild!.type.name === 'paragraph' &&
 					doc.firstChild!.content.size === 0
 				) {
 					const decoration = Decoration.node(0, doc.content.size, {
