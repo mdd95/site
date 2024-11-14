@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { getCoreRowModel } from '@tanstack/table-core';
+	import { Button } from '@/components/ui/button/index.js';
 	import { Checkbox } from '@/components/ui/checkbox/index.js';
 	import {
 		createSvelteTable,
 		FlexRender,
 		renderSnippet
 	} from '@/components/ui/data-table/index.js';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import * as Table from '@/components/ui/table/index.js';
+	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
 
 	import type { ColumnDef, RowSelectionState } from '@tanstack/table-core';
 	import type { CheckboxProps } from '@/components/ui/checkbox';
@@ -69,6 +72,14 @@
 					'aria-label': 'Publish'
 				});
 			}
+		},
+		{
+			id: 'actions',
+			cell: ({ row }) => {
+				return renderSnippet(cellRowActions, {
+					id: row.getValue('id') as string
+				});
+			}
 		}
 	];
 
@@ -98,6 +109,10 @@
 		id: string;
 		title: string;
 	};
+
+	type CellRowActionsProps = {
+		id: string;
+	};
 </script>
 
 {#snippet cellCheckbox({ ...props }: CheckboxProps)}
@@ -105,7 +120,39 @@
 {/snippet}
 
 {#snippet cellTitle({ id, title }: CellTitleProps)}
-	<a href="/probset/{id}" class="hover:underline">{title}</a>
+	<a
+		href="/probset/{id}"
+		class="font-medium text-blue-600 hover:underline dark:text-blue-500"
+		{title}
+	>
+		{title}
+	</a>
+{/snippet}
+
+{#snippet cellRowActions({ id }: CellRowActionsProps)}
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger>
+			{#snippet child({ props })}
+				<Button {...props} variant="ghost" size="icon">
+					<DotsHorizontal />
+				</Button>
+			{/snippet}
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content align="end">
+			<DropdownMenu.Group>
+				<DropdownMenu.GroupHeading>Actions</DropdownMenu.GroupHeading>
+				<DropdownMenu.Item>Copy link</DropdownMenu.Item>
+			</DropdownMenu.Group>
+			<DropdownMenu.Separator />
+			<DropdownMenu.Item>
+				{#snippet child({ props })}
+					<a {...props} href="/probset/{id}/edit">Edit</a>
+				{/snippet}
+			</DropdownMenu.Item>
+			<DropdownMenu.Item>Encrypt</DropdownMenu.Item>
+			<DropdownMenu.Item>Delete</DropdownMenu.Item>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
 {/snippet}
 
 <Table.Root>
