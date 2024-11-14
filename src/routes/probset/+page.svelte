@@ -11,6 +11,9 @@
 		DropdownMenuTrigger
 	} from '@/components/ui/dropdown-menu/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
+	import DataTable from './data-table.svelte';
+	import { columns } from './columns.js';
+
 	import type { PageServerData } from './$types';
 
 	interface Props {
@@ -79,21 +82,15 @@
 	</div>
 </header>
 
-<div class="container flex h-16 items-center">
-	<form method="post">
-		<Button type="submit">Create</Button>
-	</form>
-</div>
-
-{#if data.result !== null}
-	<div class="container">
-		{#each data.result as set, i}
-			<div>
-				<a href="/probset/{set.id}/edit">{set.id}</a>
-			</div>
-		{/each}
+<div class="container">
+	<div class="py-4">
+		<form method="post">
+			<Button type="submit">Create</Button>
+		</form>
 	</div>
-{/if}
+
+	<DataTable {columns} data={data.result || []} />
+</div>
 
 <style>
 	:global(.ProseMirror:focus) {
