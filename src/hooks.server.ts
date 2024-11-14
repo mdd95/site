@@ -1,7 +1,13 @@
-import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/auth.js';
-import { TokenBucket } from '$lib/server/rate-limit.js';
 import { sequence } from '@sveltejs/kit/hooks';
+import {
+	sessionCookieName,
+	setSessionTokenCookie,
+	deleteSessionTokenCookie,
+	validateSessionToken
+} from '@/server/auth.js';
+import { TokenBucket } from '@/server/rate-limit.js';
+
+import type { Handle } from '@sveltejs/kit';
 
 const bucket = new TokenBucket<string>(100, 1);
 
@@ -17,23 +23,22 @@ const handleRateLimit: Handle = async ({ event, resolve }) => {
 };
 
 const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
+	const sessionToken = event.cookies.get(sessionCookieName);
 	if (!sessionToken) {
 		event.locals.user = null;
 		event.locals.session = null;
 		return resolve(event);
 	}
 
-	const { session, user } = await auth.validateSessionToken(sessionToken);
+	const { session, user } = await validateSessionToken(sessionToken);
 	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+		setSessionTokenCookie(event, sessionToken, session.expiresAt);
 	} else {
-		auth.deleteSessionTokenCookie(event);
+		deleteSessionTokenCookie(event);
 	}
 
 	event.locals.user = user;
 	event.locals.session = session;
-
 	return resolve(event);
 };
 
