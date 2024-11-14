@@ -12,7 +12,6 @@
 	} from '@/components/ui/dropdown-menu/index.js';
 	import LightSwitch from '@/components/light-switch.svelte';
 	import DataTable from './data-table.svelte';
-	import { columns } from './columns.js';
 
 	import type { PageServerData } from './$types';
 
@@ -89,7 +88,7 @@
 		</form>
 	</div>
 
-	<DataTable {columns} data={data.result || []} />
+	<DataTable data={data.result || []} />
 </div>
 
 <style>

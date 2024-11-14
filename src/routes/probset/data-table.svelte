@@ -1,18 +1,50 @@
-<script lang="ts" generics="Data, Value">
+<script lang="ts">
 	import { getCoreRowModel } from '@tanstack/table-core';
-	import { createSvelteTable, FlexRender } from '@/components/ui/data-table/index.js';
+	import { Button } from '@/components/ui/button/index.js';
+	import { Checkbox } from '@/components/ui/checkbox/index.js';
+	import {
+		createSvelteTable,
+		FlexRender,
+		renderSnippet
+	} from '@/components/ui/data-table/index.js';
 	import * as Table from '@/components/ui/table/index.js';
 
 	import type { ColumnDef } from '@tanstack/table-core';
+	import type { ProblemSet } from '@/server/db/schema';
 
-	type DataTableProps<Data, Value> = {
-		columns: ColumnDef<Data, Value>[];
-		data: Data[];
+	type Props = {
+		data: Array<ProblemSet>;
 	};
 
-	type Props = {};
+	let { data }: Props = $props();
 
-	let { columns, data }: Props & DataTableProps<Data, Value> = $props();
+	const columns: ColumnDef<ProblemSet>[] = [
+		{
+			accessorKey: 'id',
+			header: 'ID',
+			cell: ({ row }) => {
+				return renderSnippet(snippetCellId, row.getValue('id'));
+			}
+		},
+		{
+			accessorKey: 'createAt',
+			header: 'Date Created',
+			cell: ({ row }) => {
+				const formatter = new Intl.DateTimeFormat('default', {
+					dateStyle: 'long',
+					timeStyle: 'short'
+				});
+				return formatter.format(row.getValue('createAt'));
+			}
+		},
+		{
+			accessorKey: 'published',
+			header: 'Published',
+			cell: ({ row }) => {
+				return renderSnippet(cellPublished, row.getValue('published'));
+			}
+		}
+	];
 
 	const table = createSvelteTable({
 		get data() {
@@ -22,6 +54,14 @@
 		getCoreRowModel: getCoreRowModel()
 	});
 </script>
+
+{#snippet snippetCellId(id: string)}
+	<Button variant="link" href="/probset/{id}">{id}</Button>
+{/snippet}
+
+{#snippet cellPublished(publihsed: boolean)}
+	<Checkbox checked={publihsed} />
+{/snippet}
 
 <Table.Root>
 	<Table.Header>
