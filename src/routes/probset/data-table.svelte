@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getCoreRowModel } from '@tanstack/table-core';
-	import { Button } from '@/components/ui/button/index.js';
 	import { Checkbox } from '@/components/ui/checkbox/index.js';
 	import {
 		createSvelteTable,
@@ -9,7 +8,8 @@
 	} from '@/components/ui/data-table/index.js';
 	import * as Table from '@/components/ui/table/index.js';
 
-	import type { ColumnDef } from '@tanstack/table-core';
+	import type { ColumnDef, RowSelectionState } from '@tanstack/table-core';
+	import type { CheckboxProps } from '@/components/ui/checkbox';
 	import type { ProblemSet } from '@/server/db/schema';
 
 	type Props = {
@@ -21,9 +21,32 @@
 	const columns: ColumnDef<ProblemSet>[] = [
 		{
 			accessorKey: 'id',
-			header: 'ID',
+			header: ({ table }) => {
+				return renderSnippet(cellCheckbox, {
+					checked: table.getIsAllRowsSelected(),
+					indeterminate:
+						table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+					onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
+					'aria-label': 'Select all rows'
+				});
+			},
+			cell: ({ row }) =>
+				renderSnippet(cellCheckbox, {
+					checked: row.getIsSelected(),
+					onCheckedChange: (value) => row.toggleSelected(!!value),
+					'aria-label': 'Select row'
+				}),
+			enableSorting: false,
+			enableHiding: false
+		},
+		{
+			accessorKey: 'title',
+			header: 'Title',
 			cell: ({ row }) => {
-				return renderSnippet(snippetCellId, row.getValue('id'));
+				return renderSnippet(cellTitle, {
+					id: row.getValue('id') as string,
+					title: (row.getValue('title') || 'Untitled problem set...') as string
+				});
 			}
 		},
 		{
@@ -41,26 +64,48 @@
 			accessorKey: 'published',
 			header: 'Published',
 			cell: ({ row }) => {
-				return renderSnippet(cellPublished, row.getValue('published'));
+				return renderSnippet(cellCheckbox, {
+					checked: row.getValue('published') as boolean,
+					'aria-label': 'Publish'
+				});
 			}
 		}
 	];
+
+	let rowSelection = $state<RowSelectionState>({});
 
 	const table = createSvelteTable({
 		get data() {
 			return data;
 		},
 		columns,
-		getCoreRowModel: getCoreRowModel()
+		getCoreRowModel: getCoreRowModel(),
+		state: {
+			get rowSelection() {
+				return rowSelection;
+			}
+		},
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				rowSelection = updater(rowSelection);
+			} else {
+				rowSelection = updater;
+			}
+		}
 	});
+
+	type CellTitleProps = {
+		id: string;
+		title: string;
+	};
 </script>
 
-{#snippet snippetCellId(id: string)}
-	<Button variant="link" href="/probset/{id}">{id}</Button>
+{#snippet cellCheckbox({ ...props }: CheckboxProps)}
+	<Checkbox {...props} />
 {/snippet}
 
-{#snippet cellPublished(publihsed: boolean)}
-	<Checkbox checked={publihsed} />
+{#snippet cellTitle({ id, title }: CellTitleProps)}
+	<a href="/probset/{id}" class="hover:underline">{title}</a>
 {/snippet}
 
 <Table.Root>

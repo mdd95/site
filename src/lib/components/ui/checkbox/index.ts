@@ -1,6 +1,9 @@
-import Root from './checkbox.svelte';
+import Root, { type CheckboxProps } from './checkbox.svelte';
+
 export {
 	Root,
+	type CheckboxProps as Props,
 	//
-	Root as Checkbox
+	Root as Checkbox,
+	type CheckboxProps as CheckboxProps
 };

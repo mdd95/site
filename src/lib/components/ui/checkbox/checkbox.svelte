@@ -1,5 +1,11 @@
+<script lang="ts" module>
+	import type { CheckboxRootProps, WithoutChildrenOrChild } from 'bits-ui';
+
+	export type CheckboxProps = WithoutChildrenOrChild<CheckboxRootProps>;
+</script>
+
 <script lang="ts">
-	import { Checkbox as CheckboxPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
+	import { Checkbox as CheckboxPrimitive } from 'bits-ui';
 	import Check from 'svelte-radix/Check.svelte';
 	import Minus from 'svelte-radix/Minus.svelte';
 	import { cn } from '@/utils.js';
@@ -10,7 +16,7 @@
 		checked = $bindable(false),
 		indeterminate = $bindable(false),
 		...restProps
-	}: WithoutChildrenOrChild<CheckboxPrimitive.RootProps> = $props();
+	}: CheckboxProps = $props();
 </script>
 
 <CheckboxPrimitive.Root
