@@ -21,10 +21,17 @@
 		if (items.length === 0) return;
 
 		const selectedId = Object.keys($state.snapshot(rowSelection)).map(Number);
-
-		for (const id of selectedId) {
-			const dataId = items[id].id;
-			await fetch(`/probset/${dataId}`, { method: 'DELETE' });
+		const id = items.filter((_, i) => selectedId.includes(i)).map((item) => item.id);
+		try {
+			await fetch(`/problem_set`, {
+				method: 'DELETE',
+				body: JSON.stringify({ id }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		} catch (err) {
+			console.log(err);
 		}
 		items = items.filter((_, i) => !selectedId.includes(i));
 		rowSelection = {};

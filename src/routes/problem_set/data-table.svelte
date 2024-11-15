@@ -104,6 +104,22 @@
 		}
 	});
 
+	function removeRow(id: string) {
+		return async () => {
+			try {
+				await fetch('/problem_set', {
+					method: 'DELETE',
+					body: JSON.stringify({ id }),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+			} catch (err) {}
+
+			data = data.filter((row) => row.id !== id);
+		};
+	}
+
 	type CellTitleProps = {
 		id: string;
 		title: string;
@@ -119,13 +135,9 @@
 {/snippet}
 
 {#snippet cellTitle({ id, title }: CellTitleProps)}
-	<a
-		href="/probset/{id}"
-		class="font-medium text-blue-600 hover:underline dark:text-blue-500"
+	<Button variant="link" href="/problem_set/{id}" {title}>
 		{title}
-	>
-		{title}
-	</a>
+	</Button>
 {/snippet}
 
 {#snippet cellRowActions({ id }: CellRowActionsProps)}
@@ -137,7 +149,7 @@
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end">
+		<DropdownMenu.Content align="end" class="w-48">
 			<DropdownMenu.Group>
 				<DropdownMenu.GroupHeading>Actions</DropdownMenu.GroupHeading>
 				<DropdownMenu.Item>Copy link</DropdownMenu.Item>
@@ -145,63 +157,52 @@
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item>
 				{#snippet child({ props })}
-					<a {...props} href="/probset/{id}/edit">Edit</a>
+					<a {...props} href="/problem_set/{id}/edit">Edit</a>
 				{/snippet}
 			</DropdownMenu.Item>
-			<DropdownMenu.Item>Encrypt</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				{#snippet child({ props })}
-					<button
-						{...props}
-						onclick={async () => {
-							await fetch(`/probset/${id}`, { method: 'DELETE' });
-							data = data.filter((i) => i.id !== id);
-						}}
-						aria-label="Delete problem set"
-					>
-						Delete
-					</button>
-				{/snippet}
-			</DropdownMenu.Item>
+			<DropdownMenu.Item>Set a password</DropdownMenu.Item>
+			<DropdownMenu.Item onSelect={removeRow(id)}>Delete</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 {/snippet}
 
-<Table.Root>
-	<Table.Header>
-		{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-			<Table.Row>
-				{#each headerGroup.headers as header (header.id)}
-					<Table.Head>
-						{#if !header.isPlaceholder}
+<div class="rounded-md border">
+	<Table.Root>
+		<Table.Header>
+			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+				<Table.Row>
+					{#each headerGroup.headers as header (header.id)}
+						<Table.Head>
+							{#if !header.isPlaceholder}
+								<FlexRender
+									content={header.column.columnDef.header}
+									context={header.getContext()}
+								/>
+							{/if}
+						</Table.Head>
+					{/each}
+				</Table.Row>
+			{/each}
+		</Table.Header>
+		<Table.Body>
+			{#each table.getRowModel().rows as row (row.id)}
+				<Table.Row data-state={row.getIsSelected() && 'selected'}>
+					{#each row.getVisibleCells() as cell (cell.id)}
+						<Table.Cell>
 							<FlexRender
-								content={header.column.columnDef.header}
-								context={header.getContext()}
+								content={cell.column.columnDef.cell}
+								context={cell.getContext()}
 							/>
-						{/if}
-					</Table.Head>
-				{/each}
-			</Table.Row>
-		{/each}
-	</Table.Header>
-	<Table.Body>
-		{#each table.getRowModel().rows as row (row.id)}
-			<Table.Row data-state={row.getIsSelected() && 'selected'}>
-				{#each row.getVisibleCells() as cell (cell.id)}
-					<Table.Cell>
-						<FlexRender
-							content={cell.column.columnDef.cell}
-							context={cell.getContext()}
-						/>
+						</Table.Cell>
+					{/each}
+				</Table.Row>
+			{:else}
+				<Table.Row>
+					<Table.Cell colspan={columns.length} class="h-40 text-center">
+						You have not created any problem sets
 					</Table.Cell>
-				{/each}
-			</Table.Row>
-		{:else}
-			<Table.Row>
-				<Table.Cell colspan={columns.length} class="h-24 text-center">
-					You have not created any problem sets.
-				</Table.Cell>
-			</Table.Row>
-		{/each}
-	</Table.Body>
-</Table.Root>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
+</div>
