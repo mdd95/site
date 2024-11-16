@@ -48,7 +48,7 @@
 
 		await fetch(`/problem_set/${data.result.id}/`, {
 			method: 'PATCH',
-			body: JSON.stringify(content),
+			body: JSON.stringify({ content }),
 			headers: {
 				'Content-Type': 'application/json'
 			}

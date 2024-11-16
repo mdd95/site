@@ -21,12 +21,13 @@ export const GET: RequestHandler = async (event) => {
 export const PATCH: RequestHandler = async (event) => {
 	if (!event.locals.user) error(401, 'Unauthorized');
 
+	const data = await event.request.json();
 	let result;
 
 	try {
 		result = await db
 			.update(table.problemSet)
-			.set({})
+			.set(data)
 			.where(
 				and(
 					eq(table.problemSet.id, event.params.id),
