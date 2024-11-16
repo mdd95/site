@@ -28,11 +28,11 @@
 
 	let { data }: Props = $props();
 
-	let problems = $state(data.content as any[]);
+	let problems = $state(data.result.content as any[]);
 
 	async function save() {
 		const content = $state.snapshot(problems);
-		await fetch(`/probset/${data.id}/edit/`, {
+		await fetch(`/problem_set/${data.result.id}/`, {
 			method: 'PATCH',
 			body: JSON.stringify(content),
 			headers: {

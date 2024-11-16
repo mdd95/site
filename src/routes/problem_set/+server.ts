@@ -1,5 +1,6 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import { error, json } from '@sveltejs/kit';
+import { generateId } from '@/server/utils.js';
 import { db } from '@/server/db/index.js';
 import * as table from '@/server/db/schema.js';
 
@@ -16,9 +17,30 @@ export const GET: RequestHandler = async (event) => {
 			.from(table.problemSet)
 			.where(eq(table.problemSet.userId, event.locals.user.id))
 			.limit(20);
-	} catch (err) {}
+	} catch (err) {
+		error(500, 'Internal server error');
+	}
 
 	if (!result) error(404, 'Not found');
+	return json(result);
+};
+
+export const POST: RequestHandler = async (event) => {
+	if (!event.locals.user) error(401, 'Unauthorized');
+
+	let result;
+
+	try {
+		result = await db
+			.insert(table.problemSet)
+			.values({
+				id: generateId(18),
+				userId: event.locals.user.id
+			})
+			.returning();
+	} catch (err) {
+		error(500, 'Internal server error');
+	}
 	return json(result);
 };
 

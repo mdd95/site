@@ -61,7 +61,12 @@
 					dateStyle: 'long',
 					timeStyle: 'short'
 				});
-				return formatter.format(row.getValue('createAt'));
+				const date = row.getValue('createAt');
+
+				if (typeof date === 'string') {
+					return formatter.format(new Date(date));
+				}
+				return date;
 			}
 		},
 		{

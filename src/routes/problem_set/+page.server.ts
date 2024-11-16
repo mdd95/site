@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { generateId } from '@/server/utils.js';
 import { db } from '@/server/db/index.js';
@@ -11,15 +10,13 @@ export const load: PageServerLoad = async (event) => {
 		return { user: null, result: null };
 	}
 
-	let result;
-
-	try {
-		result = await db
-			.select()
-			.from(table.problemSet)
-			.where(eq(table.problemSet.userId, event.locals.user.id))
-			.limit(20);
-	} catch (err) {}
+	const response = await event.fetch('/problem_set', {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json'
+		}
+	});
+	const result = await response.json();
 
 	return { user: event.locals.user, result };
 };
