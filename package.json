@@ -23,7 +23,7 @@
 		"@types/eslint": "^9.6.0",
 		"@types/node": "^22.8.6",
 		"autoprefixer": "^10.4.20",
-		"bits-ui": "^1.0.0-next.54",
+		"bits-ui": "^1.0.0-next.58",
 		"drizzle-kit": "^0.22.0",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
