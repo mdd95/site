@@ -1,6 +1,6 @@
 import katex, { type KatexOptions } from 'katex';
 import 'katex/dist/katex.css';
-import './math.css';
+import '../styles/math.css';
 
 import { chainCommands, deleteSelection, newlineInCode } from 'prosemirror-commands';
 import { InputRule } from 'prosemirror-inputrules';
@@ -9,7 +9,7 @@ import { EditorState, NodeSelection, Plugin, PluginKey, TextSelection } from 'pr
 import { StepMap } from 'prosemirror-transform';
 import { EditorView } from 'prosemirror-view';
 
-import type { Node, NodeSpec, NodeType } from 'prosemirror-model';
+import type { MarkSpec, Node, NodeSpec, NodeType } from 'prosemirror-model';
 import type { Command, PluginSpec, Transaction } from 'prosemirror-state';
 import type { NodeView, NodeViewConstructor } from 'prosemirror-view';
 
@@ -20,8 +20,11 @@ export interface MathPluginState {
 
 export const MATH_PLUGIN_KEY = new PluginKey<MathPluginState>('prosemirror-math');
 
-export function createMathSchema(): Record<string, NodeSpec> {
-	return {
+export const mathSchemaSpec: {
+	nodes: Record<string, NodeSpec>;
+	marks: Record<string, MarkSpec>;
+} = {
+	nodes: {
 		math_inline: {
 			group: 'inline math',
 			content: 'text*',
@@ -39,8 +42,9 @@ export function createMathSchema(): Record<string, NodeSpec> {
 			toDOM: () => ['math-display', { class: 'math-node' }, 0],
 			parseDOM: [{ tag: 'math-display' }]
 		}
-	};
-}
+	},
+	marks: {}
+};
 
 interface MathViewOptions {
 	tagName?: string;
@@ -304,7 +308,7 @@ export class MathView implements NodeView {
 	}
 }
 
-export function createMathView(displayMode: boolean): NodeViewConstructor {
+function createMathView(displayMode: boolean): NodeViewConstructor {
 	return (node, view, getPos) => {
 		const pluginState = MATH_PLUGIN_KEY.getState(view.state);
 
@@ -324,13 +328,13 @@ export function createMathView(displayMode: boolean): NodeViewConstructor {
 export const mathPluginSpec: PluginSpec<MathPluginState> = {
 	key: MATH_PLUGIN_KEY,
 	state: {
-		init(config, instance) {
+		init() {
 			return {
 				macros: {},
 				prevCursorPos: 0
 			};
 		},
-		apply(tr, value, oldState, newState) {
+		apply(_, value, oldState) {
 			return {
 				macros: value.macros,
 				prevCursorPos: oldState.selection.from

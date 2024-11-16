@@ -1,8 +1,8 @@
 import { Plugin } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-import './placeholder.css';
+import '../styles/placeholder.css';
 
-export function placeholder(text = '') {
+export function placeholder(text: string) {
 	return new Plugin({
 		props: {
 			decorations(state) {

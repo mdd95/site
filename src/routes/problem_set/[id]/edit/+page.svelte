@@ -1,26 +1,11 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { bindContentToProxy, ProseMirror } from '@/components/prosemirror';
-	import {
-		backspaceMath,
-		createMathSchema,
-		insertMathCommand,
-		makeMathDisplayInputRule,
-		makeMathInlineInputRule,
-		mathPlugin,
-		REGEX_MATH_DISPLAY,
-		REGEX_MATH_INLINE
-	} from '@/components/prosemirror/plugins/math.js';
 	import Trash from 'svelte-radix/Trash.svelte';
+	import Question from './question.svelte';
+	import Choice from './choice.svelte';
+	import 'prosemirror-view/style/prosemirror.css';
+
 	import type { PageServerData } from './$types';
-	import { inputRules } from 'prosemirror-inputrules';
-	import {
-		chainCommands,
-		deleteSelection,
-		joinBackward,
-		selectNodeBackward
-	} from 'prosemirror-commands';
-	import { placeholder } from '@/prosemirror/plugins/placeholder.js';
 
 	type Props = {
 		data: PageServerData;
@@ -28,10 +13,17 @@
 
 	let { data }: Props = $props();
 
-	let problems = $state(data.result.content as any[]);
+	let problems = $state(
+		(data.result.content as {
+			id: string;
+			question: { value: string };
+			choices: { name: string; value: string }[];
+		}[]) || []
+	);
 
 	async function save() {
 		const content = $state.snapshot(problems);
+
 		await fetch(`/problem_set/${data.result.id}/`, {
 			method: 'PATCH',
 			body: JSON.stringify(content),
@@ -60,39 +52,16 @@
 			</Button>
 		</div>
 
-		<ProseMirror
+		<div
 			class="mb-4 rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
-			content={prob.question.value}
-			extend={{ nodes: createMathSchema() }}
-			keymap={({ schema }) => {
-				const backspace = chainCommands(
-					backspaceMath,
-					deleteSelection,
-					joinBackward,
-					selectNodeBackward
-				);
-				return {
-					Backspace: backspace,
-					'Mod-Backspace': backspace,
-					'Shift-Backspace': backspace,
-					'Alt-=': insertMathCommand(schema.nodes.math_inline)
-				};
-			}}
-			plugins={({ schema }) => [
-				bindContentToProxy(schema, prob.question),
-				mathPlugin,
-				inputRules({
-					rules: [
-						makeMathInlineInputRule(REGEX_MATH_INLINE, schema.nodes.math_inline),
-						makeMathDisplayInputRule(REGEX_MATH_DISPLAY, schema.nodes.math_display)
-					]
-				}),
-				placeholder('Enter your question...')
-			]}
-		/>
+		>
+			<Question bind:htmlContent={prob.question}>
+				{@html $state.snapshot(prob.question.value)}
+			</Question>
+		</div>
 
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-			{#each prob.choices as choice}
+			{#each prob.choices as choice, i}
 				<div
 					class="grid grid-cols-[auto_1fr] rounded-md border p-4 shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1"
 				>
@@ -100,10 +69,9 @@
 						<input type="radio" name="problem-1" />
 						<label for="" class="text-muted-foreground">{choice.name}</label>
 					</div>
-					<ProseMirror
-						content={choice.value}
-						plugins={({ schema }) => [bindContentToProxy(schema, choice)]}
-					/>
+					<Choice bind:htmlContent={prob.choices[i]}>
+						{@html $state.snapshot(choice.value)}
+					</Choice>
 				</div>
 			{/each}
 		</div>
@@ -114,6 +82,7 @@
 	<Button
 		onclick={() => {
 			problems.push({
+				id: crypto.randomUUID(),
 				question: { value: '' },
 				choices: [
 					{ name: 'A', value: '' },
@@ -126,3 +95,9 @@
 	>
 	<Button onclick={save}>Save</Button>
 </div>
+
+<style>
+	:global(.ProseMirror:focus) {
+		outline: none;
+	}
+</style>
