@@ -1,7 +1,5 @@
-import { error, fail, redirect } from '@sveltejs/kit';
-import { generateId } from '@/server/utils.js';
-import { db } from '@/server/db/index.js';
-import * as table from '@/server/db/schema.js';
+import { fail, redirect } from '@sveltejs/kit';
+import { table } from '@/server/db/index.js';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -16,7 +14,7 @@ export const load: PageServerLoad = async (event) => {
 			Accept: 'application/json'
 		}
 	});
-	const result = await response.json();
+	const result: table.ProblemSet[] = await response.json();
 
 	return { user: event.locals.user, result };
 };
@@ -27,18 +25,16 @@ export const actions: Actions = {
 			return fail(401, { message: 'Unauthorized' });
 		}
 
-		const data = {
-			id: generateId(18),
-			userId: event.locals.user.id,
-			title: ''
-		};
+		let result: table.ProblemSet;
 
 		try {
-			const r = await db.insert(table.problemSet).values(data);
-			console.log(r);
+			const response = await event.fetch('/problem_set', {
+				method: 'POST'
+			});
+			[result] = await response.json();
 		} catch (err) {
-			error(500, 'Internal server error');
+			return fail(500, { message: 'Internal server error' });
 		}
-		redirect(302, `/problem_set/${data.id}/edit`);
+		redirect(302, `/problem_set/${result.id}/edit`);
 	}
 };

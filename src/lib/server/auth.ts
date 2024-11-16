@@ -1,10 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeHexLowerCase } from '@oslojs/encoding';
-import { generateId } from './utils.js';
-import { db } from './db/index.js';
-import * as table from './db/schema.js';
+import { db, table, generateId } from './db/index.js';
 import omit from 'just-omit';
+
 import type { RequestEvent } from '@sveltejs/kit';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -80,27 +79,4 @@ export function deleteSessionTokenCookie(event: RequestEvent) {
 	event.cookies.delete(sessionCookieName, {
 		path: '/'
 	});
-}
-
-export async function createUserFromGoogleId(
-	googleId: string,
-	email: string,
-	name: string,
-	avatarUrl: string
-): Promise<string> {
-	const userId = generateId(15);
-	const user = {
-		id: userId,
-		googleId,
-		googleEmail: email,
-		googleName: name,
-		googleAvatarUrl: avatarUrl
-	};
-	await db.insert(table.user).values(user);
-	return userId;
-}
-
-export async function getUserIdFromGoogleId(googleId: string): Promise<string | undefined> {
-	const [result] = await db.select().from(table.user).where(eq(table.user.googleId, googleId));
-	return result?.id;
 }

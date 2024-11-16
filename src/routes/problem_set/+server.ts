@@ -1,7 +1,6 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import { error, json } from '@sveltejs/kit';
-import { generateId } from '@/server/utils.js';
-import { db } from '@/server/db/index.js';
+import { db, generateId } from '@/server/db/index.js';
 import * as table from '@/server/db/schema.js';
 
 import type { RequestHandler } from './$types';
