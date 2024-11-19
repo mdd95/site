@@ -1,21 +1,26 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import { error, json } from '@sveltejs/kit';
-import { db, generateId } from '@/server/db/index.js';
-import * as table from '@/server/db/schema.js';
+import { db, table, generateId } from '@/server/db/index.js';
+import { query } from './query.js';
 
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) error(401, 'Unauthorized');
 
+	const params = event.url.searchParams;
+	const limit = +(params.get('limit') ?? '10');
+	const offset = +(params.get('offset') ?? '0');
+
 	let result;
 
 	try {
 		result = await db
-			.select()
+			.select(query)
 			.from(table.problemSet)
 			.where(eq(table.problemSet.userId, event.locals.user.id))
-			.limit(20);
+			.limit(limit)
+			.offset(offset);
 	} catch (err) {
 		error(500, 'Internal server error');
 	}
@@ -36,7 +41,7 @@ export const POST: RequestHandler = async (event) => {
 				id: generateId(18),
 				userId: event.locals.user.id
 			})
-			.returning();
+			.returning(query);
 	} catch (err) {
 		error(500, 'Internal server error');
 	}
@@ -46,8 +51,8 @@ export const POST: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
 	if (!event.locals.user) error(401, 'Unauthorized');
 
-	const data = await event.request.json();
-	const id = data.id as string | string[] | undefined;
+	const params = await event.request.json();
+	const id = params.id as string | string[] | undefined;
 
 	if (!id) error(400, 'Bad request');
 	let result;
@@ -62,7 +67,7 @@ export const DELETE: RequestHandler = async (event) => {
 						eq(table.problemSet.id, id)
 					)
 				)
-				.returning();
+				.returning(query);
 		} else if (Array.isArray(id)) {
 			result = await db
 				.delete(table.problemSet)
@@ -72,7 +77,7 @@ export const DELETE: RequestHandler = async (event) => {
 						inArray(table.problemSet.id, id)
 					)
 				)
-				.returning();
+				.returning(query);
 		}
 	} catch (err) {
 		error(500, 'Internal server error');

@@ -13,16 +13,16 @@
 
 	import type { ColumnDef, RowSelectionState } from '@tanstack/table-core';
 	import type { CheckboxProps } from '@/components/ui/checkbox';
-	import type { ProblemSet } from '@/server/db/schema';
+	import type { ProblemSetData } from './query';
 
 	type Props = {
-		data: Array<ProblemSet>;
+		data: ProblemSetData[];
 		rowSelection: RowSelectionState;
 	};
 
 	let { data = $bindable(), rowSelection = $bindable({}) }: Props = $props();
 
-	const columns: ColumnDef<ProblemSet>[] = [
+	const columns: ColumnDef<ProblemSetData>[] = [
 		{
 			accessorKey: 'id',
 			header: ({ table }) => {
@@ -54,14 +54,30 @@
 			}
 		},
 		{
-			accessorKey: 'createAt',
+			accessorKey: 'createdAt',
 			header: 'Date Created',
 			cell: ({ row }) => {
 				const formatter = new Intl.DateTimeFormat('default', {
 					dateStyle: 'long',
 					timeStyle: 'short'
 				});
-				const date = row.getValue('createAt');
+				const date = row.getValue('createdAt');
+
+				if (typeof date === 'string') {
+					return formatter.format(new Date(date));
+				}
+				return date;
+			}
+		},
+		{
+			accessorKey: 'modifiedAt',
+			header: 'Date Modified',
+			cell: ({ row }) => {
+				const formatter = new Intl.DateTimeFormat('default', {
+					dateStyle: 'long',
+					timeStyle: 'short'
+				});
+				const date = row.getValue('modifiedAt');
 
 				if (typeof date === 'string') {
 					return formatter.format(new Date(date));
@@ -109,20 +125,18 @@
 		}
 	});
 
-	function removeRow(id: string) {
-		return async () => {
-			try {
-				await fetch('/problem_set', {
-					method: 'DELETE',
-					body: JSON.stringify({ id }),
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
-			} catch (err) {}
+	async function removeRow(id: string) {
+		try {
+			await fetch('/problem_set', {
+				method: 'DELETE',
+				body: JSON.stringify({ id }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		} catch (err) {}
 
-			data = data.filter((row) => row.id !== id);
-		};
+		data = data.filter((row) => row.id !== id);
 	}
 
 	type CellTitleProps = {
@@ -166,7 +180,7 @@
 				{/snippet}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item>Set a password</DropdownMenu.Item>
-			<DropdownMenu.Item onSelect={removeRow(id)}>Delete</DropdownMenu.Item>
+			<DropdownMenu.Item onSelect={() => removeRow(id)}>Delete</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 {/snippet}

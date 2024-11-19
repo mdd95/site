@@ -2,20 +2,20 @@ import { fail, redirect } from '@sveltejs/kit';
 import { table } from '@/server/db/index.js';
 
 import type { Actions, PageServerLoad } from './$types';
+import type { ProblemSetData } from './query';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		return { user: null, result: null };
 	}
 
-	const response = await event.fetch('/problem_set', {
+	const response = await event.fetch('/problem_set?limit=20&offset=0', {
 		method: 'GET',
 		headers: {
 			Accept: 'application/json'
 		}
 	});
-	const result: table.ProblemSet[] = await response.json();
-
+	const result: ProblemSetData[] = await response.json();
 	return { user: event.locals.user, result };
 };
 

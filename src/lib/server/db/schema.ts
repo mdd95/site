@@ -1,7 +1,10 @@
-import { boolean, json, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, json, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+
+export const userRole = pgEnum('user_role', ['USER', 'MODERATOR', 'ADMIN']);
 
 export const user = pgTable('user', {
 	id: varchar('id', { length: 255 }).primaryKey(),
+	role: userRole('role').notNull().default('USER'),
 	email: text('email').unique(),
 	username: text('username').unique(),
 	passwordHash: text('password_hash'),
@@ -19,6 +22,9 @@ export const session = pgTable('session', {
 		.notNull()
 		.references(() => user.id, { onDelete: 'cascade' }),
 	ipAddr: text('ip_addr'),
+	lastRefreshAt: timestamp('last_refresh_at', { withTimezone: true, mode: 'date' })
+		.notNull()
+		.defaultNow(),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull()
 });
 export type Session = typeof session.$inferSelect;
@@ -28,11 +34,14 @@ export const problemSet = pgTable('problem_set', {
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
 		.references(() => user.id),
-	createAt: timestamp('create_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	title: text('title'),
 	content: json('content'),
-	published: boolean('published').notNull().default(false),
-	encrypted: boolean('encrypted').notNull().default(false),
+	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	modifiedAt: timestamp('modified_at', { withTimezone: true, mode: 'date' })
+		.notNull()
+		.defaultNow(),
+	isPublished: boolean('is_published').notNull().default(false),
+	isEncrypted: boolean('is_encrypted').notNull().default(false),
 	passwordHash: text('password_hash')
 });
 export type ProblemSet = typeof problemSet.$inferSelect;

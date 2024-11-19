@@ -1,6 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { error, json } from '@sveltejs/kit';
 import { db, table } from '@/server/db/index.js';
+import { query } from '../query.js';
 
 import type { RequestHandler } from './$types';
 
@@ -9,7 +10,7 @@ export const GET: RequestHandler = async (event) => {
 
 	try {
 		result = await db
-			.select()
+			.select(query)
 			.from(table.problemSet)
 			.where(eq(table.problemSet.id, event.params.id));
 	} catch (err) {
@@ -34,7 +35,7 @@ export const PATCH: RequestHandler = async (event) => {
 					eq(table.problemSet.userId, event.locals.user.id)
 				)
 			)
-			.returning();
+			.returning(query);
 	} catch (err) {
 		error(500, 'Internal server error');
 	}
@@ -56,7 +57,7 @@ export const DELETE: RequestHandler = async (event) => {
 					eq(table.problemSet.userId, event.locals.user.id)
 				)
 			)
-			.returning();
+			.returning(query);
 	} catch (err) {
 		error(500, 'Internal server error');
 	}

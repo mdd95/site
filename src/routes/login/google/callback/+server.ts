@@ -2,7 +2,12 @@ import { error, redirect } from '@sveltejs/kit';
 import { decodeIdToken } from 'arctic';
 import { eq } from 'drizzle-orm';
 import { db, table, generateId } from '@/server/db/index.js';
-import { createSession, generateSessionToken, setSessionTokenCookie } from '@/server/auth.js';
+import {
+	createSession,
+	generateSessionToken,
+	setSessionTokenCookie,
+	userQuery
+} from '@/server/auth.js';
 import { google } from '@/server/oauth.js';
 
 import type { OAuth2Tokens } from 'arctic';
@@ -39,10 +44,13 @@ export const GET: RequestHandler = async (event) => {
 
 	const info = decodeIdToken(tokens.idToken()) as GoogleUser;
 
-	let user: table.User;
+	let user;
 
 	try {
-		[user] = await db.select().from(table.user).where(eq(table.user.googleId, info.sub));
+		[user] = await db
+			.select(userQuery)
+			.from(table.user)
+			.where(eq(table.user.googleId, info.sub));
 
 		if (!user) {
 			[user] = await db
@@ -54,7 +62,7 @@ export const GET: RequestHandler = async (event) => {
 					googleName: info.name,
 					googleAvatarUrl: info.picture
 				})
-				.returning();
+				.returning(userQuery);
 		}
 	} catch (err) {
 		error(500, 'Internal server error');
@@ -66,6 +74,7 @@ export const GET: RequestHandler = async (event) => {
 	const sessionToken = generateSessionToken();
 	const session = await createSession(sessionToken, user.id);
 
+	if (!session) error(500, 'Internal server error');
 	setSessionTokenCookie(event, sessionToken, session.expiresAt);
 	redirect(302, '/');
 };
