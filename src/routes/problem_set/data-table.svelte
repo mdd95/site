@@ -7,6 +7,7 @@
 		FlexRender,
 		renderSnippet
 	} from '@/components/ui/data-table/index.js';
+	import * as AlertDialog from '@/components/ui/alert-dialog/index.js';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import * as Table from '@/components/ui/table/index.js';
 	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
@@ -21,6 +22,23 @@
 	};
 
 	let { data = $bindable(), rowSelection = $bindable({}) }: Props = $props();
+
+	console.log(typeof data[0].createdAt);
+
+	type FilePropertiesMetadata = {
+		ID: string;
+		Title: string | null;
+		'Date Created': string;
+		'Date Modified': string;
+	};
+	type FileProperties = {
+		open: boolean;
+		metadata: FilePropertiesMetadata | null;
+	};
+	let fileProperties = $state<FileProperties>({
+		open: false,
+		metadata: null
+	});
 
 	const columns: ColumnDef<ProblemSetData>[] = [
 		{
@@ -54,38 +72,6 @@
 			}
 		},
 		{
-			accessorKey: 'createdAt',
-			header: 'Date Created',
-			cell: ({ row }) => {
-				const formatter = new Intl.DateTimeFormat('default', {
-					dateStyle: 'long',
-					timeStyle: 'short'
-				});
-				const date = row.getValue('createdAt');
-
-				if (typeof date === 'string') {
-					return formatter.format(new Date(date));
-				}
-				return date;
-			}
-		},
-		{
-			accessorKey: 'modifiedAt',
-			header: 'Date Modified',
-			cell: ({ row }) => {
-				const formatter = new Intl.DateTimeFormat('default', {
-					dateStyle: 'long',
-					timeStyle: 'short'
-				});
-				const date = row.getValue('modifiedAt');
-
-				if (typeof date === 'string') {
-					return formatter.format(new Date(date));
-				}
-				return date;
-			}
-		},
-		{
 			accessorKey: 'published',
 			header: 'Published',
 			cell: ({ row }) => {
@@ -98,8 +84,16 @@
 		{
 			id: 'actions',
 			cell: ({ row }) => {
+				const i = row.index;
+
 				return renderSnippet(cellRowActions, {
-					id: row.getValue('id') as string
+					id: data[i].id,
+					metadata: {
+						ID: data[i].id,
+						Title: data[i].title,
+						'Date Created': data[i].createdAt,
+						'Date Modified': data[i].modifiedAt
+					}
 				});
 			}
 		}
@@ -125,20 +119,6 @@
 		}
 	});
 
-	async function removeRow(id: string) {
-		try {
-			await fetch('/problem_set', {
-				method: 'DELETE',
-				body: JSON.stringify({ id }),
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-		} catch (err) {}
-
-		data = data.filter((row) => row.id !== id);
-	}
-
 	type CellTitleProps = {
 		id: string;
 		title: string;
@@ -146,6 +126,7 @@
 
 	type CellRowActionsProps = {
 		id: string;
+		metadata: FilePropertiesMetadata;
 	};
 </script>
 
@@ -154,12 +135,12 @@
 {/snippet}
 
 {#snippet cellTitle({ id, title }: CellTitleProps)}
-	<Button variant="link" href="/problem_set/{id}" {title}>
+	<Button variant="link" href="/problem_set/{id}" {title} class="w-full justify-start">
 		{title}
 	</Button>
 {/snippet}
 
-{#snippet cellRowActions({ id }: CellRowActionsProps)}
+{#snippet cellRowActions(row: CellRowActionsProps)}
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger>
 			{#snippet child({ props })}
@@ -176,14 +157,71 @@
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item>
 				{#snippet child({ props })}
-					<a {...props} href="/problem_set/{id}/edit">Edit</a>
+					<a {...props} href="/problem_set/{row.id}/edit">Edit</a>
 				{/snippet}
 			</DropdownMenu.Item>
 			<DropdownMenu.Item>Set a password</DropdownMenu.Item>
-			<DropdownMenu.Item onSelect={() => removeRow(id)}>Delete</DropdownMenu.Item>
+			<DropdownMenu.Item
+				onSelect={async () => {
+					try {
+						await fetch('/problem_set', {
+							method: 'DELETE',
+							body: JSON.stringify({ id: row.id }),
+							headers: {
+								'Content-Type': 'application/json'
+							}
+						});
+					} catch (err) {}
+
+					data = data.filter((_row) => _row.id !== row.id);
+				}}
+			>
+				Delete
+			</DropdownMenu.Item>
+			<DropdownMenu.Separator />
+			<DropdownMenu.Item
+				onSelect={() => {
+					fileProperties.open = true;
+					fileProperties.metadata = row.metadata;
+				}}
+			>
+				Properties
+			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 {/snippet}
+
+{#snippet tableProperties(metadata: FilePropertiesMetadata)}
+	<Table.Root>
+		<Table.Body>
+			{#each Object.entries(metadata) as [key, value]}
+				<Table.Row>
+					<Table.Cell class="font-bold">{key}</Table.Cell>
+					<Table.Cell>{value}</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
+{/snippet}
+
+<AlertDialog.Root
+	open={fileProperties.open}
+	onOpenChange={(open) => {
+		fileProperties.open = open;
+	}}
+>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Properties</AlertDialog.Title>
+		</AlertDialog.Header>
+		{#if fileProperties.metadata}
+			{@render tableProperties(fileProperties.metadata)}
+		{/if}
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel>Close</AlertDialog.Cancel>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
 
 <div class="rounded-md border">
 	<Table.Root>

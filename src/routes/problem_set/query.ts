@@ -10,4 +10,14 @@ export const query = {
 	isPublished: table.problemSet.isPublished,
 	isEncrypted: table.problemSet.isEncrypted
 };
-export type ProblemSetData = Omit<table.ProblemSet, 'passwordHash' | 'userId'>;
+
+// prettier-ignore
+export type ProblemSetData = {
+	id:          string,
+	title:       string,
+	content:     string,
+	createdAt:   string,
+	modifiedAt:  string,
+	isPublished: boolean,
+	isEncrypted: boolean
+};
