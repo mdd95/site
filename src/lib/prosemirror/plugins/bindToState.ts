@@ -13,30 +13,34 @@ function getHTMLDocumentContent(schema: Schema, view: EditorView): string {
 	return doc.render();
 }
 
-type _State = { value: string | number };
+type Proxy = { value: string | number };
 
-export function bindHTMLContentToState(schema: Schema, state: _State) {
+export function bindHTMLContentToState(schema: Schema, state?: Proxy) {
 	return new Plugin({
 		view() {
 			return {
 				update(view) {
-					state.value = getHTMLDocumentContent(schema, view);
+					if (state) {
+						state.value = getHTMLDocumentContent(schema, view);
+					}
 				}
 			};
 		}
 	});
 }
 
-export function bindWordCountToProxy(state: _State) {
+export function bindWordCountToProxy(state?: Proxy) {
 	return new Plugin({
 		view() {
 			return {
 				update(view) {
-					state.value = view.state.doc
-						.textBetween(0, view.state.doc.content.size, ' ', ' ')
-						.trim()
-						.split(/\s+/)
-						.filter((word) => word.length > 0).length;
+					if (state) {
+						state.value = view.state.doc
+							.textBetween(0, view.state.doc.content.size, ' ', ' ')
+							.trim()
+							.split(/\s+/)
+							.filter((word) => word.length > 0).length;
+					}
 				}
 			};
 		}

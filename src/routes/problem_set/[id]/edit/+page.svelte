@@ -18,8 +18,8 @@
 
 	type Item = {
 		id: string;
-		question: { value: string };
-		choices: { name: string; value: string }[];
+		question: '';
+		choices: string[];
 		answer: 0 | 1 | 2 | 3;
 	};
 
@@ -28,13 +28,8 @@
 	function newItem(): Item {
 		return {
 			id: useId(6),
-			question: { value: '' },
-			choices: [
-				{ name: 'A', value: '' },
-				{ name: 'B', value: '' },
-				{ name: 'C', value: '' },
-				{ name: 'D', value: '' }
-			],
+			question: '',
+			choices: ['', '', '', ''],
 			answer: 0
 		};
 	}
@@ -43,7 +38,7 @@
 		problems = problems.filter((item) => item.id !== id);
 	}
 
-	async function save() {
+	async function saveChanges() {
 		await fetch(`/problem_set/${data.result.id}/edit`, {
 			method: 'PATCH',
 			body: JSON.stringify({ content: $state.snapshot(problems) }),
@@ -81,7 +76,7 @@
 	</Breadcrumb.Root>
 
 	<div class="flex justify-end gap-2">
-		<Button onclick={save}>Save</Button>
+		<Button onclick={saveChanges}>Save</Button>
 		<Button variant="secondary">Settings</Button>
 	</div>
 
@@ -94,8 +89,17 @@
 			</div>
 
 			<div class="p-4">
-				<Question bind:htmlContent={problem.question}>
-					{@html $state.snapshot(problem.question.value)}
+				<Question
+					htmlContent={{
+						get value() {
+							return problem.question;
+						},
+						set value(v) {
+							problem.question = v;
+						}
+					}}
+				>
+					{@html $state.snapshot(problem.question)}
 				</Question>
 			</div>
 
@@ -104,10 +108,19 @@
 					<div class="grid grid-cols-[auto_1fr] p-4">
 						<div class="mr-4">
 							<input type="radio" name="problem-1" />
-							<label for="" class="text-muted-foreground">{choice.name}</label>
+							<label for="" class="text-muted-foreground">{i + 1}</label>
 						</div>
-						<Choice bind:htmlContent={problem.choices[i]}>
-							{@html $state.snapshot(choice.value)}
+						<Choice
+							htmlContent={{
+								get value() {
+									return choice;
+								},
+								set value(v) {
+									problem.choices[i] = v;
+								}
+							}}
+						>
+							{@html $state.snapshot(choice)}
 						</Choice>
 					</div>
 				{/each}

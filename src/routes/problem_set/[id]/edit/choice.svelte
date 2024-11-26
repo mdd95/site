@@ -14,7 +14,7 @@
 		htmlContent: { value: string };
 	};
 
-	let { children, htmlContent = $bindable() }: Props = $props();
+	let { children, htmlContent }: Props = $props();
 
 	let content: HTMLElement;
 	let editor: HTMLElement;
