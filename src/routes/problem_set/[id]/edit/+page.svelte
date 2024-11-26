@@ -44,11 +44,9 @@
 	}
 
 	async function save() {
-		const content = $state.snapshot(problems);
-
-		await fetch(`/problem_set/${data.result.id}/`, {
+		await fetch(`/problem_set/${data.result.id}/edit`, {
 			method: 'PATCH',
-			body: JSON.stringify({ content }),
+			body: JSON.stringify({ content: $state.snapshot(problems) }),
 			headers: {
 				'Content-Type': 'application/json'
 			}

@@ -1,16 +1,18 @@
-import { error } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
+import { db, table } from '@/server/db/index.js';
 
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const response = await event.fetch(`/problem_set/${event.params.id}`, {
-		method: 'GET',
-		headers: {
-			Accept: 'application/json'
-		}
-	});
-	const [result] = await response.json();
+	const result = await db
+		.select()
+		.from(table.problemSet)
+		.where(eq(table.problemSet.id, event.params.id));
 
-	if (!result) error(404, 'Not found');
-	return { result };
+	const data = result.at(0);
+
+	if (data && data.isPublished) {
+		return data;
+	}
+	return {};
 };

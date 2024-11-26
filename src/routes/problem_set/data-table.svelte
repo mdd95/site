@@ -23,8 +23,6 @@
 
 	let { data = $bindable(), rowSelection = $bindable({}) }: Props = $props();
 
-	console.log(typeof data[0].createdAt);
-
 	type FilePropertiesMetadata = {
 		ID: string;
 		Title: string | null;
