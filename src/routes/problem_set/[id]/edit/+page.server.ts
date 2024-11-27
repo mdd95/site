@@ -3,6 +3,10 @@ import { hash } from '@node-rs/argon2';
 import { and, eq } from 'drizzle-orm';
 import { db, table } from '@/server/db/index.js';
 
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { updatePasswordFormSchema } from './formSchema.js';
+
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -22,7 +26,10 @@ export const load: PageServerLoad = async (event) => {
 	const data = result.at(0);
 
 	if (data) {
-		return { result: data };
+		return {
+			result: data,
+			formUpdatePassword: await superValidate(zod(updatePasswordFormSchema))
+		};
 	}
 	error(404, 'Not Found');
 };

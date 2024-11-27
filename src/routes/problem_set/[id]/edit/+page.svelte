@@ -1,11 +1,19 @@
 <script lang="ts">
+	import { Tabs } from 'bits-ui';
 	import { Button } from '@/components/ui/button';
+	import { Input } from '@/components/ui/input/index.js';
 	import * as Breadcrumb from '@/components/ui/breadcrumb';
+	import * as Dialog from '@/components/ui/dialog/index.js';
+	import * as Form from '@/components/ui/form/index.js';
 	import Trash from 'svelte-radix/Trash.svelte';
 	import LightSwitch from '@/components/light-switch.svelte';
 	import Question from './question.svelte';
 	import Choice from './choice.svelte';
 	import { useId } from '@/utils.js';
+
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { updatePasswordFormSchema } from './formSchema.ts';
 
 	import type { PageServerData } from './$types';
 	import 'prosemirror-view/style/prosemirror.css';
@@ -47,6 +55,10 @@
 			}
 		});
 	}
+
+	const formUpdatePassword = superForm(data.formUpdatePassword, {
+		validators: zodClient(updatePasswordFormSchema)
+	});
 </script>
 
 <header class="sticky top-0 z-50 border-b border-border/40 bg-background">
@@ -77,7 +89,7 @@
 
 	<div class="flex justify-end gap-2">
 		<Button onclick={saveChanges}>Save</Button>
-		<Button variant="secondary">Settings</Button>
+		{@render dialogSettings()}
 	</div>
 
 	{#each problems as problem (problem.id)}
@@ -132,6 +144,69 @@
 		<Button variant="outline" class="w-full" onclick={() => problems.push(newItem())}>+</Button>
 	</div>
 </div>
+
+{#snippet dialogSettings()}
+	<Dialog.Root>
+		<Dialog.Trigger>
+			{#snippet child({ props })}
+				<Button variant="secondary" {...props}>Settings</Button>
+			{/snippet}
+		</Dialog.Trigger>
+		<Dialog.Content class="h-full max-h-[32rem]  w-full max-w-screen-sm">
+			<Dialog.Header class="border-b">
+				<Dialog.Title>Settings</Dialog.Title>
+			</Dialog.Header>
+			<Tabs.Root
+				value="properties"
+				class="grid grid-cols-[8rem_1fr] sm:grid-cols-[12rem_1fr]"
+			>
+				<Tabs.List class="border-r">
+					<Tabs.Trigger
+						value="properties"
+						class="block w-full cursor-pointer border-l-2 border-transparent px-4 py-2.5 text-left hover:bg-accent data-[state=active]:border-green-500"
+					>
+						Properties
+					</Tabs.Trigger>
+					<Tabs.Trigger
+						value="encryption"
+						class="block w-full cursor-pointer border-l-2 border-transparent px-4 py-2.5 text-left hover:bg-accent data-[state=active]:border-green-500"
+					>
+						Encryption
+					</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content value="properties">
+					{@render propertiesTab()}
+				</Tabs.Content>
+				<Tabs.Content value="encryption" class="p-4">
+					{@render updatePasswordForm()}
+				</Tabs.Content>
+			</Tabs.Root>
+		</Dialog.Content>
+	</Dialog.Root>
+{/snippet}
+
+{#snippet propertiesTab()}
+	<p class="text-xl">Properties</p>
+{/snippet}
+
+{#snippet updatePasswordForm()}
+	<form method="POST" action="?/updatePassword" class="flex h-full flex-col justify-between">
+		<div>
+			<input type="text" name="username" value="" autocomplete="username" hidden />
+			<Form.Field form={formUpdatePassword} name="password">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Password</Form.Label>
+						<Input type="password" autocomplete="new-password" {...props} />
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
+		</div>
+		<div class="flex justify-end">
+			<Button type="submit">Save Changes</Button>
+		</div>
+	</form>
+{/snippet}
 
 <style>
 	:global(.ProseMirror:focus) {
