@@ -9,9 +9,19 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
 	},
 	"devDependencies": {
+		"@chromatic-com/storybook": "^3.2.2",
+		"@storybook/addon-essentials": "^8.4.6",
+		"@storybook/addon-interactions": "^8.4.6",
+		"@storybook/addon-svelte-csf": "^5.0.0-next.13",
+		"@storybook/blocks": "^8.4.6",
+		"@storybook/svelte": "^8.4.6",
+		"@storybook/sveltekit": "^8.4.6",
+		"@storybook/test": "^8.4.6",
 		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/kit": "^2.9.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.1",
@@ -27,6 +37,7 @@
 		"prettier": "^3.4.1",
 		"prettier-plugin-svelte": "^3.3.2",
 		"prettier-plugin-tailwindcss": "^0.6.9",
+		"storybook": "^8.4.6",
 		"svelte": "^5.2.10",
 		"svelte-check": "^4.1.0",
 		"tailwind-merge": "^2.5.5",
