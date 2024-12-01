@@ -17,6 +17,9 @@ importers:
       inter-ui:
         specifier: ^4.1.0
         version: 4.1.0
+      mode-watcher:
+        specifier: ^0.5.0
+        version: 0.5.0(svelte@5.2.10)
       tailwind-merge:
         specifier: ^2.5.5
         version: 2.5.5
@@ -1089,6 +1092,11 @@ packages:
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  mode-watcher@0.5.0:
+    resolution: {integrity: sha512-5E6fh/aXhAVv+U+DbeM0hCmskQE9u7WSmvnCRijJB/MJu7HtB73sjiCaZ9n1M8QHmzLrBFo8XBAUcWXkDm8Z9A==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.1
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -2460,6 +2468,10 @@ snapshots:
   minimatch@9.0.5:
     dependencies:
       brace-expansion: 2.0.1
+
+  mode-watcher@0.5.0(svelte@5.2.10):
+    dependencies:
+      svelte: 5.2.10
 
   mri@1.2.0: {}
 
