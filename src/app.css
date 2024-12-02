@@ -20,6 +20,21 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--radius-xl: calc(var(--base-radius) + 4px);
+	--radius-lg: var(--base-radius);
+	--radius-md: calc(var(--base-radius) - 2px);
+	--radius-sm: calc(var(--base-radius) - 4px);
+	--color-primary-50: var(--primary-50);
+	--color-primary-100: var(--primary-100);
+	--color-primary-200: var(--primary-200);
+	--color-primary-300: var(--primary-300);
+	--color-primary-400: var(--primary-400);
+	--color-primary-500: var(--primary-500);
+	--color-primary-600: var(--primary-600);
+	--color-primary-700: var(--primary-700);
+	--color-primary-800: var(--primary-800);
+	--color-primary-900: var(--primary-900);
+	--color-primary-950: var(--primary-950);
 }
 
 @layer base {
@@ -43,7 +58,7 @@
 		--border: oklch(91.97% 0.004 286.32);
 		--input: oklch(91.97% 0.004 286.32);
 		--ring: oklch(58.59% 0.2221 17.55);
-		--radius: 0.5rem;
+		--base-radius: 0.5rem;
 	}
 	.dark {
 		--background: oklch(14.67% 0.0041 49.31);
