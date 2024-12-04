@@ -6,20 +6,35 @@
 	import { ModeWatcher } from 'mode-watcher';
 
 	import type { Snippet } from 'svelte';
-	import type { LayoutServerData } from './$types';
 
 	type Props = {
 		children: Snippet;
-		data: LayoutServerData;
 	};
 
-	let { children, data }: Props = $props();
+	let { children }: Props = $props();
+
+	type ColorThemeConfig = {
+		storageKey?: string;
+	};
+
+	function setColorTheme({ storageKey = 'color-theme-hue' }: ColorThemeConfig) {
+		const hue = localStorage.getItem(storageKey);
+
+		if (hue) {
+			const rootEl = document.documentElement;
+			rootEl.dataset.colorTheme = 'custom';
+
+			const link = document.createElement('link');
+
+			link.rel = 'stylesheet';
+			link.href = '/color_theme/' + hue + '.css';
+			document.head.appendChild(link);
+		}
+	}
 </script>
 
 <svelte:head>
-	{#if data.colorThemeHue}
-		<link rel="stylesheet" href="/color_theme/{data.colorThemeHue}.css" />
-	{/if}
+	{@html `<script>(` + setColorTheme.toString() + `)(` + JSON.stringify({}) + `);</script>`}
 </svelte:head>
 
 <ModeWatcher />
