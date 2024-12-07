@@ -3,8 +3,6 @@
 	import 'inter-ui/inter-variable.css';
 	import '../app.css';
 
-	import { ModeWatcher } from 'mode-watcher';
-
 	import type { Snippet } from 'svelte';
 
 	type Props = {
@@ -13,29 +11,42 @@
 
 	let { children }: Props = $props();
 
-	type ColorThemeConfig = {
-		storageKey?: string;
-	};
+	function setColorTheme() {
+		const themeModeKey = 'theme-mode';
+		const themeColorKey = 'theme-color';
 
-	function setColorTheme({ storageKey = 'color-theme-hue' }: ColorThemeConfig) {
-		const hue = localStorage.getItem(storageKey);
+		const themeMode = localStorage.getItem(themeModeKey) || 'system';
+		const themeColor = localStorage.getItem(themeColorKey) || 'default';
+		const lightMode =
+			themeMode === 'light' ||
+			(themeMode === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
 
-		if (hue) {
-			const rootEl = document.documentElement;
-			rootEl.dataset.colorTheme = 'custom';
+		const rootEl = document.documentElement;
+		const metaEl = document.querySelector('meta[name="theme-color"]');
 
-			const link = document.createElement('link');
+		if (lightMode) {
+			rootEl.classList.remove('dark');
+		} else {
+			rootEl.classList.add('dark');
+			metaEl?.setAttribute('content', '#000000');
+		}
+		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
 
-			link.rel = 'stylesheet';
-			link.href = '/color_theme/' + hue + '.css';
-			document.head.appendChild(link);
+		if (themeColor !== 'default') {
+			const [hue, meta] = themeColor.split(' ');
+			metaEl?.setAttribute('content', meta);
+
+			const a = document.createElement('link');
+			a.rel = 'stylesheet';
+			a.href = '/theme_color/' + hue + '.css';
+			document.head.appendChild(a);
 		}
 	}
 </script>
 
 <svelte:head>
-	{@html `<script>(` + setColorTheme.toString() + `)(` + JSON.stringify({}) + `);</script>`}
+	<meta name="theme-color" content="#ffffff" />
+	{@html `<script nonce>(` + setColorTheme.toString() + `)();</script>`}
 </svelte:head>
 
-<ModeWatcher />
 {@render children()}
