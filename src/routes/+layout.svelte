@@ -3,6 +3,7 @@
 	import 'inter-ui/inter-variable.css';
 	import '../app.css';
 
+	import { setThemeContext, type ThemeKeyConfig } from '@/theme-mode.svelte.js';
 	import type { Snippet } from 'svelte';
 
 	type Props = {
@@ -11,10 +12,7 @@
 
 	let { children }: Props = $props();
 
-	function setColorTheme() {
-		const themeModeKey = 'theme-mode';
-		const themeColorKey = 'theme-color';
-
+	function setTheme({ themeModeKey, themeColorKey }: ThemeKeyConfig) {
 		const themeMode = localStorage.getItem(themeModeKey) || 'system';
 		const themeColor = localStorage.getItem(themeColorKey) || 'default';
 		const lightMode =
@@ -42,11 +40,19 @@
 			document.head.appendChild(a);
 		}
 	}
+
+	const themeKeyConfig: ThemeKeyConfig = {
+		themeModeKey: 'theme-mode',
+		themeColorKey: 'theme-color'
+	};
+	const themeKeys = JSON.stringify(themeKeyConfig, null, 2);
+
+	setThemeContext(themeKeyConfig);
 </script>
 
 <svelte:head>
 	<meta name="theme-color" content="#ffffff" />
-	{@html `<script nonce>(` + setColorTheme.toString() + `)();</script>`}
+	{@html '<script nonce>(' + setTheme.toString() + ')(' + themeKeys + ');</script>'}
 </svelte:head>
 
 {@render children()}
