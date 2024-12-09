@@ -17,7 +17,7 @@
 		const themeColor = localStorage.getItem(themeColorKey) || 'default';
 		const lightMode =
 			themeMode === 'light' ||
-			(themeMode === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
+			(themeMode === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 		const rootEl = document.documentElement;
 		const metaEl = document.querySelector('meta[name="theme-color"]');

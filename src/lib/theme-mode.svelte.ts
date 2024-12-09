@@ -1,4 +1,5 @@
-import { getContext, setContext } from 'svelte';
+import { getContext, setContext, untrack } from 'svelte';
+import { MediaQuery } from 'svelte/reactivity';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type ThemeColor = 'default' | `${string} ${string}`;
@@ -19,53 +20,64 @@ export function getThemeContext(): ReturnType<typeof createThemeStates> {
 }
 
 function createThemeStates(config: ThemeKeyConfig) {
-	let mode = $state<ThemeMode>('system');
-	let theme = $state<ThemeColor>('default');
+	let themeMode = $state<ThemeMode>('system');
+	let themeColor = $state<ThemeColor>('default');
+	const systemDarkColorScheme = new MediaQuery('(prefers-color-scheme: dark)');
 
 	$effect(() => {
-		const themeMode = localStorage.getItem(config.themeModeKey);
-		const themeColor = localStorage.getItem(config.themeColorKey);
+		const storedThemeMode = localStorage.getItem(config.themeModeKey);
+		const storedThemeColor = localStorage.getItem(config.themeColorKey);
 
-		if (isValidThemeMode(themeMode)) {
-			mode = themeMode;
+		if (isValidThemeMode(storedThemeMode)) {
+			themeMode = storedThemeMode;
 		}
 
-		if (isValidThemeColor(themeColor)) {
-			theme = themeColor;
+		if (isValidThemeColor(storedThemeColor)) {
+			themeColor = storedThemeColor;
 		}
 	});
 
 	$effect(() => {
-		localStorage.setItem(config.themeModeKey, mode);
-		localStorage.setItem(config.themeColorKey, theme);
+		if (untrack(() => themeMode) === 'system') {
+			const lightMode = !systemDarkColorScheme.current;
+			const rootEl = document.documentElement;
+			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
 
-		const rootEl = document.documentElement;
-		const lightMode =
-			mode === 'light' ||
-			(mode === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
-		if (lightMode) {
-			rootEl.classList.remove('dark');
-		} else {
-			rootEl.classList.add('dark');
-		}
-		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
-
-		if (theme === 'default') {
+			if (lightMode) {
+				rootEl.classList.remove('dark');
+			} else {
+				rootEl.classList.add('dark');
+			}
 		}
 	});
 
 	return {
 		get mode() {
-			return mode;
+			return themeMode;
 		},
 		set mode(value: ThemeMode) {
-			mode = value;
+			if (!isValidThemeMode(value as unknown)) return;
+			themeMode = value;
+			localStorage.setItem(config.themeModeKey, themeMode);
+
+			const rootEl = document.documentElement;
+			const lightMode =
+				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
+			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
+
+			if (lightMode) {
+				rootEl.classList.remove('dark');
+			} else {
+				rootEl.classList.add('dark');
+			}
 		},
-		get theme() {
-			return theme;
+		get color() {
+			return themeColor;
 		},
-		set theme(value: ThemeColor) {
-			theme = value;
+		set color(value: ThemeColor) {
+			if (!isValidThemeColor(value as unknown)) return;
+			themeColor = value;
+			localStorage.setItem(config.themeColorKey, themeColor);
 		}
 	};
 }
