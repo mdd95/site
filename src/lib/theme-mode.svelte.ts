@@ -83,12 +83,13 @@ function createThemeStates(config: ThemeKeyConfig) {
 			lightMode ? rootEl.classList.remove('dark') : rootEl.classList.add('dark');
 			localStorage.setItem(config.themeModeKey, themeMode);
 		},
-		async setColor(value: ThemeColor | null) {
+		async setColor(value: ThemeColor) {
 			const rootEl = document.documentElement;
 			const metaEl = document.querySelector('meta[name="theme-color"]');
 
 			if (value === null) {
 				themeColor = null;
+				window.themeColor = null;
 				rootEl.dataset.theme = '';
 				localStorage.setItem(config.themeColorKey, '');
 				return;
@@ -101,7 +102,7 @@ function createThemeStates(config: ThemeKeyConfig) {
 			const theme = await res.json();
 			metaEl?.setAttribute('content', lightMode ? theme.light : theme.dark);
 
-			window.themeColor = { ...themeColor, ...theme };
+			window.themeColor = { ...value, ...theme };
 			localStorage.setItem(config.themeColorKey, JSON.stringify(window.themeColor));
 		}
 	};
