@@ -10,7 +10,7 @@
 		variants: {
 			variant: {
 				default:
-					'bg-default-950 text-default-50 hover:bg-default-900 dark:bg-default-50 dark:text-default-950 dark:hover:bg-default-100 theme:bg-primary-600 theme:text-primary-50 theme:hover:bg-primary-500 shadow',
+					'bg-neutral-950 text-neutral-50 hover:bg-neutral-950/90 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-50/90 theme:bg-primary-600 theme:text-primary-50 theme:hover:bg-primary-600/90 shadow',
 				destructive:
 					'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
 				outline:

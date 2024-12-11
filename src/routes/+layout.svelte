@@ -3,10 +3,10 @@
 	import 'inter-ui/inter-variable.css';
 	import '../app.css';
 
-	import { setThemeContext } from '@/theme-mode.svelte';
+	import { setTheme } from '@/theme-mode.svelte';
 
 	import type { Snippet } from 'svelte';
-	import type { ThemeKeyConfig, ThemeMode } from '@/theme-mode.svelte';
+	import type { ThemeKeys, ThemeMode } from '@/theme-mode.svelte';
 
 	type Props = {
 		children: Snippet;
@@ -14,56 +14,51 @@
 
 	let { children }: Props = $props();
 
-	function setTheme({ themeModeKey, themeColorKey }: ThemeKeyConfig) {
-		const themeMode = localStorage.getItem(themeModeKey) || 'system';
-		const themeColor = localStorage.getItem(themeColorKey);
-		const lightMode =
-			themeMode === 'light' ||
-			(themeMode === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+	function initTheme({ mode: modeKey, colors: colorsKey }: ThemeKeys) {
+		const mode = localStorage.getItem(modeKey) || 'system';
+		const colors = localStorage.getItem(colorsKey);
+		const light =
+			mode == 'light' ||
+			(mode == 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-		const rootEl = document.documentElement;
-		const metaEl = document.querySelector('meta[name="theme-color"]');
+		const root = document.documentElement;
+		const meta = document.querySelector('meta[name="theme-color"]');
 
-		if (lightMode) {
-			rootEl.classList.remove('dark');
+		if (light) {
+			root.classList.remove('dark');
 		} else {
-			rootEl.classList.add('dark');
-			metaEl?.setAttribute('content', '#000');
+			root.classList.add('dark');
+			meta?.setAttribute('content', '#000');
 		}
-		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
-		window.themeMode = themeMode as ThemeMode;
+		root.style.colorScheme = light ? 'light' : 'dark';
+		window.themeMode = mode as ThemeMode;
 
-		if (themeColor) {
-			const parsed = JSON.parse(themeColor);
-			window.themeColor = parsed;
-
-			const { light, dark, ...rest } = parsed;
-			const params = new URLSearchParams(rest);
-
-			const palettes = document.createElement('link');
-			palettes.rel = 'stylesheet';
-			palettes.href = '/theme_color/palettes.css?' + params.toString();
-			document.head.appendChild(palettes);
-
-			rootEl.dataset.theme = 'custom';
-			metaEl?.setAttribute('content', lightMode ? light : dark);
+		if (colors) {
+			const parsed = JSON.parse(colors);
+			window.themeColors = parsed;
+			root.dataset.theme = 'custom';
+			for (const [k, v] of Object.entries(parsed)) {
+				root.style.setProperty(`--${k}`, `${v}`);
+			}
+			meta?.setAttribute(
+				'content',
+				`${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${parsed.ambient})`
+			);
 		} else {
-			window.themeColor = null;
+			window.themeColors = null;
 		}
 	}
 
-	const themeKeyConfig: ThemeKeyConfig = {
-		themeModeKey: 'theme-mode',
-		themeColorKey: 'theme-color'
+	const themeKeys: ThemeKeys = {
+		mode: 'theme-mode',
+		colors: 'theme-colors'
 	};
-	const themeKeys = JSON.stringify(themeKeyConfig, null, 2);
-
-	setThemeContext(themeKeyConfig);
+	setTheme(themeKeys);
 </script>
 
 <svelte:head>
 	<meta name="theme-color" content="#fff" />
-	{@html '<script nonce>(' + setTheme.toString() + ')(' + themeKeys + ');</script>'}
+	{@html `<script nonce>(${initTheme.toString()})(${JSON.stringify(themeKeys)});</script>`}
 </svelte:head>
 
 {@render children()}

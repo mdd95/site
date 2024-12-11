@@ -1,29 +1,28 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { getThemeContext } from '@/theme-mode.svelte';
+	import { getTheme } from '@/theme-mode.svelte';
 
-	const theme = getThemeContext();
+	const theme = getTheme();
 
 	let ambient = $state(0);
 	let primary = $state(0);
 
 	$effect(() => {
-		if (window.themeColor) {
-			ambient = +window.themeColor.ambient;
-			primary = +window.themeColor.primary;
-		}
+		const root = document.documentElement;
+		root.style.setProperty('--ambient', ambient.toString());
+		root.style.setProperty('--primary', primary.toString());
 	});
 </script>
 
-<header class="border-primary-100 dark:border-primary-950 sticky top-0 z-50 border-b">
-	<div class="container mx-auto flex h-16 items-center justify-between">
-		<Button onclick={() => theme.setMode(theme.mode === 'dark' ? 'light' : 'dark')}>
+<header class="sticky top-0 z-50">
+	<div class="container flex h-16 items-center justify-between" style="--primary: 0;">
+		<Button onclick={() => (theme.mode = theme.mode == 'dark' ? 'light' : 'dark')}>
 			Toggle dark mode
 		</Button>
 	</div>
 </header>
 
-<div class="container mx-auto py-12">
+<div class="container py-12">
 	<h1>Welcome to SvelteKit</h1>
 	<p>
 		Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation
@@ -38,22 +37,37 @@
 				const ambient = data.get('ambient') as string;
 				const primary = data.get('primary') as string;
 
-				theme.setColor({ ambient, primary, light: '', dark: '' });
+				theme.colors = { ambient, primary };
 				location.reload();
 			}}
 		>
-			<div class="h-6 w-12" style="background-color: oklch(64.78% 0.1472 {ambient});"></div>
-			<input type="range" min="0" max="360" step="0.1" name="ambient" bind:value={ambient} />
-
-			<div class="h-6 w-12" style="background-color: oklch(64.78% 0.1472 {primary});"></div>
-			<input type="range" min="0" max="360" step="0.1" name="primary" bind:value={primary} />
+			<input
+				type="range"
+				min="0"
+				max="360"
+				step="0.01"
+				name="ambient"
+				defaultValue={window.themeColors?.ambient || 262.88}
+				bind:value={ambient}
+			/>
+			<input
+				type="range"
+				min="0"
+				max="360"
+				step="0.01"
+				name="primary"
+				defaultValue={window.themeColors?.primary || 262.88}
+				bind:value={primary}
+			/>
 			<Button type="submit">Save</Button>
 		</form>
 		<Button
 			onclick={() => {
-				theme.setColor(null);
+				theme.colors = null;
 				location.reload();
-			}}>Reset</Button
+			}}
 		>
+			Reset
+		</Button>
 	</div>
 </div>

@@ -3,69 +3,68 @@
 @variant theme (&:where([data-theme="custom"], [data-theme="custom"] *));
 
 @theme {
-	--color-default-50: oklch(97.78% 0 0);
-	--color-default-100: oklch(93.56% 0 0);
-	--color-default-200: oklch(88.11% 0 0);
-	--color-default-300: oklch(82.67% 0 0);
-	--color-default-400: oklch(74.22% 0 0);
-	--color-default-500: oklch(64.78% 0 0);
-	--color-default-600: oklch(57.33% 0 0);
-	--color-default-700: oklch(46.89% 0 0);
-	--color-default-800: oklch(39.44% 0 0);
-	--color-default-900: oklch(32% 0 0);
-	--color-default-950: oklch(23.78% 0 0);
-	--color-default-975: oklch(11.73% 0 0);
+	--color-primary-50: oklch(97.78% 0.0108 var(--primary));
+	--color-primary-100: oklch(93.56% 0.0321 var(--primary));
+	--color-primary-200: oklch(88.11% 0.0609 var(--primary));
+	--color-primary-300: oklch(82.67% 0.0908 var(--primary));
+	--color-primary-400: oklch(74.22% 0.1398 var(--primary));
+	--color-primary-500: oklch(64.78% 0.1472 var(--primary));
+	--color-primary-600: oklch(57.33% 0.1299 var(--primary));
+	--color-primary-700: oklch(46.89% 0.1067 var(--primary));
+	--color-primary-800: oklch(39.44% 0.0898 var(--primary));
+	--color-primary-900: oklch(32% 0.0726 var(--primary));
+	--color-primary-950: oklch(23.78% 0.054 var(--primary));
+	--color-primary-975: oklch(11.73% 0.0243 var(--primary));
 
-	--color-ambient-50: var(--ambient-50);
-	--color-ambient-100: var(--ambient-100);
-	--color-ambient-200: var(--ambient-200);
-	--color-ambient-300: var(--ambient-300);
-	--color-ambient-400: var(--ambient-400);
-	--color-ambient-500: var(--ambient-500);
-	--color-ambient-600: var(--ambient-600);
-	--color-ambient-700: var(--ambient-700);
-	--color-ambient-800: var(--ambient-800);
-	--color-ambient-900: var(--ambient-900);
-	--color-ambient-950: var(--ambient-950);
-	--color-ambient-975: var(--ambient-975);
-
-	--color-primary-50: var(--primary-50);
-	--color-primary-100: var(--primary-100);
-	--color-primary-200: var(--primary-200);
-	--color-primary-300: var(--primary-300);
-	--color-primary-400: var(--primary-400);
-	--color-primary-500: var(--primary-500);
-	--color-primary-600: var(--primary-600);
-	--color-primary-700: var(--primary-700);
-	--color-primary-800: var(--primary-800);
-	--color-primary-900: var(--primary-900);
-	--color-primary-950: var(--primary-950);
-	--color-primary-975: var(--primary-975);
+	--color-ambient-50: oklch(from var(--color-primary-50) l c var(--ambient));
+	--color-ambient-100: oklch(from var(--color-primary-100) l c var(--ambient));
+	--color-ambient-200: oklch(from var(--color-primary-200) l c var(--ambient));
+	--color-ambient-300: oklch(from var(--color-primary-300) l c var(--ambient));
+	--color-ambient-400: oklch(from var(--color-primary-400) l c var(--ambient));
+	--color-ambient-500: oklch(from var(--color-primary-500) l c var(--ambient));
+	--color-ambient-600: oklch(from var(--color-primary-600) l c var(--ambient));
+	--color-ambient-700: oklch(from var(--color-primary-700) l c var(--ambient));
+	--color-ambient-800: oklch(from var(--color-primary-800) l c var(--ambient));
+	--color-ambient-900: oklch(from var(--color-primary-900) l c var(--ambient));
+	--color-ambient-950: oklch(from var(--color-primary-950) l c var(--ambient));
+	--color-ambient-975: oklch(from var(--color-primary-975) l c var(--ambient));
 }
 
-@layer base {
+@layer theme {
 	:root {
 		--default-font-family: 'Inter';
-		--ambient-background: var(--color-default-50);
-		--ambient-foreground: var(--color-default-950);
-		background-color: var(--ambient-background);
-		color: var(--ambient-foreground);
 	}
 	@supports (font-variation-settings: normal) {
 		:root {
 			--default-font-family: 'InterVariable';
 		}
 	}
+}
+
+@layer base {
+	:root {
+		--primary: 262.88;
+		--ambient: 262.88;
+		--background: oklch(from var(--color-primary-50) l 0 0);
+		--foreground: oklch(from var(--color-primary-975) l 0 0);
+		background-color: var(--background);
+		color: var(--foreground);
+	}
 	.dark {
-		--ambient-background: var(--color-default-975);
-		--ambient-foreground: var(--color-default-50);
+		--background: oklch(from var(--color-primary-975) l 0 0);
+		--foreground: oklch(from var(--color-primary-50) l 0 0);
 	}
 	[data-theme='custom'] {
-		--ambient-background: var(--color-ambient-50);
-		--ambient-foreground: var(--color-ambient-950);
+		--background: var(--color-ambient-50);
+		--foreground: var(--color-ambient-975);
 	}
 	[data-theme='custom'].dark {
-		--ambient-background: var(--color-ambient-975);
-		--ambient-foreground: var(--color-ambient-50);
+		--background: var(--color-ambient-975);
+		--foreground: var(--color-ambient-50);
 	}
+}
+
+@utility container {
+	margin-inline: auto;
+	padding-inline: 1rem;
 }

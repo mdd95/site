@@ -11,7 +11,7 @@ declare global {
 
 	interface Window {
 		themeMode: import('@/theme-mode.svelte').ThemeMode;
-		themeColor: import('@/theme-mode.svelte').ThemeColor;
+		themeColors: import('@/theme-mode.svelte').ThemeColor;
 	}
 }
 
