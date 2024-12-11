@@ -2,7 +2,7 @@ import { getContext, setContext, untrack } from 'svelte';
 import { MediaQuery } from 'svelte/reactivity';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
-export type ThemeColor = 'default' | `${string} ${string}`;
+export type ThemeColor = Record<string, any>;
 
 export type ThemeKeyConfig = {
 	themeModeKey: string;
@@ -21,7 +21,7 @@ export function getThemeContext(): ReturnType<typeof createThemeStates> {
 
 function createThemeStates(config: ThemeKeyConfig) {
 	let themeMode = $state<ThemeMode>('system');
-	let themeColor = $state<ThemeColor>('default');
+	let themeColor = $state.raw<ThemeColor>({});
 	const systemDarkColorScheme = new MediaQuery('(prefers-color-scheme: dark)');
 
 	$effect(() => {
@@ -32,9 +32,7 @@ function createThemeStates(config: ThemeKeyConfig) {
 			themeMode = storedThemeMode;
 		}
 
-		if (isValidThemeColor(storedThemeColor)) {
-			themeColor = storedThemeColor;
-		}
+		themeColor = JSON.parse(storedThemeColor || '{}');
 	});
 
 	$effect(() => {
@@ -75,9 +73,8 @@ function createThemeStates(config: ThemeKeyConfig) {
 			return themeColor;
 		},
 		set color(value: ThemeColor) {
-			if (!isValidThemeColor(value as unknown)) return;
 			themeColor = value;
-			localStorage.setItem(config.themeColorKey, themeColor);
+			localStorage.setItem(config.themeColorKey, JSON.stringify(themeColor));
 		}
 	};
 }
@@ -87,10 +84,4 @@ const modes = ['system', 'light', 'dark'];
 export function isValidThemeMode(value: unknown): value is ThemeMode {
 	if (typeof value !== 'string') return false;
 	return modes.includes(value);
-}
-
-export function isValidThemeColor(value: unknown): value is ThemeColor {
-	if (typeof value !== 'string') return false;
-	if (value === 'default') return true;
-	return value.split(' ').length === 2;
 }

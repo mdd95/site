@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @variant dark (&:where(.dark, .dark *));
+@variant theme (&:where([data-theme="custom"], [data-theme="custom"] *));
 
 @theme {
 	--color-primary-50: var(--primary-50);
@@ -14,6 +15,18 @@
 	--color-primary-900: var(--primary-900);
 	--color-primary-950: var(--primary-950);
 	--color-primary-1000: var(--primary-1000);
+	--color-secondary-50: var(--secondary-50);
+	--color-secondary-100: var(--secondary-100);
+	--color-secondary-200: var(--secondary-200);
+	--color-secondary-300: var(--secondary-300);
+	--color-secondary-400: var(--secondary-400);
+	--color-secondary-500: var(--secondary-500);
+	--color-secondary-600: var(--secondary-600);
+	--color-secondary-700: var(--secondary-700);
+	--color-secondary-800: var(--secondary-800);
+	--color-secondary-900: var(--secondary-900);
+	--color-secondary-950: var(--secondary-950);
+	--color-secondary-1000: var(--secondary-1000);
 }
 
 @layer base {

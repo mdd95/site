@@ -34,9 +34,11 @@
 			const [hue, meta] = themeColor.split(' ');
 			metaEl?.setAttribute('content', meta);
 
+			const params = new URLSearchParams({ primary: hue });
+
 			const a = document.createElement('link');
 			a.rel = 'stylesheet';
-			a.href = '/theme_color/' + hue + '.css';
+			a.href = '/theme_color/palettes.css' + params.toString();
 			document.head.appendChild(a);
 		}
 	}
@@ -56,3 +58,4 @@
 </svelte:head>
 
 {@render children()}
+<div class="colored:bg-green-100"></div>
