@@ -40,6 +40,7 @@
 			a.href = '/theme_color/palettes.css?' + params.toString();
 			document.head.appendChild(a);
 
+			rootEl.dataset.theme = 'custom';
 			metaEl?.setAttribute('content', theme);
 		}
 	}
@@ -59,4 +60,3 @@
 </svelte:head>
 
 {@render children()}
-<div class="colored:bg-green-100"></div>

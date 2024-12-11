@@ -25,13 +25,22 @@
 				e.preventDefault();
 
 				const data = new FormData(e.target as HTMLFormElement);
-				const hue = data.get('hue');
+				const ambient = data.get('ambient');
+				const primary = data.get('primary');
 
-				theme.color = { primary: hue, theme: '#fafafa' };
+				theme.color = { ambient, primary, theme: '#fafafa' };
 			}}
 		>
-			<input type="number" min="0" max="360" step="0.1" name="hue" />
+			<input type="range" min="0" max="360" step="0.1" name="ambient" />
+			<input type="range" min="0" max="360" step="0.1" name="primary" />
 			<Button type="submit">Save</Button>
 		</form>
+		<Button
+			onclick={() => {
+				theme.color = null;
+			}}
+		>
+			Reset
+		</Button>
 	</div>
 </div>

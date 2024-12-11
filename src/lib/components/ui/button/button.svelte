@@ -9,7 +9,8 @@
 		base: 'cursor-pointer focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 		variants: {
 			variant: {
-				default: 'bg-primary-800 text-primary-50 hover:bg-primary-700 shadow',
+				default:
+					'bg-default-950 text-default-50 hover:bg-default-900 dark:bg-default-50 dark:text-default-950 dark:hover:bg-default-100 theme:bg-primary-600 theme:text-primary-50 theme:hover:bg-primary-500 shadow',
 				destructive:
 					'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
 				outline:

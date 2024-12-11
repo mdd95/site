@@ -74,16 +74,34 @@ function createThemeStates(config: ThemeKeyConfig) {
 		},
 		set color(value: ThemeColor | null) {
 			const rootEl = document.documentElement;
+			const metaEl = document.querySelector('meta[name="theme-color"]');
 
 			if (value === null) {
 				themeColor = {};
-				localStorage.setItem(config.themeColorKey, '{}');
+				localStorage.setItem(config.themeColorKey, '');
 				rootEl.dataset.themeColor = '';
 				return;
 			}
 			themeColor = value;
-			localStorage.setItem(config.themeColorKey, JSON.stringify(themeColor));
 			rootEl.dataset.themeColor = 'custom';
+			const lightMode =
+				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
+
+			fetch(
+				'/api/theme_color/' +
+					(lightMode ? '97.78,' : '11.73,') +
+					(lightMode ? '0.0108,' : '0.0243,') +
+					themeColor.ambient,
+				{ method: 'GET' }
+			)
+				.then((res) => res.text())
+				.then((color) => {
+					localStorage.setItem(
+						config.themeColorKey,
+						JSON.stringify({ ...themeColor, theme: color })
+					);
+					metaEl?.setAttribute('content', color);
+				});
 		}
 	};
 }
