@@ -72,9 +72,18 @@ function createThemeStates(config: ThemeKeyConfig) {
 		get color() {
 			return themeColor;
 		},
-		set color(value: ThemeColor) {
+		set color(value: ThemeColor | null) {
+			const rootEl = document.documentElement;
+
+			if (value === null) {
+				themeColor = {};
+				localStorage.setItem(config.themeColorKey, '{}');
+				rootEl.dataset.themeColor = '';
+				return;
+			}
 			themeColor = value;
 			localStorage.setItem(config.themeColorKey, JSON.stringify(themeColor));
+			rootEl.dataset.themeColor = 'custom';
 		}
 	};
 }

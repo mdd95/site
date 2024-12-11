@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { getThemeContext } from '@/theme-mode.svelte';
 
@@ -18,4 +18,20 @@
 	<p>
 		Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation
 	</p>
+
+	<div>
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+
+				const data = new FormData(e.target as HTMLFormElement);
+				const hue = data.get('hue');
+
+				theme.color = { primary: hue, theme: '#fafafa' };
+			}}
+		>
+			<input type="number" min="0" max="360" step="0.1" name="hue" />
+			<Button type="submit">Save</Button>
+		</form>
+	</div>
 </div>

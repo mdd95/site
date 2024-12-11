@@ -14,7 +14,7 @@
 
 	function setTheme({ themeModeKey, themeColorKey }: ThemeKeyConfig) {
 		const themeMode = localStorage.getItem(themeModeKey) || 'system';
-		const themeColor = localStorage.getItem(themeColorKey) || 'default';
+		const themeColor = localStorage.getItem(themeColorKey);
 		const lightMode =
 			themeMode === 'light' ||
 			(themeMode === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -30,16 +30,17 @@
 		}
 		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
 
-		if (themeColor !== 'default') {
-			const [hue, meta] = themeColor.split(' ');
-			metaEl?.setAttribute('content', meta);
-
-			const params = new URLSearchParams({ primary: hue });
+		if (themeColor) {
+			const parsed = JSON.parse(themeColor);
+			const { theme, ...rest } = parsed;
+			const params = new URLSearchParams(rest);
 
 			const a = document.createElement('link');
 			a.rel = 'stylesheet';
-			a.href = '/theme_color/palettes.css' + params.toString();
+			a.href = '/theme_color/palettes.css?' + params.toString();
 			document.head.appendChild(a);
+
+			metaEl?.setAttribute('content', theme);
 		}
 	}
 
