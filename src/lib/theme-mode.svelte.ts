@@ -2,7 +2,13 @@ import { getContext, setContext, untrack } from 'svelte';
 import { MediaQuery } from 'svelte/reactivity';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
-export type ThemeColor = Record<string, any>;
+export type ThemeColor = {
+	light: string;
+	dark: string;
+	ambient: string;
+	primary: string;
+	[key: string]: string;
+} | null;
 
 export type ThemeKeyConfig = {
 	themeModeKey: string;
@@ -25,15 +31,8 @@ function createThemeStates(config: ThemeKeyConfig) {
 	const systemDarkColorScheme = new MediaQuery('(prefers-color-scheme: dark)');
 
 	$effect(() => {
-		const storedThemeMode = localStorage.getItem(config.themeModeKey);
-		const storedThemeColor = localStorage.getItem(config.themeColorKey);
-
-		if (isValidThemeMode(storedThemeMode)) {
-			themeMode = storedThemeMode;
-		}
-		if (storedThemeColor) {
-			themeColor = JSON.parse(storedThemeColor);
-		}
+		themeMode = window.themeMode;
+		themeColor = window.themeColor;
 	});
 
 	$effect(() => {
@@ -69,6 +68,7 @@ function createThemeStates(config: ThemeKeyConfig) {
 
 			if (!isValidThemeMode(value)) return;
 			themeMode = value;
+			window.themeMode = value;
 
 			const lightMode =
 				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
@@ -93,15 +93,16 @@ function createThemeStates(config: ThemeKeyConfig) {
 				localStorage.setItem(config.themeColorKey, '');
 				return;
 			}
-			themeColor = value;
 			rootEl.dataset.theme = 'custom';
 			const lightMode =
 				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
 
-			const res = await fetch('/api/theme_color/' + themeColor.ambient, { method: 'GET' });
+			const res = await fetch('/api/theme_color/' + value.ambient, { method: 'GET' });
 			const theme = await res.json();
 			metaEl?.setAttribute('content', lightMode ? theme.light : theme.dark);
-			localStorage.setItem(config.themeColorKey, JSON.stringify({ ...themeColor, ...theme }));
+
+			window.themeColor = { ...themeColor, ...theme };
+			localStorage.setItem(config.themeColorKey, JSON.stringify(window.themeColor));
 		}
 	};
 }

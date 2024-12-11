@@ -3,6 +3,16 @@
 	import { getThemeContext } from '@/theme-mode.svelte';
 
 	const theme = getThemeContext();
+
+	let ambient = $state(0);
+	let primary = $state(0);
+
+	$effect(() => {
+		if (window.themeColor) {
+			ambient = +window.themeColor.ambient;
+			primary = +window.themeColor.primary;
+		}
+	});
 </script>
 
 <header class="border-primary-100 dark:border-primary-950 sticky top-0 z-50 border-b">
@@ -25,16 +35,25 @@
 				e.preventDefault();
 
 				const data = new FormData(e.target as HTMLFormElement);
-				const ambient = data.get('ambient');
-				const primary = data.get('primary');
+				const ambient = data.get('ambient') as string;
+				const primary = data.get('primary') as string;
 
-				theme.setColor({ ambient, primary });
+				theme.setColor({ ambient, primary, light: '', dark: '' });
+				location.reload();
 			}}
 		>
-			<input type="range" min="0" max="360" step="0.1" name="ambient" />
-			<input type="range" min="0" max="360" step="0.1" name="primary" />
+			<div class="h-6 w-12" style="background-color: oklch(64.78% 0.1472 {ambient});"></div>
+			<input type="range" min="0" max="360" step="0.1" name="ambient" bind:value={ambient} />
+
+			<div class="h-6 w-12" style="background-color: oklch(64.78% 0.1472 {primary});"></div>
+			<input type="range" min="0" max="360" step="0.1" name="primary" bind:value={primary} />
 			<Button type="submit">Save</Button>
 		</form>
-		<Button onclick={() => theme.setColor(null)}>Reset</Button>
+		<Button
+			onclick={() => {
+				theme.setColor(null);
+				location.reload();
+			}}>Reset</Button
+		>
 	</div>
 </div>

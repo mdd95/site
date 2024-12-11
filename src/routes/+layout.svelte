@@ -6,7 +6,7 @@
 	import { setThemeContext } from '@/theme-mode.svelte';
 
 	import type { Snippet } from 'svelte';
-	import type { ThemeKeyConfig } from '@/theme-mode.svelte';
+	import type { ThemeKeyConfig, ThemeMode } from '@/theme-mode.svelte';
 
 	type Props = {
 		children: Snippet;
@@ -31,9 +31,12 @@
 			metaEl?.setAttribute('content', '#000');
 		}
 		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
+		window.themeMode = themeMode as ThemeMode;
 
 		if (themeColor) {
 			const parsed = JSON.parse(themeColor);
+			window.themeColor = parsed;
+
 			const { light, dark, ...rest } = parsed;
 			const params = new URLSearchParams(rest);
 
@@ -44,6 +47,8 @@
 
 			rootEl.dataset.theme = 'custom';
 			metaEl?.setAttribute('content', lightMode ? light : dark);
+		} else {
+			window.themeColor = null;
 		}
 	}
 
