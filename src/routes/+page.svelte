@@ -7,7 +7,7 @@
 
 <header class="border-primary-100 dark:border-primary-950 sticky top-0 z-50 border-b">
 	<div class="container mx-auto flex h-16 items-center justify-between">
-		<Button onclick={() => (theme.mode = theme.mode === 'dark' ? 'light' : 'dark')}>
+		<Button onclick={() => theme.setMode(theme.mode === 'dark' ? 'light' : 'dark')}>
 			Toggle dark mode
 		</Button>
 	</div>
@@ -28,19 +28,13 @@
 				const ambient = data.get('ambient');
 				const primary = data.get('primary');
 
-				theme.color = { ambient, primary, theme: '#fafafa' };
+				theme.setColor({ ambient, primary });
 			}}
 		>
 			<input type="range" min="0" max="360" step="0.1" name="ambient" />
 			<input type="range" min="0" max="360" step="0.1" name="primary" />
 			<Button type="submit">Save</Button>
 		</form>
-		<Button
-			onclick={() => {
-				theme.color = null;
-			}}
-		>
-			Reset
-		</Button>
+		<Button onclick={() => theme.setColor(null)}>Reset</Button>
 	</div>
 </div>

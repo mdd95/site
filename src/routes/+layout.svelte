@@ -3,8 +3,10 @@
 	import 'inter-ui/inter-variable.css';
 	import '../app.css';
 
-	import { setThemeContext, type ThemeKeyConfig } from '@/theme-mode.svelte.js';
+	import { setThemeContext } from '@/theme-mode.svelte';
+
 	import type { Snippet } from 'svelte';
+	import type { ThemeKeyConfig } from '@/theme-mode.svelte';
 
 	type Props = {
 		children: Snippet;
@@ -26,22 +28,22 @@
 			rootEl.classList.remove('dark');
 		} else {
 			rootEl.classList.add('dark');
-			metaEl?.setAttribute('content', '#000000');
+			metaEl?.setAttribute('content', '#000');
 		}
 		rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
 
 		if (themeColor) {
 			const parsed = JSON.parse(themeColor);
-			const { theme, ...rest } = parsed;
+			const { light, dark, ...rest } = parsed;
 			const params = new URLSearchParams(rest);
 
-			const a = document.createElement('link');
-			a.rel = 'stylesheet';
-			a.href = '/theme_color/palettes.css?' + params.toString();
-			document.head.appendChild(a);
+			const palettes = document.createElement('link');
+			palettes.rel = 'stylesheet';
+			palettes.href = '/theme_color/palettes.css?' + params.toString();
+			document.head.appendChild(palettes);
 
 			rootEl.dataset.theme = 'custom';
-			metaEl?.setAttribute('content', theme);
+			metaEl?.setAttribute('content', lightMode ? light : dark);
 		}
 	}
 
@@ -55,7 +57,7 @@
 </script>
 
 <svelte:head>
-	<meta name="theme-color" content="#ffffff" />
+	<meta name="theme-color" content="#fff" />
 	{@html '<script nonce>(' + setTheme.toString() + ')(' + themeKeys + ');</script>'}
 </svelte:head>
 

@@ -21,7 +21,7 @@ export function getThemeContext(): ReturnType<typeof createThemeStates> {
 
 function createThemeStates(config: ThemeKeyConfig) {
 	let themeMode = $state<ThemeMode>('system');
-	let themeColor = $state.raw<ThemeColor>({});
+	let themeColor = $state.raw<ThemeColor | null>(null);
 	const systemDarkColorScheme = new MediaQuery('(prefers-color-scheme: dark)');
 
 	$effect(() => {
@@ -31,21 +31,28 @@ function createThemeStates(config: ThemeKeyConfig) {
 		if (isValidThemeMode(storedThemeMode)) {
 			themeMode = storedThemeMode;
 		}
-
-		themeColor = JSON.parse(storedThemeColor || '{}');
+		if (storedThemeColor) {
+			themeColor = JSON.parse(storedThemeColor);
+		}
 	});
 
 	$effect(() => {
 		if (untrack(() => themeMode) === 'system') {
-			const lightMode = !systemDarkColorScheme.current;
 			const rootEl = document.documentElement;
-			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
+			const metaEl = document.querySelector('meta[name="theme-color"]');
 
-			if (lightMode) {
-				rootEl.classList.remove('dark');
-			} else {
-				rootEl.classList.add('dark');
-			}
+			const lightMode = !systemDarkColorScheme.current;
+			const theme = untrack(() => themeColor);
+
+			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
+			metaEl?.setAttribute(
+				'content',
+				// prettier-ignore
+				theme
+					? (lightMode ? theme.light : theme.dark)
+					: (lightMode ? '#fff' : '#000')
+			);
+			lightMode ? rootEl.classList.remove('dark') : rootEl.classList.add('dark');
 		}
 	});
 
@@ -53,55 +60,48 @@ function createThemeStates(config: ThemeKeyConfig) {
 		get mode() {
 			return themeMode;
 		},
-		set mode(value: ThemeMode) {
-			if (!isValidThemeMode(value as unknown)) return;
-			themeMode = value;
-			localStorage.setItem(config.themeModeKey, themeMode);
-
-			const rootEl = document.documentElement;
-			const lightMode =
-				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
-			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
-
-			if (lightMode) {
-				rootEl.classList.remove('dark');
-			} else {
-				rootEl.classList.add('dark');
-			}
-		},
 		get color() {
 			return themeColor;
 		},
-		set color(value: ThemeColor | null) {
+		setMode(value: ThemeMode) {
+			const rootEl = document.documentElement;
+			const metaEl = document.querySelector('meta[name="theme-color"]');
+
+			if (!isValidThemeMode(value)) return;
+			themeMode = value;
+
+			const lightMode =
+				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
+			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
+			metaEl?.setAttribute(
+				'content',
+				// prettier-ignore
+				themeColor
+					? (lightMode ? themeColor.light : themeColor.dark)
+					: (lightMode ? '#fff' : '#000')
+			);
+			lightMode ? rootEl.classList.remove('dark') : rootEl.classList.add('dark');
+			localStorage.setItem(config.themeModeKey, themeMode);
+		},
+		async setColor(value: ThemeColor | null) {
 			const rootEl = document.documentElement;
 			const metaEl = document.querySelector('meta[name="theme-color"]');
 
 			if (value === null) {
-				themeColor = {};
+				themeColor = null;
+				rootEl.dataset.theme = '';
 				localStorage.setItem(config.themeColorKey, '');
-				rootEl.dataset.themeColor = '';
 				return;
 			}
 			themeColor = value;
-			rootEl.dataset.themeColor = 'custom';
+			rootEl.dataset.theme = 'custom';
 			const lightMode =
 				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
 
-			fetch(
-				'/api/theme_color/' +
-					(lightMode ? '97.78,' : '11.73,') +
-					(lightMode ? '0.0108,' : '0.0243,') +
-					themeColor.ambient,
-				{ method: 'GET' }
-			)
-				.then((res) => res.text())
-				.then((color) => {
-					localStorage.setItem(
-						config.themeColorKey,
-						JSON.stringify({ ...themeColor, theme: color })
-					);
-					metaEl?.setAttribute('content', color);
-				});
+			const res = await fetch('/api/theme_color/' + themeColor.ambient, { method: 'GET' });
+			const theme = await res.json();
+			metaEl?.setAttribute('content', lightMode ? theme.light : theme.dark);
+			localStorage.setItem(config.themeColorKey, JSON.stringify({ ...themeColor, ...theme }));
 		}
 	};
 }
