@@ -49,6 +49,51 @@ function createThemeStates(config: ThemeKeys) {
 		}
 	});
 
+	const setMode = (value: ThemeMode) => {
+		const root = document.documentElement;
+		const meta = document.querySelector('meta[name="theme-color"]');
+
+		mode = value;
+		window.themeMode = value;
+
+		const light = mode == 'light' || (mode == 'system' && !dark.current);
+		root.style.colorScheme = light ? 'light' : 'dark';
+		meta?.setAttribute(
+			'content',
+			// prettier-ignore
+			colors
+				? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.ambient})`
+				: light ? '#fff' : '#000'
+		);
+		light ? root.classList.remove('dark') : root.classList.add('dark');
+		localStorage.setItem(config.mode, mode);
+	};
+
+	const setColors = (value: ThemeColors) => {
+		const root = document.documentElement;
+		const meta = document.querySelector('meta[name="theme-color"]');
+		const light = mode == 'light' || (mode == 'system' && !dark.current);
+
+		if (value == null) {
+			root.dataset.theme = '';
+			meta?.setAttribute('content', light ? '#fff' : '#000');
+
+			colors = null;
+			window.themeColors = null;
+			localStorage.setItem(config.colors, '');
+			return;
+		}
+		root.dataset.theme = 'custom';
+		meta?.setAttribute(
+			'content',
+			`${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.ambient})`
+		);
+
+		colors = value;
+		window.themeColors = value;
+		localStorage.setItem(config.colors, JSON.stringify(value));
+	};
+
 	return {
 		get mode() {
 			return mode;
@@ -57,47 +102,21 @@ function createThemeStates(config: ThemeKeys) {
 			return colors;
 		},
 		set mode(value: ThemeMode) {
-			const root = document.documentElement;
-			const meta = document.querySelector('meta[name="theme-color"]');
-
-			mode = value;
-			window.themeMode = value;
-
-			const light = mode == 'light' || (mode == 'system' && !dark.current);
-			root.style.colorScheme = light ? 'light' : 'dark';
-			meta?.setAttribute(
-				'content',
-				// prettier-ignore
-				colors
-					? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.ambient})`
-					: light ? '#fff' : '#000'
-			);
-			light ? root.classList.remove('dark') : root.classList.add('dark');
-			localStorage.setItem(config.mode, mode);
+			setMode(value);
 		},
 		set colors(value: ThemeColors) {
-			const root = document.documentElement;
-			const meta = document.querySelector('meta[name="theme-color"]');
-			const light = mode == 'light' || (mode == 'system' && !dark.current);
-
-			if (value == null) {
-				root.dataset.theme = '';
-				meta?.setAttribute('content', light ? '#fff' : '#000');
-
-				colors = null;
-				window.themeColors = null;
-				localStorage.setItem(config.colors, '');
-				return;
-			}
-			root.dataset.theme = 'custom';
-			meta?.setAttribute(
-				'content',
-				`${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.ambient})`
+			setColors(value);
+		},
+		toggleMode() {
+			setMode(
+				// prettier-ignore
+				mode == 'system'
+					? (dark.current ? 'light' : 'dark')
+					: (mode == 'light' ? 'dark' : 'light')
 			);
-
-			colors = value;
-			window.themeColors = value;
-			localStorage.setItem(config.colors, JSON.stringify(value));
+		},
+		resetMode() {
+			setMode('system');
 		}
 	};
 }
