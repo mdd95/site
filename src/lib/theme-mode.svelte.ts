@@ -2,115 +2,121 @@ import { getContext, setContext, untrack } from 'svelte';
 import { MediaQuery } from 'svelte/reactivity';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
-export type ThemeColor = {
-	light: string;
-	dark: string;
-	ambient: string;
-	primary: string;
-	[key: string]: string;
-} | null;
+export type ThemeColors = { [key: string]: string } | null;
 
-export type ThemeKeyConfig = {
-	themeModeKey: string;
-	themeColorKey: string;
+export type ThemeKeys = {
+	mode: string;
+	colors: string;
 };
 
 export const themeContextKey = Symbol('theme');
 
-export function setThemeContext(config: ThemeKeyConfig) {
-	return setContext(themeContextKey, createThemeStates(config));
+export function setTheme(keys: ThemeKeys) {
+	return setContext(themeContextKey, createThemeStates(keys));
 }
 
-export function getThemeContext(): ReturnType<typeof createThemeStates> {
+export function getTheme(): ReturnType<typeof setTheme> {
 	return getContext(themeContextKey);
 }
 
-function createThemeStates(config: ThemeKeyConfig) {
-	let themeMode = $state<ThemeMode>('system');
-	let themeColor = $state.raw<ThemeColor | null>(null);
-	const systemDarkColorScheme = new MediaQuery('(prefers-color-scheme: dark)');
+function createThemeStates(config: ThemeKeys) {
+	let mode = $state<ThemeMode>('system');
+	let colors = $state.raw<ThemeColors>(null);
+	const dark = new MediaQuery('(prefers-color-scheme: dark)');
 
 	$effect(() => {
-		themeMode = window.themeMode;
-		themeColor = window.themeColor;
+		mode = window.themeMode;
+		colors = window.themeColors;
 	});
 
 	$effect(() => {
-		if (untrack(() => themeMode) === 'system') {
-			const rootEl = document.documentElement;
-			const metaEl = document.querySelector('meta[name="theme-color"]');
+		if (untrack(() => mode) == 'system') {
+			const root = document.documentElement;
+			const meta = document.querySelector('meta[name="theme-color"]');
 
-			const lightMode = !systemDarkColorScheme.current;
-			const theme = untrack(() => themeColor);
+			const light = !dark.current;
+			const ucolors = untrack(() => colors);
 
-			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
-			metaEl?.setAttribute(
+			root.style.colorScheme = light ? 'light' : 'dark';
+			meta?.setAttribute(
 				'content',
 				// prettier-ignore
-				theme
-					? (lightMode ? theme.light : theme.dark)
-					: (lightMode ? '#fff' : '#000')
+				ucolors
+					? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${ucolors.ambient})`
+					: light ? '#fff' : '#000'
 			);
-			lightMode ? rootEl.classList.remove('dark') : rootEl.classList.add('dark');
+			light ? root.classList.remove('dark') : root.classList.add('dark');
 		}
 	});
+
+	const setMode = (value: ThemeMode) => {
+		const root = document.documentElement;
+		const meta = document.querySelector('meta[name="theme-color"]');
+
+		mode = value;
+		window.themeMode = value;
+
+		const light = mode == 'light' || (mode == 'system' && !dark.current);
+		root.style.colorScheme = light ? 'light' : 'dark';
+		meta?.setAttribute(
+			'content',
+			// prettier-ignore
+			colors
+				? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.ambient})`
+				: light ? '#fff' : '#000'
+		);
+		light ? root.classList.remove('dark') : root.classList.add('dark');
+		localStorage.setItem(config.mode, mode);
+	};
+
+	const setColors = (value: ThemeColors) => {
+		const root = document.documentElement;
+		const meta = document.querySelector('meta[name="theme-color"]');
+		const light = mode == 'light' || (mode == 'system' && !dark.current);
+
+		if (value == null) {
+			root.dataset.theme = '';
+			meta?.setAttribute('content', light ? '#fff' : '#000');
+
+			colors = null;
+			window.themeColors = null;
+			localStorage.setItem(config.colors, '');
+			return;
+		}
+		root.dataset.theme = 'custom';
+		meta?.setAttribute(
+			'content',
+			`${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.ambient})`
+		);
+
+		colors = value;
+		window.themeColors = value;
+		localStorage.setItem(config.colors, JSON.stringify(value));
+	};
 
 	return {
 		get mode() {
-			return themeMode;
+			return mode;
 		},
-		get color() {
-			return themeColor;
+		get colors() {
+			return colors;
 		},
-		setMode(value: ThemeMode) {
-			const rootEl = document.documentElement;
-			const metaEl = document.querySelector('meta[name="theme-color"]');
-
-			if (!isValidThemeMode(value)) return;
-			themeMode = value;
-			window.themeMode = value;
-
-			const lightMode =
-				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
-			rootEl.style.colorScheme = lightMode ? 'light' : 'dark';
-			metaEl?.setAttribute(
-				'content',
+		set mode(value: ThemeMode) {
+			setMode(value);
+		},
+		set colors(value: ThemeColors) {
+			setColors(value);
+		},
+		toggleMode() {
+			setMode(
 				// prettier-ignore
-				themeColor
-					? (lightMode ? themeColor.light : themeColor.dark)
-					: (lightMode ? '#fff' : '#000')
+				mode == 'system'
+					? (dark.current ? 'light' : 'dark')
+					: (mode == 'light' ? 'dark' : 'light')
 			);
-			lightMode ? rootEl.classList.remove('dark') : rootEl.classList.add('dark');
-			localStorage.setItem(config.themeModeKey, themeMode);
 		},
-		async setColor(value: ThemeColor) {
-			const rootEl = document.documentElement;
-			const metaEl = document.querySelector('meta[name="theme-color"]');
-
-			if (value === null) {
-				themeColor = null;
-				window.themeColor = null;
-				rootEl.dataset.theme = '';
-				localStorage.setItem(config.themeColorKey, '');
-				return;
-			}
-			rootEl.dataset.theme = 'custom';
-			const lightMode =
-				themeMode === 'light' || (themeMode === 'system' && !systemDarkColorScheme.current);
-
-			const res = await fetch('/api/theme_color/' + value.ambient, { method: 'GET' });
-			const theme = await res.json();
-			metaEl?.setAttribute('content', lightMode ? theme.light : theme.dark);
-
-			window.themeColor = { ...value, ...theme };
-			localStorage.setItem(config.themeColorKey, JSON.stringify(window.themeColor));
+		resetMode() {
+			setMode('system');
 		}
 	};
-}
-
-const modes = ['system', 'light', 'dark'];
-
-export function isValidThemeMode(value: unknown): value is ThemeMode {
-	if (typeof value !== 'string') return false;
-	return modes.includes(value);
 }
