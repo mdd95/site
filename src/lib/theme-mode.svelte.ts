@@ -75,6 +75,9 @@ function createThemeStates(config: ThemeKeys) {
 		const light = mode == 'light' || (mode == 'system' && !dark.current);
 
 		if (value == null) {
+			for (const [key] of Object.entries(colors || {})) {
+				root.style.removeProperty(`--${key}`);
+			}
 			root.dataset.theme = '';
 			meta?.setAttribute('content', light ? '#fff' : '#000');
 
@@ -82,6 +85,9 @@ function createThemeStates(config: ThemeKeys) {
 			window.themeColors = null;
 			localStorage.setItem(config.colors, '');
 			return;
+		}
+		for (const [key] of Object.entries(colors || {})) {
+			root.style.setProperty(`--${key}`, value[key]);
 		}
 		root.dataset.theme = 'custom';
 		meta?.setAttribute(
