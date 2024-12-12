@@ -37,8 +37,8 @@
 			const parsed = JSON.parse(colors);
 			window.themeColors = parsed;
 			root.dataset.theme = 'custom';
-			for (const [k, v] of Object.entries(parsed)) {
-				root.style.setProperty(`--${k}`, `${v}`);
+			for (const [key, val] of Object.entries(parsed)) {
+				root.style.setProperty(`--${key}`, `${val}`);
 			}
 			meta?.setAttribute(
 				'content',
