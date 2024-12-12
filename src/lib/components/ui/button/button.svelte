@@ -6,18 +6,17 @@
 	import type { WithElementRef } from 'bits-ui';
 
 	export const buttonVariants = tv({
-		base: 'cursor-pointer focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+		base: 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-within:ring-offset-2 focus-visible:ring-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 		variants: {
 			variant: {
 				default:
-					'bg-neutral-950 text-neutral-50 hover:bg-neutral-950/90 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-50/90 theme:bg-primary-600 theme:text-primary-50 theme:hover:bg-primary-600/90 shadow',
+					'theme:bg-primary-600 theme:text-primary-50 theme:hover:bg-primary-600/90 focus-within:ring-primary-600 bg-neutral-950 text-neutral-50 shadow hover:bg-neutral-950/90 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-50/90',
 				destructive:
-					'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
+					'bg-red-700 text-neutral-50 shadow-sm hover:bg-red-700/90 focus-visible:ring-red-700',
 				outline:
-					'border-input bg-background hover:bg-accent hover:text-accent-foreground border shadow-sm',
-				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm',
-				ghost: 'hover:bg-accent hover:text-accent-foreground',
-				link: 'text-primary underline-offset-4 hover:underline'
+					'theme:text-primary-600 theme:border-primary-600 theme:hover:bg-primary-600 border border-neutral-950 shadow-sm hover:text-neutral-50 dark:border-neutral-50',
+				ghost: 'hover:bg-ambient-200 text-ambient-950',
+				link: 'text-primary-600 underline-offset-2 hover:underline'
 			},
 			size: {
 				default: 'h-9 px-4 py-2',

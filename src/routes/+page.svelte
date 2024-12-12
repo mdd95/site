@@ -10,7 +10,7 @@
 
 <header class="sticky top-0 z-50">
 	<div class="container flex h-16 items-center justify-between">
-		<Button onclick={theme.toggleMode}>Toggle dark mode</Button>
+		<Button onclick={theme.toggleMode} variant="ghost">Toggle dark mode</Button>
 	</div>
 </header>
 
@@ -35,7 +35,7 @@
 			<input type="range" min="0" max="360" step="0.1" name="primary" bind:value={primary} />
 			<Button type="submit">Save</Button>
 		</form>
-		<Button onclick={theme.resetMode}>Reset mode</Button>
-		<Button onclick={() => (theme.colors = null)}>Reset colors</Button>
+		<Button onclick={theme.resetMode} variant="destructive">Reset mode</Button>
+		<Button onclick={() => (theme.colors = null)} variant="outline">Reset colors</Button>
 	</div>
 </div>
