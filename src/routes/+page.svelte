@@ -6,19 +6,11 @@
 
 	let ambient = $state(0);
 	let primary = $state(0);
-
-	$effect(() => {
-		const root = document.documentElement;
-		root.style.setProperty('--ambient', ambient.toString());
-		root.style.setProperty('--primary', primary.toString());
-	});
 </script>
 
 <header class="sticky top-0 z-50">
-	<div class="container flex h-16 items-center justify-between" style="--primary: 0;">
-		<Button onclick={() => (theme.mode = theme.mode == 'dark' ? 'light' : 'dark')}>
-			Toggle dark mode
-		</Button>
+	<div class="container flex h-16 items-center justify-between">
+		<Button onclick={theme.toggleMode}>Toggle dark mode</Button>
 	</div>
 </header>
 
@@ -32,42 +24,18 @@
 		<form
 			onsubmit={(e) => {
 				e.preventDefault();
-
 				const data = new FormData(e.target as HTMLFormElement);
 				const ambient = data.get('ambient') as string;
 				const primary = data.get('primary') as string;
-
 				theme.colors = { ambient, primary };
-				location.reload();
+				console.log(theme.colors);
 			}}
 		>
-			<input
-				type="range"
-				min="0"
-				max="360"
-				step="0.01"
-				name="ambient"
-				defaultValue={window.themeColors?.ambient || 262.88}
-				bind:value={ambient}
-			/>
-			<input
-				type="range"
-				min="0"
-				max="360"
-				step="0.01"
-				name="primary"
-				defaultValue={window.themeColors?.primary || 262.88}
-				bind:value={primary}
-			/>
+			<input type="range" min="0" max="360" step="0.1" name="ambient" bind:value={ambient} />
+			<input type="range" min="0" max="360" step="0.1" name="primary" bind:value={primary} />
 			<Button type="submit">Save</Button>
 		</form>
-		<Button
-			onclick={() => {
-				theme.colors = null;
-				location.reload();
-			}}
-		>
-			Reset
-		</Button>
+		<Button onclick={theme.resetMode}>Reset mode</Button>
+		<Button onclick={() => (theme.colors = null)}>Reset colors</Button>
 	</div>
 </div>
