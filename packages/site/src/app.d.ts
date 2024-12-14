@@ -8,6 +8,11 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
+
+  interface Window {
+    themeMode: import('components').ThemeMode;
+    themeColors: import('components').ThemeColors | null;
+  }
 }
 
 export {};

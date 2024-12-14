@@ -46,18 +46,4 @@
     justify-content: center;
     cursor: pointer;
   }
-
-  /* Variants */
-  .primary {
-  }
-  .ghost {
-  }
-  .outline {
-  }
-
-  /* Size */
-  .sm {
-  }
-  .lg {
-  }
 </style>

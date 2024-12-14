@@ -9,8 +9,7 @@ export {
   default as Theme,
   setTheme,
   getTheme,
+  THEME_CONTEXT_KEY,
   type ThemeMode,
-  type ThemeColors,
-  type ThemeConfig,
-  type ThemeProps
+  type ThemeColors
 } from './theme.svelte';
