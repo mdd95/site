@@ -3,57 +3,38 @@
   import { MediaQuery } from 'svelte/reactivity';
   import { browser } from '$app/environment';
 
-  export type DeepRequired<T> = T extends Function | Date | RegExp
-    ? T
-    : T extends Array<infer U>
-      ? DeepRequired<U>[]
-      : T extends object
-        ? { [K in keyof T]-?: DeepRequired<T[K]> }
-        : T;
+  export const THEME_MODE = 'theme-mode';
+  export const THEME_COLORS = 'theme-colors';
+  export const THEME_CONTEXT_KEY = Symbol('theme');
 
   export type ThemeMode = 'system' | 'light' | 'dark';
-  export type ThemeColors = Record<string, string>;
-  export type ThemeStoreKeys = {
-    mode?: string;
-    colors?: string;
+  export type ThemeColors = {
+    backdrop: string;
+    primary: string;
   };
 
-  export type ThemeConfig = {
-    mode?: ThemeMode;
-    colors?: ThemeColors | null;
-    storeKeys?: ThemeStoreKeys;
-  };
-
-  export type ThemeProps = {
-    theme: DeepRequired<ThemeConfig>;
-  };
-
-  export const themeContextKey = Symbol('theme');
-
-  export function setTheme(config: ThemeConfig = {}) {
-    return setContext(themeContextKey, setupTheme(config));
+  export function setTheme() {
+    return setContext(THEME_CONTEXT_KEY, setupTheme());
   }
 
   export function getTheme(): ReturnType<typeof setTheme> {
-    return getContext(themeContextKey);
+    return getContext(THEME_CONTEXT_KEY);
   }
 
-  function setupTheme(config: ThemeConfig = {}): DeepRequired<ThemeConfig> & {
+  function setupTheme(): {
+    mode: ThemeMode;
+    colors: ThemeColors | null;
     toggleMode?: () => void;
     resetMode?: () => void;
   } {
-    if (!browser) {
-      return { mode: 'system', colors: null, storeKeys: { mode: '', colors: '' } };
-    }
-    let mode = $state<ThemeMode>(config.mode || window.themeMode || 'system');
-    let colors = $state.raw<ThemeColors | null>(config.colors || window.themeColors || null);
+    if (!browser) return { mode: 'system', colors: null };
+
+    let mode = $state<ThemeMode>(window.themeMode || 'system');
+    let colors = $state.raw<ThemeColors | null>(window.themeColors);
     const dark = new MediaQuery('(prefers-color-scheme: dark)');
 
     const root = document.documentElement;
     const meta = document.querySelector('meta[name="theme-color"]');
-
-    const modeStoreKey = config.storeKeys?.mode || 'theme-mode';
-    const colorStoreKey = config.storeKeys?.colors || 'theme-colors';
 
     $effect(() => {
       if (untrack(() => mode) == 'system') {
@@ -65,7 +46,7 @@
           'content',
           // prettier-ignore
           ucolors
-            ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${ucolors.background})`
+            ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${ucolors.backdrop})`
             : light ? '#fff' : '#000'
         );
         light ? root.classList.remove('dark') : root.classList.add('dark');
@@ -82,47 +63,42 @@
         'content',
         // prettier-ignore
         colors
-          ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.background})`
+          ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.backdrop})`
           : light ? '#fff' : '#000'
       );
       light ? root.classList.remove('dark') : root.classList.add('dark');
-      localStorage.setItem(modeStoreKey, mode);
+      localStorage.setItem(THEME_MODE, mode);
     };
 
     const setColors = (value: ThemeColors | null) => {
       const light = mode == 'light' || (mode == 'system' && !dark.current);
 
       if (value == null) {
-        for (const [key] of Object.entries(colors || {})) {
-          root.style.removeProperty(`--${key}`);
-        }
+        root.style.removeProperty('--backdrop');
+        root.style.removeProperty('--primary');
         root.dataset.theme = '';
         meta?.setAttribute('content', light ? '#fff' : '#000');
 
         colors = null;
         window.themeColors = null;
-        localStorage.setItem(colorStoreKey, '');
+        localStorage.setItem(THEME_COLORS, '');
         return;
       }
-      for (const [key] of Object.entries(colors || {})) {
-        root.style.setProperty(`--${key}`, value[key]);
-      }
+
+      root.style.setProperty('--backdrop', value.backdrop);
+      root.style.setProperty('--primary', value.primary);
       root.dataset.theme = 'custom';
       meta?.setAttribute(
         'content',
-        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.background})`
+        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.backdrop})`
       );
 
       colors = value;
       window.themeColors = value;
-      localStorage.setItem(colorStoreKey, JSON.stringify(value));
+      localStorage.setItem(THEME_COLORS, JSON.stringify(value));
     };
 
     return {
-      storeKeys: {
-        mode: modeStoreKey,
-        colors: colorStoreKey
-      },
       get mode() {
         return mode;
       },
@@ -151,9 +127,12 @@
 </script>
 
 <script lang="ts">
-  let { theme }: ThemeProps = $props();
+  type ThemeStoreKeys = {
+    mode: string;
+    colors: string;
+  };
 
-  function initTheme(storeKeys: Required<ThemeStoreKeys>) {
+  function initTheme(storeKeys: ThemeStoreKeys) {
     const mode = localStorage.getItem(storeKeys.mode) || 'system';
     const colors = localStorage.getItem(storeKeys.colors);
     const light =
@@ -173,21 +152,26 @@
     window.themeMode = mode as ThemeMode;
 
     if (colors) {
-      const parsed = JSON.parse(colors);
-      window.themeColors = parsed;
+      const data: ThemeColors = JSON.parse(colors);
+      window.themeColors = data;
+
+      root.style.setProperty('--backdrop', data.backdrop);
+      root.style.setProperty('--primary', data.primary);
       root.dataset.theme = 'custom';
-      for (const [key, val] of Object.entries(parsed)) {
-        root.style.setProperty(`--${key}`, `${val}`);
-      }
       meta?.setAttribute(
         'content',
-        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${parsed.background})`
+        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${data.backdrop})`
       );
     }
   }
+
+  const themeStoreKeys = {
+    mode: THEME_MODE,
+    colors: THEME_COLORS
+  };
 </script>
 
 <svelte:head>
   <meta name="theme-color" content="#fff" />
-  {@html `<script nonce>(${initTheme.toString()})(${JSON.stringify(theme.storeKeys)});</script>`}
+  {@html `<script nonce>(${initTheme.toString()})(${JSON.stringify(themeStoreKeys)});</script>`}
 </svelte:head>

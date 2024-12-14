@@ -10,8 +10,8 @@ declare global {
   }
 
   interface Window {
-    themeMode: import('$lib/theme.svelte').ThemeMode | null | undefined;
-    themeColors: import('$lib/theme.svelte').ThemeColors | null | undefined;
+    themeMode: import('$lib/theme.svelte').ThemeMode;
+    themeColors: import('$lib/theme.svelte').ThemeColors | null;
   }
 }
 
