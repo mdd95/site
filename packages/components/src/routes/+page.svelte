@@ -1,6 +1,12 @@
 <script>
+  import '$lib/base.css';
   import Button from '$lib/button.svelte';
+  import Theme, { setTheme } from '$lib/theme.svelte';
+
+  const theme = setTheme();
 </script>
+
+<Theme {theme} />
 
 <h1>Welcome to your library project</h1>
 <p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
