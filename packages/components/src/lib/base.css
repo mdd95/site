@@ -1,32 +1,45 @@
 @layer theme, base;
 
 @layer theme {
+  :root {
+    --root-background: oklch(0.978 0 0);
+    --root-foreground: oklch(0.117 0 0);
+    --radius: 0.5rem;
+
+    --rounded-sm: calc(var(--radius) - 4px);
+    --rounded-md: calc(var(--radius) - 2px);
+    --rounded-lg: var(--radius);
+    --rounded-xl: calc(var(--radius) + 4px);
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+    --duration: 150ms;
+    --function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:where(.dark, .dark *) {
+      --root-background: oklch(0.117 0 0);
+      --root-foreground: oklch(0.978 0 0);
+    }
+  }
 }
 
 @layer base {
   *,
-  :after,
-  :before,
-  ::backdrop {
-    box-sizing: border-box;
-    border: 0 solid;
-    margin: 0;
-    padding: 0;
-  }
-
+  ::after,
+  ::before,
+  ::backdrop,
   ::file-selector-button {
     box-sizing: border-box;
-    border: 0 solid;
     margin: 0;
     padding: 0;
+    border: 0 solid;
   }
 
   html,
   :host {
-    -webkit-text-size-adjust: 100%;
-    -moz-tab-size: 4;
-    tab-size: 4;
     line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
     font-family: var(
       --sans,
       ui-sans-serif,
@@ -40,6 +53,8 @@
     font-feature-settings: normal;
     font-variation-settings: normal;
     -webkit-tap-highlight-color: transparent;
+    background-color: var(--root-background);
+    color: var(--root-foreground);
   }
 
   body {
@@ -104,10 +119,10 @@
 
   sub,
   sup {
-    vertical-align: baseline;
     font-size: 75%;
     line-height: 0;
     position: relative;
+    vertical-align: baseline;
   }
 
   sub {
@@ -150,8 +165,8 @@
   iframe,
   embed,
   object {
-    vertical-align: middle;
     display: block;
+    vertical-align: middle;
   }
 
   img,
@@ -164,26 +179,16 @@
   input,
   select,
   optgroup,
-  textarea {
-    font: inherit;
-    font-feature-settings: inherit;
-    font-variation-settings: inherit;
-    letter-spacing: inherit;
-    color: inherit;
-    opacity: 1;
-    background-color: #0000;
-    border-radius: 0;
-  }
-
+  textarea,
   ::file-selector-button {
     font: inherit;
     font-feature-settings: inherit;
     font-variation-settings: inherit;
     letter-spacing: inherit;
     color: inherit;
-    opacity: 1;
-    background-color: #0000;
     border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
   }
 
   :where(select:is([multiple], [size])) optgroup {
@@ -220,7 +225,10 @@
     display: inline-flex;
   }
 
-  ::-webkit-datetime-edit-fields-wrapper,
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+
   ::-webkit-datetime-edit,
   ::-webkit-datetime-edit-year-field,
   ::-webkit-datetime-edit-month-field,
@@ -238,22 +246,12 @@
   }
 
   button,
-  input:where([type='button'], [type='reset'], [type='submit']) {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
-  }
-
+  input:where([type='button'], [type='reset'], [type='submit']),
   ::file-selector-button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
     appearance: button;
   }
 
-  ::-webkit-inner-spin-button {
-    height: auto;
-  }
-
+  ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
     height: auto;
   }

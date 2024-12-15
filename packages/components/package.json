@@ -25,7 +25,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js"
-    }
+    },
+    "./dist/*": "./dist/*"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "bits-ui": "1.0.0-next.71",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "inter-ui": "^4.1.0"
   }
 }
