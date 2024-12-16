@@ -42,22 +42,22 @@
   a,
   button {
     --opacity: 1;
-    --background: var(--root-background);
-    --foreground: var(--root-foreground);
+    --bg: var(--root-bg);
+    --fg: var(--root-fg);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding-inline: 1rem;
     padding-block: 0.5rem;
-    border-radius: var(--rounded-md);
-    box-shadow: var(--shadow-sm);
-    background-color: oklch(from var(--root-background) l c h / var(--opacity));
-    color: oklch(from var(--root-foreground) l c h / var(--opacity));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background-color: oklch(from var(--bg) l c h / var(--opacity));
+    color: oklch(from var(--fg) l c h / var(--opacity));
     font-size: 0.875rem;
     line-height: 1.25rem;
     white-space: nowrap;
     cursor: pointer;
-    transition: color var(--duration) var(--function);
+    transition: var(--tr-colors) var(--tr-duration) var(--tr-timing);
 
     &:disabled {
       --opacity: 0.9;
@@ -65,9 +65,14 @@
       pointer-events: none;
     }
 
-    &:global(:where(.dark, .dark *)) {
-      --background: var(--root-foreground);
-      --foreground: var(--root-background);
+    &:global(:where(.theme, .theme *)) {
+      --bg: oklch(var(--color-150) var(--primary));
+      --fg: oklch(var(--color-900) var(--primary));
+    }
+
+    &:global(:where(.dark.theme, .dark.theme *)) {
+      --bg: oklch(var(--color-950) var(--primary));
+      --fg: oklch(var(--color-150) var(--primary));
     }
 
     & :global(svg) {

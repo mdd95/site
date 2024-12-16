@@ -46,7 +46,7 @@
           'content',
           // prettier-ignore
           ucolors
-            ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${ucolors.backdrop})`
+            ? `${light ? 'oklch(0.827 0.091' : 'oklch(0.117 0.024'} ${ucolors.backdrop})`
             : light ? '#fff' : '#000'
         );
         light ? root.classList.remove('dark') : root.classList.add('dark');
@@ -63,7 +63,7 @@
         'content',
         // prettier-ignore
         colors
-          ? `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${colors.backdrop})`
+          ? `${light ? 'oklch(0.827 0.091' : 'oklch(0.117 0.024'} ${colors.backdrop})`
           : light ? '#fff' : '#000'
       );
       light ? root.classList.remove('dark') : root.classList.add('dark');
@@ -76,7 +76,7 @@
       if (value == null) {
         root.style.removeProperty('--backdrop');
         root.style.removeProperty('--primary');
-        root.dataset.theme = '';
+        root.classList.remove('theme');
         meta?.setAttribute('content', light ? '#fff' : '#000');
 
         colors = null;
@@ -87,10 +87,10 @@
 
       root.style.setProperty('--backdrop', value.backdrop);
       root.style.setProperty('--primary', value.primary);
-      root.dataset.theme = 'custom';
+      root.classList.add('theme');
       meta?.setAttribute(
         'content',
-        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${value.backdrop})`
+        `${light ? 'oklch(0.827 0.091' : 'oklch(0.117 0.024'} ${value.backdrop})`
       );
 
       colors = value;
@@ -157,10 +157,10 @@
 
       root.style.setProperty('--backdrop', data.backdrop);
       root.style.setProperty('--primary', data.primary);
-      root.dataset.theme = 'custom';
+      root.classList.add('theme');
       meta?.setAttribute(
         'content',
-        `${light ? 'oklch(82.67% 0.0908' : 'oklch(11.73% 0.0243'} ${data.backdrop})`
+        `${light ? 'oklch(0.827 0.091' : 'oklch(0.117 0.024'} ${data.backdrop})`
       );
     }
   }
@@ -173,5 +173,5 @@
 
 <svelte:head>
   <meta name="theme-color" content="#fff" />
-  {@html `<script nonce>(${initTheme.toString()})(${JSON.stringify(themeStoreKeys)});</script>`}
+  {@html `<script>(${initTheme.toString()})(${JSON.stringify(themeStoreKeys)});</script>`}
 </svelte:head>
