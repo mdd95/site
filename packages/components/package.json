@@ -39,6 +39,7 @@
     "publint": "^0.2.0",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "svelte-radix": "^2.0.1",
     "typescript": "^5.0.0",
     "vite": "^6.0.0"
   },

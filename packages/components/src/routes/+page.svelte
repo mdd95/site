@@ -2,6 +2,10 @@
   import 'inter-ui/inter.css';
   import 'inter-ui/inter-variable.css';
   import '$lib/base.css';
+
+  import Sun from 'svelte-radix/Sun.svelte';
+  import Moon from 'svelte-radix/Moon.svelte';
+
   import Button from '$lib/button.svelte';
   import Theme, { setTheme } from '$lib/theme.svelte';
 
@@ -33,10 +37,15 @@
 </svelte:head>
 
 <div class="container">
+  <div class="header">
+    <Button class="ghost icon" onclick={theme.toggleMode}>
+      <Sun class={theme.mode == 'light' ? 'hidden' : ''} />
+      <Moon class={theme.mode == 'dark' ? 'hidden' : ''} />
+    </Button>
+  </div>
   <h2>Buttons</h2>
 
-  <Button variant="primary" class="outline" onclick={theme.toggleMode}>Toggle mode</Button>
-  <Button class="ghost" onclick={theme.resetMode}>Reset</Button>
+  <Button class="ghost" onclick={theme.resetMode} disabled={theme.mode == 'system'}>Reset</Button>
 
   <div class="flex">
     <label for="backdrop">Backdrop </label>
@@ -48,8 +57,23 @@
     <div style="width: 64px; height: 48px; background-color: oklch(0.648 0.147 {primary});"></div>
     <input type="range" id="primary" min="0" max="360" bind:value={primary} />
   </div>
-  <Button size="sm" onclick={changeTheme}>Change theme</Button>
-  <Button variant="primary" size="sm" onclick={resetTheme}>Reset theme</Button>
+  <Button class="primary sm" onclick={changeTheme}>Change theme</Button>
+  <Button class="primary sm" onclick={resetTheme} disabled={theme.colors == null}>
+    Reset theme
+  </Button>
+  <Button class="destructive">Delete</Button>
+
+  <section>
+    <h2>Checkbox</h2>
+
+    <input type="checkbox" />
+  </section>
+
+  <section>
+    <h2>Dialog</h2>
+
+    <Button>Open dialog</Button>
+  </section>
 </div>
 
 <style>
@@ -63,7 +87,13 @@
     }
   }
 
-  .flex {
+  .header {
+    padding-block: 0.75rem;
     display: flex;
+    justify-content: flex-end;
+  }
+
+  :global(.hidden) {
+    display: none;
   }
 </style>

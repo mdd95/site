@@ -2,40 +2,21 @@
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
   import type { WithElementRef } from 'bits-ui';
 
-  export type ButtonVariant = 'default' | 'primary' | 'destructive';
+  export type ButtonVariant = 'default' | 'primary' | 'ghost' | 'outline' | 'destructive';
   export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
   export type ButtonProps = WithElementRef<HTMLButtonAttributes> &
-    WithElementRef<HTMLAnchorAttributes> & {
-      variant?: ButtonVariant;
-      size?: ButtonSize;
-    };
+    WithElementRef<HTMLAnchorAttributes>;
 </script>
 
 <script lang="ts">
-  import clsx from 'clsx';
-
-  let {
-    ref = $bindable(null),
-    children,
-    variant = 'default',
-    size = 'default',
-    href = undefined,
-    class: className,
-    ...restProps
-  }: ButtonProps = $props();
-
-  const cn = clsx(variant != 'default' && variant, size != 'default' && size, className);
+  let { ref = $bindable(null), children, href = undefined, ...restProps }: ButtonProps = $props();
 </script>
 
 {#if href}
-  <a bind:this={ref} {href} class={cn} {...restProps}>
-    {@render children?.()}
-  </a>
+  <a bind:this={ref} {href} {...restProps}>{@render children?.()}</a>
 {:else}
-  <button bind:this={ref} class={cn} {...restProps}>
-    {@render children?.()}
-  </button>
+  <button bind:this={ref} {...restProps}>{@render children?.()}</button>
 {/if}
 
 <style>
@@ -61,7 +42,7 @@
     transition: var(--tr-colors) var(--tr-duration) var(--tr-timing);
 
     &:disabled {
-      --opacity: 0.9;
+      --opacity: 0.65;
       cursor: default;
       pointer-events: none;
     }
@@ -105,12 +86,22 @@
   }
 
   .outline {
-    border: 1px solid var(--bg);
+    --bg: transparent;
+    --border-color: oklch(var(--light-975) / var(--opacity));
+    border: 1px solid var(--border-color);
 
-    &:not(:hover) {
-      background-color: transparent;
-      color: currentColor;
+    &:global(:where(.dark, .dark *)) {
+      --border-color: oklch(var(--light-100) / var(--opacity));
     }
+    &:global(:where(.theme, .theme *)) {
+      --fg: oklch(var(--color-600) var(--primary) / var(--opacity));
+      --border-color: oklch(var(--color-600) var(--primary) / var(--opacity));
+    }
+  }
+
+  .destructive {
+    --bg: oklch(0.577 0.245 27.325 / var(--opacity));
+    --fg: oklch(var(--light-100) / var(--opacity));
   }
 
   @media (hover: hover) {
@@ -138,6 +129,24 @@
       &:global(:where(.theme, .theme *)) {
         --bg: oklch(var(--color-500) var(--primary) / var(--opacity));
       }
+    }
+
+    .outline:hover {
+      --bg: oklch(var(--light-975) / var(--opacity));
+      --fg: oklch(var(--light-100) / var(--opacity));
+
+      &:global(:where(.dark, .dark *)) {
+        --bg: oklch(var(--light-100) / var(--opacity));
+        --fg: oklch(var(--light-975) / var(--opacity));
+      }
+      &:global(:where(.theme, .theme *)) {
+        --bg: oklch(var(--color-600) var(--primary) / var(--opacity));
+        --fg: oklch(var(--light-100) / var(--opacity));
+      }
+    }
+
+    .destructive:hover {
+      --bg: oklch(0.637 0.237 25.331 / var(--opacity));
     }
   }
 
