@@ -2,7 +2,7 @@
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
   import type { WithElementRef } from 'bits-ui';
 
-  export type ButtonVariant = 'default' | 'primary' | 'ghost' | 'outline' | 'destructive';
+  export type ButtonVariant = 'default' | 'primary' | 'destructive';
   export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
   export type ButtonProps = WithElementRef<HTMLButtonAttributes> &
@@ -42,17 +42,18 @@
   a,
   button {
     --opacity: 1;
-    --bg: var(--root-bg);
-    --fg: var(--root-fg);
+    --bg: oklch(var(--light-150) / var(--opacity));
+    --fg: oklch(var(--light-975) / var(--opacity));
+    height: 2.25rem;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding-inline: 1rem;
-    padding-block: 0.5rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    background-color: oklch(from var(--bg) l c h / var(--opacity));
-    color: oklch(from var(--fg) l c h / var(--opacity));
+    background-color: var(--bg);
+    color: var(--fg);
     font-size: 0.875rem;
     line-height: 1.25rem;
     white-space: nowrap;
@@ -65,14 +66,15 @@
       pointer-events: none;
     }
 
-    &:global(:where(.theme, .theme *)) {
-      --bg: oklch(var(--color-150) var(--primary));
-      --fg: oklch(var(--color-900) var(--primary));
+    &:global(:where(.dark, .dark *)) {
+      --bg: oklch(var(--light-950) / var(--opacity));
+      --fg: oklch(var(--light-100) / var(--opacity));
     }
-
+    &:global(:where(.theme, .theme *)) {
+      --bg: oklch(var(--color-150) var(--backdrop) / var(--opacity));
+    }
     &:global(:where(.dark.theme, .dark.theme *)) {
-      --bg: oklch(var(--color-950) var(--primary));
-      --fg: oklch(var(--color-150) var(--primary));
+      --bg: oklch(var(--color-950) var(--backdrop) / var(--opacity));
     }
 
     & :global(svg) {
@@ -81,5 +83,76 @@
       flex-shrink: 0;
       pointer-events: none;
     }
+  }
+
+  .primary {
+    --bg: oklch(var(--light-975) / var(--opacity));
+    --fg: oklch(var(--light-100) / var(--opacity));
+
+    &:global(:where(.dark, .dark *)) {
+      --bg: oklch(var(--light-100) / var(--opacity));
+      --fg: oklch(var(--light-975) / var(--opacity));
+    }
+    &:global(:where(.theme, .theme *)) {
+      --bg: oklch(var(--color-600) var(--primary) / var(--opacity));
+      --fg: oklch(var(--light-100) / var(--opacity));
+    }
+  }
+
+  .ghost {
+    --bg: transparent;
+    box-shadow: none;
+  }
+
+  .outline {
+    border: 1px solid var(--bg);
+
+    &:not(:hover) {
+      background-color: transparent;
+      color: currentColor;
+    }
+  }
+
+  @media (hover: hover) {
+    a:hover,
+    button:hover {
+      --bg: oklch(var(--light-200) / var(--opacity));
+
+      &:global(:where(.dark, .dark *)) {
+        --bg: oklch(var(--light-900) / var(--opacity));
+      }
+      &:global(:where(.theme, .theme *)) {
+        --bg: oklch(var(--color-200) var(--backdrop) / var(--opacity));
+      }
+      &:global(:where(.dark.theme, .dark.theme *)) {
+        --bg: oklch(var(--color-900) var(--backdrop) / var(--opacity));
+      }
+    }
+
+    .primary:hover {
+      --bg: oklch(var(--light-900) / var(--opacity));
+
+      &:global(:where(.dark, .dark *)) {
+        --bg: oklch(var(--light-200) / var(--opacity));
+      }
+      &:global(:where(.theme, .theme *)) {
+        --bg: oklch(var(--color-500) var(--primary) / var(--opacity));
+      }
+    }
+  }
+
+  .sm {
+    height: 2rem;
+    padding-inline: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  .lg {
+    height: 2.5rem;
+    padding-inline: 2rem;
+  }
+  .icon {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 </style>

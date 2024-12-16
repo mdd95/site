@@ -20,21 +20,37 @@
       primary: primary.toString()
     };
   }
+
+  function resetTheme() {
+    theme.colors = null;
+  }
 </script>
 
 <Theme />
 
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<svelte:head>
+  <title>My Components</title>
+</svelte:head>
 
-<Button onclick={theme.toggleMode}>Toggle mode</Button>
+<div class="container">
+  <h2>Buttons</h2>
 
-<div style="width: 64px; height: 48px; background-color: oklch(0.648 0.147 {backdrop});"></div>
-<input type="range" min="0" max="360" bind:value={backdrop} />
-<div style="width: 64px; height: 48px; background-color: oklch(0.648 0.147 {primary});"></div>
-<input type="range" min="0" max="360" bind:value={primary} />
-<Button size="sm" onclick={changeTheme}>Change theme</Button>
+  <Button variant="primary" class="outline" onclick={theme.toggleMode}>Toggle mode</Button>
+  <Button class="ghost" onclick={theme.resetMode}>Reset</Button>
+
+  <div class="flex">
+    <label for="backdrop">Backdrop </label>
+    <div style="width: 64px; height: 48px; background-color: oklch(0.648 0.147 {backdrop});"></div>
+    <input type="range" id="backdrop" min="0" max="360" bind:value={backdrop} />
+  </div>
+  <div class="flex">
+    <label for="primary">Primary</label>
+    <div style="width: 64px; height: 48px; background-color: oklch(0.648 0.147 {primary});"></div>
+    <input type="range" id="primary" min="0" max="360" bind:value={primary} />
+  </div>
+  <Button size="sm" onclick={changeTheme}>Change theme</Button>
+  <Button variant="primary" size="sm" onclick={resetTheme}>Reset theme</Button>
+</div>
 
 <style>
   :global(:root) {
@@ -45,5 +61,9 @@
     :global(:root) {
       --sans: 'InterVariable';
     }
+  }
+
+  .flex {
+    display: flex;
   }
 </style>

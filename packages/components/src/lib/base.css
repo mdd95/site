@@ -1,16 +1,16 @@
 :root {
-  --light-100: 0.978 0;
-  --light-150: 0.936 0;
-  --light-200: 0.881 0;
-  --light-300: 0.827 0;
-  --light-400: 0.742 0;
-  --light-500: 0.648 0;
-  --light-600: 0.573 0;
-  --light-700: 0.469 0;
-  --light-800: 0.394 0;
-  --light-900: 0.321 0;
-  --light-950: 0.238 0;
-  --light-975: 0.117 0;
+  --light-100: 0.978 0 0;
+  --light-150: 0.936 0 0;
+  --light-200: 0.881 0 0;
+  --light-300: 0.827 0 0;
+  --light-400: 0.742 0 0;
+  --light-500: 0.648 0 0;
+  --light-600: 0.573 0 0;
+  --light-700: 0.469 0 0;
+  --light-800: 0.394 0 0;
+  --light-900: 0.321 0 0;
+  --light-950: 0.238 0 0;
+  --light-975: 0.143 0 0;
   --color-100: 0.978 0.011;
   --color-150: 0.936 0.032;
   --color-200: 0.881 0.061;
@@ -22,10 +22,10 @@
   --color-800: 0.394 0.089;
   --color-900: 0.321 0.073;
   --color-950: 0.238 0.054;
-  --color-975: 0.117 0.024;
-  --root-bg: oklch(var(--light-100) 0);
-  --root-fg: oklch(var(--light-975) 0);
-  --radius: calc(0.5rem - 2px);
+  --color-975: 0.143 0.024;
+  --root-bg: oklch(var(--light-100));
+  --root-fg: oklch(var(--light-975));
+  --radius: calc(0.5rem - 4px);
   --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
   --tr-colors: color, background-color, border-color, text-decoration-color, fill, stroke;
@@ -33,8 +33,8 @@
   --tr-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
   &:where(.dark, .dark *) {
-    --root-bg: oklch(var(--light-975) 0);
-    --root-fg: oklch(var(--light-100) 0);
+    --root-bg: oklch(var(--light-975));
+    --root-fg: oklch(var(--light-100));
   }
 
   &:where(.theme, .theme *) {
@@ -282,4 +282,15 @@ input:where([type='button'], [type='reset'], [type='submit']),
 
 [hidden]:where(:not([hidden='until-found'])) {
   display: none !important;
+}
+
+h1 {
+}
+h2 {
+}
+
+.container {
+  width: clamp(0px, 100%, 80rem);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
 }
