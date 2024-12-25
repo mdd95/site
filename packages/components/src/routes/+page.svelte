@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import 'inter-ui/inter.css';
   import 'inter-ui/inter-variable.css';
   import '$lib/base.css';
@@ -8,6 +8,7 @@
 
   import Button from '$lib/button.svelte';
   import Theme, { setTheme } from '$lib/theme.svelte';
+  import Dialog from '$lib/dialog.svelte';
 
   const theme = setTheme();
 
@@ -27,6 +28,13 @@
 
   function resetTheme() {
     theme.colors = null;
+  }
+
+  let mydialog: HTMLDialogElement | null = $state(null);
+  let bitsDialog = $state(false);
+
+  function openNative() {
+    mydialog?.showModal();
   }
 </script>
 
@@ -72,7 +80,24 @@
   <section>
     <h2>Dialog</h2>
 
-    <Button>Open dialog</Button>
+    <Button onclick={openNative}>Open native dialog</Button>
+
+    <Dialog bind:ref={mydialog} title="Are you sure?" description="This action cannot be undone.">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti earum quibusdam saepe,
+      animi debitis distinctio!
+    </Dialog>
+
+    <Button onclick={() => (bitsDialog = true)}>Open dialog</Button>
+    <Dialog
+      bits
+      title="Are you sure?"
+      description="This action cannot be undone."
+      open={bitsDialog}
+      onOpenChange={(value) => (bitsDialog = value)}
+    >
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti earum quibusdam saepe,
+      animi debitis distinctio!
+    </Dialog>
   </section>
 </div>
 
