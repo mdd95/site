@@ -1,13 +1,16 @@
 <script lang="ts">
-  import { Dialog } from 'bits-ui';
+  import { Dialog, useId } from 'bits-ui';
   import Cross from 'svelte-radix/Cross2.svelte';
 
-  type DialogProps = Dialog.RootProps & {
-    bits?: boolean;
-    ref?: HTMLDialogElement | null;
-    title?: string;
-    description?: string;
-  };
+  import type { HTMLDialogAttributes } from 'svelte/elements';
+
+  type DialogProps = Dialog.RootProps &
+    HTMLDialogAttributes & {
+      bits?: boolean;
+      ref?: HTMLDialogElement | null;
+      title?: string;
+      description?: string;
+    };
 
   let {
     bits = false,
@@ -18,6 +21,9 @@
     description,
     ...restProps
   }: DialogProps = $props();
+
+  const titleId = useId();
+  const descriptionId = useId();
 </script>
 
 {#if bits}
@@ -33,6 +39,7 @@
             </div>
             <Dialog.Close>
               <Cross size={16} />
+              <span class="sr-only">Close</span>
             </Dialog.Close>
           </div>
           <div class="content">
@@ -43,14 +50,21 @@
     </Dialog.Portal>
   </Dialog.Root>
 {:else}
-  <dialog bind:this={ref} {open} {...restProps}>
+  <dialog
+    bind:this={ref}
+    aria-labelledby={titleId}
+    aria-describedby={descriptionId}
+    {open}
+    {...restProps}
+  >
     <div class="header">
       <div>
-        <p>{title}</p>
-        <p>{description}</p>
+        <div id={titleId} role="heading" aria-level="2" class="title">{title}</div>
+        <div id={descriptionId} class="description">{description}</div>
       </div>
-      <button onclick={() => ref?.close()} class="close">
+      <button onclick={() => ref!.close()} class="close">
         <Cross size={16} />
+        <span class="sr-only">Close</span>
       </button>
     </div>
     <div class="content">
@@ -60,13 +74,29 @@
 {/if}
 
 <style>
-  dialog,
   .dialog :global([data-dialog-content]) {
-    position: absolute;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    max-height: calc(100% - 2rem);
+    overflow-y: auto;
+    background-color: var(--root-bg);
+    border-radius: var(--radius);
+  }
+
+  .dialog :global([data-dialog-overlay]) {
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+    background-color: rgba(0 0 0 / 0.5);
+  }
+
+  dialog {
     top: 50%;
     left: 50%;
     transform: translate(-50%, calc(-50% - 1rem));
-    background-color: var(--root-bg);
     border-radius: var(--radius);
     opacity: 0;
     transition:
@@ -76,24 +106,19 @@
       display var(--tr-duration) var(--tr-timing) allow-discrete;
   }
 
-  dialog[open],
-  .dialog :global([data-dialog-content]:where([data-state='open'])) {
+  dialog[open] {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
 
   @starting-style {
-    dialog[open],
-    .dialog :global([data-dialog-content]:where([data-state='open'])) {
+    dialog[open] {
       opacity: 0;
       transform: translate(-50%, calc(-50% - 1rem));
     }
   }
 
-  dialog::backdrop,
-  .dialog :global([data-dialog-overlay]) {
-    position: absolute;
-    inset: 0;
+  dialog::backdrop {
     background-color: rgba(0 0 0 / 0);
     transition:
       display var(--tr-duration) allow-discrete,
@@ -101,34 +126,30 @@
       background-color var(--tr-duration);
   }
 
-  dialog[open]::backdrop,
-  .dialog :global([data-dialog-overlay]:where([data-state='open'])) {
+  dialog[open]::backdrop {
     background-color: rgba(0 0 0 / 0.5);
   }
 
   @starting-style {
-    dialog[open]::backdrop,
-    .dialog :global([data-dialog-overlay]:where([data-state='open'])) {
+    dialog[open]::backdrop {
       background-color: rgba(0 0 0 / 0);
     }
   }
 
-  dialog .header,
-  .dialog .header {
+  .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
   }
 
-  dialog .close,
+  .close,
   .dialog :global([data-dialog-close]) {
     align-self: flex-start;
     cursor: pointer;
   }
 
-  dialog .content,
-  .dialog .content {
+  .content {
     padding: 1rem;
     padding-top: 0;
   }
