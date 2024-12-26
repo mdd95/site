@@ -59,8 +59,8 @@
   >
     <div class="header">
       <div>
-        <div id={titleId} role="heading" aria-level="2" class="title">{title}</div>
-        <div id={descriptionId} class="description">{description}</div>
+        <h2 id={titleId} class="title">{title}</h2>
+        <p id={descriptionId} class="description">{description}</p>
       </div>
       <button onclick={() => ref!.close()} class="close">
         <Cross size={16} />
@@ -106,6 +106,12 @@
       display var(--tr-duration) var(--tr-timing) allow-discrete;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    dialog {
+      transition: none;
+    }
+  }
+
   dialog[open] {
     opacity: 1;
     transform: translate(-50%, -50%);
@@ -147,6 +153,20 @@
   .dialog :global([data-dialog-close]) {
     align-self: flex-start;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title,
+  .dialog :global([data-dialog-title]) {
+    font-weight: 600;
+  }
+
+  .description,
+  .dialog :global([data-dialog-description]) {
+    color: var(--text-muted);
+    font-size: 0.875rem;
   }
 
   .content {

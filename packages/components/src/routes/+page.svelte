@@ -9,6 +9,7 @@
   import Button from '$lib/button.svelte';
   import Theme, { setTheme } from '$lib/theme.svelte';
   import Dialog from '$lib/dialog.svelte';
+  import Checkbox from '$lib/checkbox.svelte';
 
   const theme = setTheme();
 
@@ -98,6 +99,10 @@
       Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti earum quibusdam saepe,
       animi debitis distinctio!
     </Dialog>
+  </section>
+
+  <section>
+    <Checkbox labelText="Accept terms and conditions" />
   </section>
 </div>
 
