@@ -73,12 +73,6 @@
   <Button class="destructive">Delete</Button>
 
   <section>
-    <h2>Checkbox</h2>
-
-    <input type="checkbox" />
-  </section>
-
-  <section>
     <h2>Dialog</h2>
 
     <Button onclick={openNative}>Open native dialog</Button>
@@ -102,7 +96,10 @@
   </section>
 
   <section>
+    <h2>Checkboxes</h2>
+
     <Checkbox labelText="Accept terms and conditions" />
+    <Checkbox bits labelText="Accept terms and conditions" />
   </section>
 </div>
 
