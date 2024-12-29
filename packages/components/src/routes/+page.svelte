@@ -10,6 +10,9 @@
   import Theme, { setTheme } from '$lib/theme.svelte';
   import Dialog from '$lib/dialog.svelte';
   import Checkbox from '$lib/checkbox.svelte';
+  import Switch from '$lib/components/switch.svelte';
+  import UseId from '$lib/components/use-id.svelte';
+  import { Label } from 'bits-ui';
 
   const theme = setTheme();
 
@@ -101,6 +104,19 @@
     <Checkbox labelText="Accept terms and conditions" />
     <Checkbox bits labelText="Accept terms and conditions" />
   </section>
+
+  <section>
+    <h2>Switch</h2>
+
+    <UseId>
+      {#snippet children({ id })}
+        <div class="item">
+          <Switch {id} />
+          <Label.Root for={id}>Enable notifications</Label.Root>
+        </div>
+      {/snippet}
+    </UseId>
+  </section>
 </div>
 
 <style>
@@ -122,5 +138,13 @@
 
   :global(.hidden) {
     display: none;
+  }
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+  }
+  .item :global(> * + *) {
+    margin-inline-start: 0.5rem;
   }
 </style>
