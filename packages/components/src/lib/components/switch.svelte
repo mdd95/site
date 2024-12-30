@@ -1,46 +1,83 @@
 <script lang="ts">
   import { Switch } from 'bits-ui';
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  type Props = Switch.RootProps &
+    HTMLInputAttributes & {
+      bits?: boolean;
+    };
 
   let {
+    bits = false,
     ref = $bindable(null),
     checked = $bindable(false),
     ...restProps
-  }: Switch.RootProps = $props();
+  }: Props = $props();
 </script>
 
-<Switch.Root bind:ref bind:checked {...restProps}>
-  {#snippet child({ props })}
-    <button {...props}>
-      <Switch.Thumb />
-    </button>
-  {/snippet}
-</Switch.Root>
+{#if bits}
+  <Switch.Root bind:ref bind:checked {...restProps}>
+    {#snippet child({ props })}
+      <button {...props}>
+        <Switch.Thumb />
+      </button>
+    {/snippet}
+  </Switch.Root>
+{:else}
+  <input type="checkbox" bind:this={ref} bind:checked {...restProps} />
+{/if}
 
 <style>
-  [data-switch-root] {
-    position: relative;
-    width: 2.5rem;
-    height: 1.25rem;
-    display: inline-flex;
-    align-items: center;
-    background-color: oklch(var(--light-100));
-    border-radius: 9999px;
+  input {
+    appearance: none;
   }
 
-  [data-switch-root] :global([data-switch-thumb]) {
+  input::after {
+    content: '';
+  }
+
+  input,
+  button {
+    position: relative;
+    width: 2.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-full);
+  }
+
+  input::after,
+  button :global([data-switch-thumb]) {
     position: absolute;
     top: 50%;
-    left: 0.1875rem;
-    width: 0.875rem;
-    height: 0.875rem;
-    background-color: oklch(var(--light-975));
-    border-radius: 9999px;
-    display: block;
+    left: 0.125rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: var(--radius-full);
     transform: translate(0, -50%);
-    transition: transform var(--tr-duration);
+    transition: transform var(--tr-duration) var(--tr-timing);
     pointer-events: none;
   }
-  [data-switch-root] :global([data-switch-thumb][data-state='checked']) {
-    transform: translate(1.25rem, -50%);
+
+  input:checked::after,
+  button :global([data-switch-thumb][data-state='checked']) {
+    transform: translate(1rem, -50%);
+  }
+
+  input,
+  button {
+    box-shadow: inset 0 0 0 1px oklch(var(--light-975));
+  }
+
+  input::after,
+  button :global([data-switch-thumb]) {
+    background-color: oklch(var(--light-975));
+  }
+
+  :global(:where(.dark, .dark *)) input,
+  :global(:where(.dark, .dark *)) button {
+    box-shadow: inset 0 0 0 1px oklch(var(--light-100));
+  }
+  :global(:where(.dark, .dark *)) input::after,
+  :global(:where(.dark, .dark *)) button :global([data-switch-thumb]) {
+    background-color: oklch(var(--light-100));
   }
 </style>

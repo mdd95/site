@@ -26,6 +26,7 @@
   --root-bg: oklch(var(--light-100));
   --root-fg: oklch(var(--light-975));
   --radius: calc(0.5rem - 4px);
+  --radius-full: 9999px;
   --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
   --tr-colors: color, background-color, border-color, text-decoration-color, fill, stroke;
