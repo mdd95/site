@@ -74,8 +74,8 @@
       const light = mode == 'light' || (mode == 'system' && !dark.current);
 
       if (value == null) {
-        root.style.removeProperty('--backdrop');
-        root.style.removeProperty('--primary');
+        root.style.removeProperty('--primary-hue');
+        root.style.removeProperty('--secondary-hue');
         root.classList.remove('theme');
         meta?.setAttribute('content', light ? '#fff' : '#000');
 
@@ -85,8 +85,8 @@
         return;
       }
 
-      root.style.setProperty('--backdrop', value.backdrop);
-      root.style.setProperty('--primary', value.primary);
+      root.style.setProperty('--primary-hue', value.primary);
+      root.style.setProperty('--secondary-hue', value.backdrop);
       root.classList.add('theme');
       meta?.setAttribute(
         'content',
@@ -155,8 +155,8 @@
       const data: ThemeColors = JSON.parse(colors);
       window.themeColors = data;
 
-      root.style.setProperty('--backdrop', data.backdrop);
-      root.style.setProperty('--primary', data.primary);
+      root.style.setProperty('--primary-hue', data.primary);
+      root.style.setProperty('--secondary-hue', data.backdrop);
       root.classList.add('theme');
       meta?.setAttribute(
         'content',
