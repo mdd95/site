@@ -1,11 +1,4 @@
 export {
-  default as Button,
-  type ButtonVariant,
-  type ButtonSize,
-  type ButtonProps
-} from './button.svelte';
-
-export {
   default as Theme,
   setTheme,
   getTheme,
@@ -14,4 +7,6 @@ export {
   type ThemeColors
 } from './theme.svelte';
 
+export { default as Button } from './components/button.svelte';
 export { default as Switch } from './components/switch.svelte';
+export { default as UseId } from './components/use-id.svelte';

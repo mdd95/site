@@ -6,13 +6,11 @@
   import Sun from 'svelte-radix/Sun.svelte';
   import Moon from 'svelte-radix/Moon.svelte';
 
-  import Button from '$lib/button.svelte';
   import Theme, { setTheme } from '$lib/theme.svelte';
   import Dialog from '$lib/dialog.svelte';
   import Checkbox from '$lib/checkbox.svelte';
-  import Switch from '$lib/components/switch.svelte';
-  import UseId from '$lib/components/use-id.svelte';
   import { Label } from 'bits-ui';
+  import { Button, Switch, UseId } from '$lib/index.js';
 
   const theme = setTheme();
 
