@@ -13,3 +13,5 @@ export {
   type ThemeMode,
   type ThemeColors
 } from './theme.svelte';
+
+export { default as Switch } from './components/switch.svelte';

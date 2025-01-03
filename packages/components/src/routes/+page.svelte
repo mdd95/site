@@ -1,7 +1,7 @@
 <script lang="ts">
   import 'inter-ui/inter.css';
   import 'inter-ui/inter-variable.css';
-  import '$lib/base.css';
+  import '$lib/styles/global.css';
 
   import Sun from 'svelte-radix/Sun.svelte';
   import Moon from 'svelte-radix/Moon.svelte';
@@ -110,10 +110,8 @@
 
     <UseId>
       {#snippet children({ id })}
-        <div class="item">
-          <Switch {id} />
-          <Label.Root for={id}>Enable notifications</Label.Root>
-        </div>
+        <Switch {id} />
+        <Label.Root for={id}>Enable notifications</Label.Root>
       {/snippet}
     </UseId>
   </section>
@@ -138,13 +136,5 @@
 
   :global(.hidden) {
     display: none;
-  }
-
-  .item {
-    display: inline-flex;
-    align-items: center;
-  }
-  .item :global(> * + *) {
-    margin-inline-start: 0.5rem;
   }
 </style>
