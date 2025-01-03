@@ -21,7 +21,12 @@
     width: 2rem;
     height: 1rem;
     border-radius: var(--border-radius-full);
+    background-color: var(--scope-background);
     cursor: pointer;
+  }
+  button:disabled {
+    background-color: color-mix(in oklab, var(--scope-background), transparent 50%);
+    cursor: auto;
   }
 
   button :global([data-switch-thumb]) {
@@ -31,11 +36,11 @@
     width: 0.75rem;
     height: 0.75rem;
     border-radius: var(--border-radius-full);
+    background-color: var(--scope-background);
     transform: translate(0, -50%);
     transition: var(--transition-all);
     pointer-events: none;
   }
-
   button :global([data-switch-thumb][data-state='checked']) {
     transform: translate(1rem, -50%);
   }
@@ -43,18 +48,30 @@
   /* Color styles */
 
   button {
-    --box-shadow: currentColor;
-    box-shadow: inset 0 0 0 0.0625rem var(--box-shadow);
+    --scope-background: var(--color-primary-200);
   }
   button[data-state='checked'] {
-    --box-shadow: var(--color-primary-500);
+    --scope-background: var(--color-primary-500);
   }
 
   button :global([data-switch-thumb]) {
-    --background: currentColor;
-    background-color: var(--background);
+    --scope-background: var(--background-default);
   }
-  button :global([data-switch-thumb][data-state='checked']) {
-    --background: var(--color-primary-500);
+
+  .outline {
+    --scope-background: transparent;
+    --scope-box-shadow: var(--color-primary-200);
+    box-shadow: inset 0 0 0 0.0625rem var(--scope-box-shadow);
+  }
+  .outline[data-state='checked'] {
+    --scope-background: transparent;
+    --scope-box-shadow: var(--color-primary-500);
+  }
+
+  .outline :global([data-switch-thumb]) {
+    --scope-background: var(--color-primary-200);
+  }
+  .outline :global([data-switch-thumb][data-state='checked']) {
+    --scope-background: var(--color-primary-500);
   }
 </style>
