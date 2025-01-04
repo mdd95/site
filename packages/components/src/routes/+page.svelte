@@ -8,9 +8,8 @@
 
   import Theme, { setTheme } from '$lib/theme.svelte';
   import Dialog from '$lib/dialog.svelte';
-  import Checkbox from '$lib/checkbox.svelte';
   import { Label } from 'bits-ui';
-  import { Button, Switch, UseId } from '$lib/index.js';
+  import { Button, Checkbox, Switch, UseId } from '$lib/index.js';
 
   const theme = setTheme();
 
@@ -99,8 +98,12 @@
   <section>
     <h2>Checkboxes</h2>
 
-    <Checkbox labelText="Accept terms and conditions" />
-    <Checkbox bits labelText="Accept terms and conditions" />
+    <UseId>
+      {#snippet children({ id })}
+        <Checkbox {id} />
+        <Label.Root for={id}>Enable notifications</Label.Root>
+      {/snippet}
+    </UseId>
   </section>
 
   <section>
