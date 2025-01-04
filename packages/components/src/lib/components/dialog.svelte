@@ -3,17 +3,18 @@
   import Cross from 'svelte-radix/Cross2.svelte';
 
   import type { HTMLDialogAttributes } from 'svelte/elements';
+  import type { WithoutChild } from 'bits-ui';
 
-  type DialogProps = Dialog.RootProps &
+  type DialogProps = WithoutChild<Dialog.RootProps> &
     HTMLDialogAttributes & {
-      bits?: boolean;
+      native?: boolean;
       ref?: HTMLDialogElement | null;
       title?: string;
       description?: string;
     };
 
   let {
-    bits = false,
+    native = true,
     ref = $bindable(null),
     open = $bindable(false),
     children,
@@ -26,30 +27,7 @@
   const descriptionId = useId();
 </script>
 
-{#if bits}
-  <Dialog.Root bind:open {...restProps}>
-    <Dialog.Portal>
-      <div class="dialog" style="display: contents;">
-        <Dialog.Overlay />
-        <Dialog.Content>
-          <div class="header">
-            <div>
-              <Dialog.Title>{title}</Dialog.Title>
-              <Dialog.Description>{description}</Dialog.Description>
-            </div>
-            <Dialog.Close>
-              <Cross size={16} />
-              <span class="sr-only">Close</span>
-            </Dialog.Close>
-          </div>
-          <div class="content">
-            {@render children?.()}
-          </div>
-        </Dialog.Content>
-      </div>
-    </Dialog.Portal>
-  </Dialog.Root>
-{:else}
+{#if native}
   <dialog
     bind:this={ref}
     aria-labelledby={titleId}
@@ -62,19 +40,46 @@
         <h2 id={titleId} class="title">{title}</h2>
         <p id={descriptionId} class="description">{description}</p>
       </div>
-      <button onclick={() => ref!.close()} class="close">
+      <button onclick={() => ref!.close()} class="close" aria-label="Close">
         <Cross size={16} />
-        <span class="sr-only">Close</span>
       </button>
     </div>
     <div class="content">
       {@render children?.()}
     </div>
   </dialog>
+{:else}
+  <Dialog.Root bind:open {...restProps}>
+    <Dialog.Portal>
+      <Dialog.Overlay>
+        {#snippet child({ props })}
+          <div class="overlay" {...props}></div>
+        {/snippet}
+      </Dialog.Overlay>
+      <Dialog.Content>
+        {#snippet child({ props })}
+          <div class="content" {...props}>
+            <div class="header">
+              <div>
+                <Dialog.Title>{title}</Dialog.Title>
+                <Dialog.Description>{description}</Dialog.Description>
+              </div>
+              <Dialog.Close aria-label="Close">
+                <Cross size={16} />
+              </Dialog.Close>
+            </div>
+            <div class="content">
+              {@render children?.()}
+            </div>
+          </div>
+        {/snippet}
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
 {/if}
 
 <style>
-  .dialog :global([data-dialog-content]) {
+  .content:global([data-dialog-content]) {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -82,11 +87,11 @@
     z-index: 20;
     max-height: calc(100% - 2rem);
     overflow-y: auto;
-    background-color: var(--root-bg);
-    border-radius: var(--radius);
+    background-color: var(--background-default);
+    border-radius: var(--border-radius-default);
   }
 
-  .dialog :global([data-dialog-overlay]) {
+  .overlay {
     position: fixed;
     inset: 0;
     z-index: 19;
@@ -97,13 +102,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, calc(-50% - 1rem));
-    border-radius: var(--radius);
+    border-radius: var(--border-radius-default);
     opacity: 0;
     transition:
-      opacity var(--tr-duration) var(--tr-timing),
-      transform var(--tr-duration) var(--tr-timing),
-      overlay var(--tr-duration) var(--tr-timing) allow-discrete,
-      display var(--tr-duration) var(--tr-timing) allow-discrete;
+      opacity var(--transition-duration-default) var(--transition-timing-function-default),
+      transform var(--transition-duration-default) var(--transition-timing-function-default),
+      overlay var(--transition-duration-default) var(--transition-timing-function-default)
+        allow-discrete,
+      display var(--transition-duration-default) var(--transition-timing-function-default)
+        allow-discrete;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -127,9 +134,9 @@
   dialog::backdrop {
     background-color: rgba(0 0 0 / 0);
     transition:
-      display var(--tr-duration) allow-discrete,
-      overlay var(--tr-duration) allow-discrete,
-      background-color var(--tr-duration);
+      display var(--transition-duration-default) allow-discrete,
+      overlay var(--transition-duration-default) allow-discrete,
+      background-color var(--transition-duration-default);
   }
 
   dialog[open]::backdrop {
@@ -150,12 +157,17 @@
   }
 
   .close,
-  .dialog :global([data-dialog-close]) {
+  .header :global([data-dialog-close]) {
     align-self: flex-start;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    & :global(svg) {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   .title,

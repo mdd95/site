@@ -7,9 +7,8 @@
   import Moon from 'svelte-radix/Moon.svelte';
 
   import Theme, { setTheme } from '$lib/theme.svelte';
-  import Dialog from '$lib/dialog.svelte';
   import { Label } from 'bits-ui';
-  import { Button, Checkbox, Switch, UseId } from '$lib/index.js';
+  import { Button, Checkbox, Dialog, Switch, UseId } from '$lib/index.js';
 
   const theme = setTheme();
 
@@ -84,7 +83,7 @@
 
     <Button onclick={() => (bitsDialog = true)}>Open dialog</Button>
     <Dialog
-      bits
+      native={false}
       title="Are you sure?"
       description="This action cannot be undone."
       open={bitsDialog}
@@ -121,6 +120,7 @@
 <style>
   :global(:root) {
     --sans: 'Inter';
+    font-size: 56px;
   }
 
   @supports (font-variation-settings: normal) {
