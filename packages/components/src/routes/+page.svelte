@@ -8,7 +8,17 @@
 
   import Theme, { setTheme } from '$lib/theme.svelte';
   import { Label } from 'bits-ui';
-  import { Button, Checkbox, Dialog, Switch, UseId } from '$lib/index.js';
+  import {
+    Button,
+    Checkbox,
+    Dialog,
+    Dropdown,
+    DropdownContent,
+    DropdownItem,
+    DropdownTrigger,
+    Switch,
+    UseId
+  } from '$lib/index.js';
 
   const theme = setTheme();
 
@@ -115,12 +125,22 @@
       {/snippet}
     </UseId>
   </section>
+
+  <section>
+    <Dropdown>
+      <DropdownTrigger>Open</DropdownTrigger>
+      <DropdownContent sideOffset={8}>
+        <DropdownItem href="/login">Link 1</DropdownItem>
+        <DropdownItem>Link 2</DropdownItem>
+        <DropdownItem>Link 3</DropdownItem>
+      </DropdownContent>
+    </Dropdown>
+  </section>
 </div>
 
 <style>
   :global(:root) {
     --sans: 'Inter';
-    font-size: 56px;
   }
 
   @supports (font-variation-settings: normal) {

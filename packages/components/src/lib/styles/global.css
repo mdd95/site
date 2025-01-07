@@ -317,6 +317,11 @@ input:where([type='button'], [type='reset'], [type='submit']),
   display: none !important;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: auto;
+}
+
 .container {
   width: clamp(0px, 100%, 80rem);
   margin-inline: auto;
