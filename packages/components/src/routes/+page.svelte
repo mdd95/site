@@ -128,8 +128,12 @@
 
   <section>
     <Dropdown>
-      <DropdownTrigger>Open</DropdownTrigger>
-      <DropdownContent sideOffset={8}>
+      <DropdownTrigger>
+        {#snippet children({ props })}
+          <button {...props}>Dropdown</button>
+        {/snippet}
+      </DropdownTrigger>
+      <DropdownContent>
         <DropdownItem href="/login">Link 1</DropdownItem>
         <DropdownItem>Link 2</DropdownItem>
         <DropdownItem>Link 3</DropdownItem>

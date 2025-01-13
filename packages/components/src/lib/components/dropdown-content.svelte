@@ -1,26 +1,28 @@
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui';
+  import { getAnchorId } from './dropdown-context.js';
+
   import type { WithoutChild } from 'bits-ui';
 
-  type Props = WithoutChild<DropdownMenu.ContentProps>;
+  type Props = WithoutChild<DropdownMenu.ContentStaticProps>;
 
   let { children, ...restProps }: Props = $props();
+
+  const anchorId = getAnchorId();
 </script>
 
-<DropdownMenu.Portal>
-  <DropdownMenu.Content {...restProps}>
-    {#snippet child({ props, wrapperProps })}
-      <div class="wrapper" {...wrapperProps}>
-        <div class="content" {...props}>
-          {@render children?.()}
-        </div>
-      </div>
-    {/snippet}
-  </DropdownMenu.Content>
-</DropdownMenu.Portal>
+<DropdownMenu.ContentStatic preventScroll={false} {...restProps}>
+  {#snippet child({ props })}
+    <div {...props} style:position-anchor={anchorId}>
+      {@render children?.()}
+    </div>
+  {/snippet}
+</DropdownMenu.ContentStatic>
 
 <style>
-  .content {
+  div {
+    position: absolute;
+    position-area: bottom right;
     padding: 0.25rem;
     height: 100%;
     min-width: 8rem;
