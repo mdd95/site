@@ -15,10 +15,13 @@
     Dropdown,
     DropdownContent,
     DropdownItem,
+    DropdownSub,
     DropdownTrigger,
     Switch,
     UseId
   } from '$lib/index.js';
+  import DropdownSubtrigger from '$lib/components/dropdown-subtrigger.svelte';
+  import DropdownSubcontent from '$lib/components/dropdown-subcontent.svelte';
 
   const theme = setTheme();
 
@@ -137,6 +140,16 @@
         <DropdownItem href="/login">Link 1</DropdownItem>
         <DropdownItem>Link 2</DropdownItem>
         <DropdownItem>Link 3</DropdownItem>
+        <DropdownSub>
+          <DropdownSubtrigger>
+            {#snippet children({ props })}
+              <button {...props}>Submenu</button>
+            {/snippet}
+          </DropdownSubtrigger>
+          <DropdownSubcontent>
+            <DropdownItem>Link 1</DropdownItem>
+          </DropdownSubcontent>
+        </DropdownSub>
       </DropdownContent>
     </Dropdown>
   </section>
