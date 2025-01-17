@@ -16,6 +16,9 @@
     DropdownContent,
     DropdownItem,
     DropdownTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
     Switch,
     UseId
   } from '$lib/index.js';
@@ -136,11 +139,22 @@
       </DropdownContent>
     </Dropdown>
   </section>
+
+  <section>
+    <Popover>
+      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverContent>HELLO WORLD!</PopoverContent>
+    </Popover>
+  </section>
 </div>
 
 <style>
   :global(:root) {
     --sans: 'Inter';
+    --padding: 0.5rem;
+    --radius: 0.25em;
+    --color-popover: pink;
+    --color-popover-foreground: #000;
   }
 
   @supports (font-variation-settings: normal) {

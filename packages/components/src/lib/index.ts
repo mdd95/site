@@ -19,3 +19,5 @@ export { default as DropdownContent } from './components/dropdown-content.svelte
 export { default as DropdownItem } from './components/dropdown-item.svelte';
 export { default as Switch } from './components/switch.svelte';
 export { default as UseId } from './components/use-id.svelte';
+
+export * from './popover/index.js';
