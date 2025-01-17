@@ -1,5 +1,5 @@
 import { Context } from '../utils/context.js';
-import type { Wrapped } from '../utils/wrap.svelte.js';
+import type { BindState } from '../utils/reactivity.svelte.js';
 
 const useAnchorName = (() => {
   let count = 0;
@@ -7,7 +7,7 @@ const useAnchorName = (() => {
 })();
 
 type PopoverStateProps = {
-  open: Wrapped<boolean>;
+  open: BindState<boolean>;
 };
 export class PopoverState {
   anchorName = useAnchorName();
@@ -17,7 +17,6 @@ export class PopoverState {
 
   constructor(props: PopoverStateProps) {
     this.open = props.open;
-    $inspect(this);
   }
 }
 

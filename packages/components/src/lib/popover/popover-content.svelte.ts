@@ -5,9 +5,8 @@ import {
   type PopoverBaseStateProps
 } from './popover.svelte.js';
 import { Context } from '../utils/context.js';
-import { applyToRef } from '../utils/ref.svelte.js';
-import { toStyle } from '../utils/to-style.js';
-import { wrap } from '../utils/wrap.svelte.js';
+import { bind, bindRef } from '../utils/reactivity.svelte.js';
+import { prependStyle } from '../utils/style.js';
 import type { HTMLAttributes } from 'svelte/elements';
 
 export type PopoverElementAttributes = HTMLAttributes<HTMLDivElement>;
@@ -15,26 +14,23 @@ export type PopoverContentStateProps = PopoverBaseStateProps<PopoverElementAttri
 export class PopoverContentState extends PopoverBaseState<PopoverElementAttributes> {
   constructor(props: PopoverContentStateProps, parentState: PopoverState) {
     super(props, parentState);
-    applyToRef({
-      id: wrap(() => this.id),
-      ref: wrap(
+    bindRef(
+      () => this.id,
+      bind(
         () => this.parentState.contentNode,
-        (value) => {
-          this.parentState.contentNode = value;
-        }
+        (v) => (this.parentState.contentNode = v)
       )
-    });
+    );
   }
   props = $derived.by(() => {
     const { onclick, style, ...restProps } = this.restProps;
     return {
       id: this.id,
       popover: 'auto',
-      style:
-        toStyle({
-          positionAnchor: this.parentState.anchorName,
-          positionArea: 'block-end span-inline-end'
-        }) + (style || ''),
+      style: prependStyle(style, {
+        'position-anchor': this.parentState.anchorName,
+        'position-area': 'block-end span-inline-end'
+      }),
       ...restProps
     } satisfies PopoverElementAttributes;
   });

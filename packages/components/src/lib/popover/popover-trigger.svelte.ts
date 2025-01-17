@@ -5,9 +5,8 @@ import {
   type PopoverBaseStateProps
 } from './popover.svelte.js';
 import { Context } from '../utils/context.js';
-import { applyToRef } from '../utils/ref.svelte.js';
-import { toStyle } from '../utils/to-style.js';
-import { wrap } from '../utils/wrap.svelte.js';
+import { prependStyle } from '../utils/style.js';
+import { bind, bindRef } from '../utils/reactivity.svelte.js';
 import type { HTMLButtonAttributes } from 'svelte/elements';
 
 export type PopoverElementAttributes = HTMLButtonAttributes;
@@ -15,33 +14,22 @@ export type PopoverTriggerStateProps = PopoverBaseStateProps<PopoverElementAttri
 export class PopoverTriggerState extends PopoverBaseState<PopoverElementAttributes> {
   constructor(props: PopoverTriggerStateProps, parentState: PopoverState) {
     super(props, parentState);
-    applyToRef({
-      id: wrap(() => this.id),
-      ref: wrap(
+    bindRef(
+      () => this.id,
+      bind(
         () => this.parentState.triggerNode,
-        (value) => {
-          this.parentState.triggerNode = value;
-        }
+        (v) => (this.parentState.triggerNode = v)
       )
-    });
+    );
   }
   props = $derived.by(() => {
-    const { onclick, style, ...restProps } = this.restProps;
+    const { style, ...restProps } = this.restProps;
     return {
       id: this.id,
       popovertarget: this.parentState.contentNode?.id,
-      popovertargetaction: 'toggle',
-      onclick: (e) => {
-        if (onclick) onclick(e);
-        if (!e.defaultPrevented) {
-          e.preventDefault();
-          this.parentState.contentNode?.togglePopover();
-        }
-      },
-      style:
-        toStyle({
-          anchorName: this.parentState.anchorName
-        }) + (style || ''),
+      style: prependStyle(style, {
+        'anchor-name': this.parentState.anchorName
+      }),
       ...restProps
     } satisfies PopoverElementAttributes;
   });

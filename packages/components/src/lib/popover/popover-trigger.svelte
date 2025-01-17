@@ -11,7 +11,6 @@
   let { children, id = useId(), ...restProps }: PopoverTriggerProps = $props();
 
   const ctx = usePopoverTrigger({ id, restProps });
-  $inspect(ctx);
 </script>
 
 <button type="button" {...ctx.props}>

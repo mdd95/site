@@ -1,6 +1,6 @@
 <script lang="ts">
   import { usePopover } from './popover.svelte.js';
-  import { wrap } from '../utils/wrap.svelte.js';
+  import { bind } from '../utils/reactivity.svelte.js';
   import type { Snippet } from 'svelte';
 
   type PopoverProps = {
@@ -10,11 +10,9 @@
   let { children, open = $bindable(false) }: PopoverProps = $props();
 
   usePopover({
-    open: wrap(
+    open: bind(
       () => open,
-      (value) => {
-        open = value;
-      }
+      (v) => (open = v)
     )
   });
 </script>
