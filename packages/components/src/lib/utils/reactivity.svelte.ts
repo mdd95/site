@@ -1,5 +1,5 @@
 import { untrack } from 'svelte';
-import type { Getter, Setter, VoidFn } from './types.js';
+import type { AnyVoidFn, Getter, Setter, VoidFn } from './types.js';
 
 export type BindState<T> = { current: T };
 
@@ -25,4 +25,23 @@ export function bindRef(getId: Getter<string>, onRefChange: VoidFn<HTMLElement |
       onRefChange?.(null);
     };
   });
+}
+
+export class Bin {
+  #bin: AnyVoidFn[] = [];
+
+  constructor() {
+    $effect(() => {
+      return () => this.execute();
+    });
+  }
+
+  add(...fn: AnyVoidFn[]) {
+    this.#bin.push(...fn);
+  }
+
+  execute() {
+    for (const fn of this.#bin) fn();
+    this.#bin.length = 0;
+  }
 }

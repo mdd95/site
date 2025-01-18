@@ -1,7 +1,7 @@
 import { Context } from '../utils/context.js';
 import { useId } from '../utils/id.js';
 import { prependStyle } from '../utils/style.js';
-import { bindRef, type BindState } from '../utils/reactivity.svelte.js';
+import { Bin, bindRef, type BindState } from '../utils/reactivity.svelte.js';
 
 type PopoverStateProps = {
   open: BindState<boolean>;
@@ -59,10 +59,24 @@ export class PopoverTrigger extends PopoverBase {
 export class PopoverContent extends PopoverBase {
   constructor(props: PopoverProps, parent: PopoverState) {
     super(props, parent);
+    const bin = new Bin();
 
     bindRef(
       () => this._id,
-      (v) => (this.parent.contentNode = v)
+      (v) => {
+        this.parent.contentNode = v;
+
+        if (v) {
+          const handler = (e: Event) => {
+            // @ts-ignore
+            this.parent.open.current = e.newState === 'open';
+          };
+          v.addEventListener('toggle', handler);
+          bin.add(() => {
+            v.removeEventListener('toggle', handler);
+          });
+        }
+      }
     );
   }
 
