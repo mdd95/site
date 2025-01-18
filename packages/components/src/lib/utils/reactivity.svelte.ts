@@ -14,22 +14,14 @@ export function bind<T>(getter: Getter<T>, setter?: Setter<T>): BindState<T> {
   };
 }
 
-export function bindRef(
-  getId: Getter<string>,
-  ref: BindState<HTMLElement | null>,
-  getRoot: Getter<Document | ShadowRoot> | undefined = undefined,
-  onRefChange: VoidFn<HTMLElement | null> | undefined = undefined
-): void {
+export function bindRef(getId: Getter<string>, onRefChange: VoidFn<HTMLElement | null>): void {
   $effect(() => {
     const id = getId();
     untrack(() => {
-      const root = getRoot?.() ?? document;
-      const node = root.getElementById(id);
-      ref.current = node;
+      const node = document.getElementById(id);
       onRefChange?.(node);
     });
     return () => {
-      ref.current = null;
       onRefChange?.(null);
     };
   });
