@@ -145,6 +145,10 @@
       <PopoverTrigger>Open popover</PopoverTrigger>
       <PopoverContent>HELLO WORLD!</PopoverContent>
     </Popover>
+    <Popover>
+      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverContent>HELLO WORLD!</PopoverContent>
+    </Popover>
   </section>
 </div>
 

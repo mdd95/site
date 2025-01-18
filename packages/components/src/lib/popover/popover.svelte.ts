@@ -1,16 +1,12 @@
 import { Context } from '../utils/context.js';
+import { useId } from '../utils/id.js';
 import type { BindState } from '../utils/reactivity.svelte.js';
-
-const useAnchorName = (() => {
-  let count = 0;
-  return () => `--anchor-${++count}`;
-})();
 
 type PopoverStateProps = {
   open: BindState<boolean>;
 };
 export class PopoverState {
-  anchorName = useAnchorName();
+  anchorName = useId('--anchor');
   open: PopoverStateProps['open'];
   triggerNode = $state<HTMLElement | null>(null);
   contentNode = $state<HTMLElement | null>(null);

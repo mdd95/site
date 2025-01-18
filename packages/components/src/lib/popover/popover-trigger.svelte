@@ -1,6 +1,6 @@
 <script lang="ts">
   import { usePopoverTrigger } from './popover-trigger.svelte.js';
-  import { useId } from '../utils/use-id.js';
+  import { useId } from '../utils/id.js';
   import type { Snippet } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
@@ -8,7 +8,7 @@
     children?: Snippet;
     id?: string;
   };
-  let { children, id = useId(), ...restProps }: PopoverTriggerProps = $props();
+  let { children, id = useId('popover'), ...restProps }: PopoverTriggerProps = $props();
 
   const ctx = usePopoverTrigger({ id, restProps });
 </script>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { usePopoverContent } from './popover-content.svelte.js';
-  import { useId } from '../utils/use-id.js';
+  import { useId } from '../utils/id.js';
   import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
 
@@ -8,7 +8,7 @@
     children?: Snippet;
     id?: string;
   };
-  let { children, id = useId(), ...restProps }: PopoverContentProps = $props();
+  let { children, id = useId('popover'), ...restProps }: PopoverContentProps = $props();
 
   const ctx = usePopoverContent({ id, restProps });
 </script>
