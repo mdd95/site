@@ -65,11 +65,12 @@ export class PopoverContent extends PopoverBase {
       () => this._id,
       (v) => {
         this.parent.contentNode = v;
+        bin.execute();
 
         if (v) {
           const handler = (e: Event) => {
-            // @ts-ignore
-            this.parent.open.current = e.newState === 'open';
+            this.parent.open.current =
+              (e as Event & { newState: 'open' | 'closed' }).newState === 'open';
           };
           v.addEventListener('toggle', handler);
           bin.add(() => {
