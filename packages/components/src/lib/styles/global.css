@@ -1,103 +1,19 @@
 :root {
-  --font-family-base: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+  --font-base: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-family-base-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+  --font-base-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
-
-  --border-radius-default: 0.25rem;
-  --border-radius-full: 9999px;
-
-  --shadow-default: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-
-  --transition-property-colors: color, background-color, border-color, text-decoration-color, fill,
-    stroke;
-  --transition-duration-default: 150ms;
-  --transition-timing-function-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-all: all var(--transition-duration-default) var(--transition-timing-function-default);
-
-  --background-default: oklch(0.936 0 0);
-  --foreground-default: oklch(0 0 0);
-
-  --color-primary-100: oklch(0.827 0 0);
-  --color-primary-200: oklch(0.648 0 0);
-  --color-primary-300: oklch(0.469 0 0);
-  --color-primary-400: oklch(0.238 0 0);
-  --color-primary-500: oklch(0 0 0);
-  --color-primary-600: oklch(0 0 0);
-  --color-primary-700: oklch(0 0 0);
-  --color-primary-800: oklch(0 0 0);
-  --color-primary-900: oklch(0 0 0);
-
-  --color-secondary-100: var(--color-primary-100);
-  --color-secondary-200: var(--color-primary-200);
-  --color-secondary-300: var(--color-primary-300);
-  --color-secondary-400: var(--color-primary-400);
-  --color-secondary-500: var(--color-primary-500);
-  --color-secondary-600: var(--color-primary-600);
-  --color-secondary-700: var(--color-primary-700);
-  --color-secondary-800: var(--color-primary-800);
-  --color-secondary-900: var(--color-primary-900);
-
-  &:where(.dark, .dark *) {
-    --background-default: oklch(0.143 0 0);
-    --foreground-default: oklch(1 0 0);
-
-    --color-primary-100: oklch(0.238 0 0);
-    --color-primary-200: oklch(0.469 0 0);
-    --color-primary-300: oklch(0.648 0 0);
-    --color-primary-400: oklch(0.827 0 0);
-    --color-primary-500: oklch(1 0 0);
-    --color-primary-600: oklch(1 0 0);
-    --color-primary-700: oklch(1 0 0);
-    --color-primary-800: oklch(1 0 0);
-    --color-primary-900: oklch(1 0 0);
-  }
-
-  &:where(.theme, .theme *) {
-    --color-primary-100: oklch(0.936 0.032 var(--primary-hue));
-    --color-primary-200: oklch(0.827 0.091 var(--primary-hue));
-    --color-primary-300: oklch(0.742 0.139 var(--primary-hue));
-    --color-primary-400: oklch(0.648 0.147 var(--primary-hue));
-    --color-primary-500: oklch(0.573 0.129 var(--primary-hue));
-    --color-primary-600: oklch(0.469 0.107 var(--primary-hue));
-    --color-primary-700: oklch(0.321 0.073 var(--primary-hue));
-    --color-primary-800: oklch(0.238 0.054 var(--primary-hue));
-    --color-primary-900: oklch(0.143 0.024 var(--primary-hue));
-
-    --color-secondary-100: oklch(0.936 0.032 var(--secondary-hue));
-    --color-secondary-200: oklch(0.827 0.091 var(--secondary-hue));
-    --color-secondary-300: oklch(0.742 0.139 var(--secondary-hue));
-    --color-secondary-400: oklch(0.648 0.147 var(--secondary-hue));
-    --color-secondary-500: oklch(0.573 0.129 var(--secondary-hue));
-    --color-secondary-600: oklch(0.469 0.107 var(--secondary-hue));
-    --color-secondary-700: oklch(0.321 0.073 var(--secondary-hue));
-    --color-secondary-800: oklch(0.238 0.054 var(--secondary-hue));
-    --color-secondary-900: oklch(0.143 0.024 var(--secondary-hue));
-
-    --background-default: var(--color-secondary-100);
-  }
-
-  &:where(.dark.theme, .dark.theme *) {
-    --color-primary-100: oklch(0.143 0.024 var(--primary-hue));
-    --color-primary-200: oklch(0.238 0.054 var(--primary-hue));
-    --color-primary-300: oklch(0.321 0.073 var(--primary-hue));
-    --color-primary-400: oklch(0.469 0.107 var(--primary-hue));
-    --color-primary-500: oklch(0.573 0.129 var(--primary-hue));
-    --color-primary-600: oklch(0.648 0.147 var(--primary-hue));
-    --color-primary-700: oklch(0.742 0.139 var(--primary-hue));
-    --color-primary-800: oklch(0.827 0.091 var(--primary-hue));
-    --color-primary-900: oklch(0.936 0.032 var(--primary-hue));
-
-    --color-secondary-100: oklch(0.143 0.024 var(--secondary-hue));
-    --color-secondary-200: oklch(0.238 0.054 var(--secondary-hue));
-    --color-secondary-300: oklch(0.321 0.073 var(--secondary-hue));
-    --color-secondary-400: oklch(0.469 0.107 var(--secondary-hue));
-    --color-secondary-500: oklch(0.573 0.129 var(--secondary-hue));
-    --color-secondary-600: oklch(0.648 0.147 var(--secondary-hue));
-    --color-secondary-700: oklch(0.742 0.139 var(--secondary-hue));
-    --color-secondary-800: oklch(0.827 0.091 var(--secondary-hue));
-    --color-secondary-900: oklch(0.936 0.032 var(--secondary-hue));
-  }
+  --radius: 0.25rem;
+  --radius-full: 9999px;
+  --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --transition-colors: color, background-color, border-color, text-decoration-color, fill, stroke;
+  --transition-duration: 150ms;
+  --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-all: all var(--transition-duration) var(--transition-easing);
+  --background: light-dark(#fff, #171717);
+  --text: light-dark(#000, #fff);
+  --primary: oklch(0.6532 0.1854 33.46);
+  --secondary: oklch(0.735 0.1195 61.68);
 }
 
 *,
@@ -116,12 +32,12 @@ html,
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
   tab-size: 4;
-  font-family: var(--font-family-default, var(--font-family-base));
+  font-family: var(--font, var(--font-base));
   font-feature-settings: normal;
   font-variation-settings: normal;
   -webkit-tap-highlight-color: transparent;
-  background-color: var(--background-default);
-  color: var(--foreground-default);
+  background-color: var(--background);
+  color: var(--text);
 }
 
 body {
@@ -164,7 +80,7 @@ code,
 kbd,
 samp,
 pre {
-  font-family: var(--font-family-default-mono, var(--font-family-base-mono));
+  font-family: var(--font-mono, var(--font-base-mono));
   font-feature-settings: normal;
   font-variation-settings: normal;
   font-size: 1em;
