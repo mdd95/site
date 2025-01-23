@@ -16,12 +16,10 @@
     DropdownContent,
     DropdownItem,
     DropdownTrigger,
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
     Switch,
     UseId
   } from '$lib/index.js';
+  import Popover from '$lib/components/popover.svelte';
 
   const theme = setTheme();
 
@@ -142,12 +140,11 @@
 
   <section>
     <Popover>
-      <PopoverTrigger>Open popover</PopoverTrigger>
-      <PopoverContent>HELLO WORLD!</PopoverContent>
-    </Popover>
-    <Popover>
-      <PopoverTrigger>Open popover</PopoverTrigger>
-      <PopoverContent>HELLO WORLD!</PopoverContent>
+      {#snippet trigger({ targetId, style })}
+        <Button popovertarget={targetId} {style}>Open</Button>
+      {/snippet}
+
+      HELLO WORLD!
     </Popover>
   </section>
 </div>

@@ -22,7 +22,7 @@ export class Context<T> {
   }
 
   get(): T {
-    const context: T | undefined = getContext(this.#key);
+    const context = getContext<T | undefined>(this.#key);
     if (!context) {
       throw new Error(`Context "${this.#name}" not found`);
     }
@@ -30,10 +30,6 @@ export class Context<T> {
   }
 
   getOr<U>(fallback: U): T | U {
-    const context: T | undefined = getContext(this.#key);
-    if (!context) {
-      return fallback;
-    }
-    return context;
+    return getContext<T | undefined>(this.#key) ?? fallback;
   }
 }

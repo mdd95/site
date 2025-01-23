@@ -1,6 +1,6 @@
 import { Context } from '../utils/context.js';
 import { useId } from '../utils/id.js';
-import { prependStyle } from '../utils/style.js';
+import { objToStyle } from '../utils/style.js';
 import { Bin, bindRef, type BindState } from '../utils/reactivity.svelte.js';
 
 type PopoverStateProps = {
@@ -48,7 +48,7 @@ export class PopoverTrigger extends PopoverBase {
     return {
       id: this._id,
       popovertarget: this.parent.contentNode?.id,
-      style: prependStyle(style, {
+      style: objToStyle({
         'anchor-name': this.parent.anchor
       }),
       ...restProps
@@ -86,7 +86,7 @@ export class PopoverContent extends PopoverBase {
     return {
       id: this._id,
       popover: 'auto',
-      style: prependStyle(style, {
+      style: objToStyle({
         'position-anchor': this.parent.anchor
       }),
       ...restProps

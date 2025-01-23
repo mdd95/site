@@ -1,4 +1,4 @@
 export const useId = (() => {
   let count = 0;
-  return (prefix: string) => `${prefix}-${++count}`;
+  return (prefix = 'id') => `${prefix}-${++count}`;
 })();
