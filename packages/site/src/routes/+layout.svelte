@@ -1,6 +1,6 @@
 <script lang="ts">
   import 'components/app.css';
-  import { Theme } from 'components/theme/index.js';
+  import { ThemeWatcher } from 'components/theme-watcher/index.js';
   import type { Snippet } from 'svelte';
 
   type Props = {
@@ -9,5 +9,5 @@
   let { children }: Props = $props();
 </script>
 
-<Theme />
+<ThemeWatcher />
 {@render children?.()}

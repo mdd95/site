@@ -1,9 +1,9 @@
 <script lang="ts">
   import '$lib/app.css';
-  import { theme, Theme } from '$lib/theme/index.js';
+  import { theme, ThemeWatcher } from '$lib/theme-watcher/index.js';
 </script>
 
-<Theme />
+<ThemeWatcher />
 
 <select bind:value={theme.mode}>
   <option value="light">Light</option>
