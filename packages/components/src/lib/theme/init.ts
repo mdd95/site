@@ -1,4 +1,4 @@
-export function setupTheme() {
+export function initializeTheme() {
   try {
     const stored = localStorage.getItem('theme');
     if (!stored) return;
