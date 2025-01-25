@@ -20,19 +20,15 @@
   button {
     height: 2.25rem;
     padding-inline: 1rem;
-    padding-block: 0.5rem;
+    border-radius: var(--radius);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    background-color: color-mix(in oklab, var(--background) 90%, var(--text));
-    color: var(--text);
+    background-color: color-mix(in oklab, var(--background) 92.5%, var(--complementary));
+    color: inherit;
+    font-size: 1rem;
     white-space: nowrap;
     cursor: pointer;
-    transition-property: var(--transition-colors);
-    transition-duration: var(--transition-duration);
-    transition-timing-function: var(--transition-easing);
 
     &:disabled {
       background-color: color-mix(in oklab, var(--background) 50%, transparent);
@@ -42,7 +38,7 @@
 
     @media (hover: hover) {
       &:hover {
-        background-color: color-mix(in oklab, var(--background) 85%, var(--text));
+        background-color: color-mix(in oklab, var(--background) 90%, var(--complementary));
       }
     }
 

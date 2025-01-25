@@ -37,10 +37,12 @@
     top: calc(anchor(bottom) + var(--offset));
     left: anchor(left);
     margin: 0;
-    border: 0;
+    padding-inline: 1rem;
+    padding-block: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--background) 92.5%, var(--text));
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    background-color: color-mix(in oklab, var(--background) 80%, white);
+    background-color: color-mix(in oklab, var(--background) 95%, var(--text));
     color: var(--text);
   }
 </style>
