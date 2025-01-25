@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { Theme, setTheme } from 'components';
+  import 'components/app.css';
+  import { Theme } from 'components/theme/index.js';
   import type { Snippet } from 'svelte';
 
   type Props = {
     children?: Snippet;
   };
-
   let { children }: Props = $props();
-
-  setTheme();
 </script>
 
 <Theme />
