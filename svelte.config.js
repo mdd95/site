@@ -4,7 +4,7 @@ import { mdsvex } from 'mdsvex';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: [vitePreprocess(), mathPreprocess(), mdsvex()],
+  preprocess: [vitePreprocess(), mdsvex(), mathPreprocess()],
   kit: {
     adapter: adapter()
   },

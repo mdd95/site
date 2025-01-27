@@ -17,10 +17,4 @@
   });
 </script>
 
-<div bind:this={ref}></div>
-
-<style>
-  div {
-    font-size: 0.875em;
-  }
-</style>
+<span bind:this={ref}></span>
