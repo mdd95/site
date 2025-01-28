@@ -28,12 +28,12 @@
 
   html,
   :host {
-    line-height: 1.5;
-    -webkit-text-size-adjust: 100%;
     tab-size: 4;
+    line-height: 1.5;
     font-family: var(--font, var(--font-base));
     font-feature-settings: normal;
     font-variation-settings: normal;
+    -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -233,12 +233,14 @@
   body {
     background-color: light-dark(oklch(100% 0 0), oklch(15% 0 0));
     color: light-dark(oklch(25% 0 0), oklch(85% 0 0));
+    transition-property: background-color, color;
+    transition-duration: var(--transition-duration);
+    transition-timing-function: var(--transition-easing);
   }
 
   * {
     scrollbar-color: light-dark(oklch(75% 0 0), oklch(50% 0 0))
       light-dark(oklch(100% 0 0), oklch(15% 0 0));
-    scrollbar-gutter: stable;
     scrollbar-width: thin;
   }
 }

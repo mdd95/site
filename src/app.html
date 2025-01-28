@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- prettier-ignore -->
+    <script nonce="%sveltekit.nonce%">!function(){try{let e=localStorage.getItem("theme");if(!e)return;let{mode:t,primary:r,secondary:s}=JSON.parse(e),c=document.documentElement;switch(t){case"light":c.style.colorScheme="light";break;case"dark":c.style.colorScheme="dark"}c.style.setProperty("--primary",r),c.style.setProperty("--secondary",s)}catch(l){console.error("Failed to parse stored theme",l)}}();</script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

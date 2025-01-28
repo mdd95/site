@@ -1,13 +1,10 @@
 <script lang="ts">
-  import type { PageData } from './$types';
-  type Props = {
-    data: PageData;
-  };
-  let { data }: Props = $props();
+  import type { PageProps } from './$types';
+  let { data }: PageProps = $props();
 </script>
 
 <svelte:head>
-  <title>{data.metadata?.title}</title>
+  <title>{data.metadata ? data.metadata.title : `Not Found: ${data.slug}`}</title>
 </svelte:head>
 
 <main>
