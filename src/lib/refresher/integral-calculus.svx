@@ -4,7 +4,10 @@ title: Integral calculus
 
 # Integral calculus
 
-<div>
-  {`$$ \\int dx = x+C $$`}
-  {`$$ \\int a\\,dx = a\\int dx+C $$`}
-</div>
+$$
+\int dx = x+C
+$$
+
+$$
+\int a\,dx = a\int dx+C
+$$

@@ -1,0 +1,25 @@
+# Tension members
+
+Yielding on gross area
+
+$$
+P_n = F_y A_g
+$$
+
+Rupture on net area
+
+$$
+P_n = F_u A_e
+$$
+
+Net area
+
+$$
+A_e = A_n U
+$$
+
+For any type of tension member except plates and round HSS with $l \ge 1.3D$
+
+$$
+U = 1 - \frac{\bar{x}}{l}
+$$
