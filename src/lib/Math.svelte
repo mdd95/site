@@ -1,20 +1,13 @@
-<script lang="ts">
+<script lang="ts" module>
   import 'katex/dist/katex.css';
   import katex from 'katex';
 
-  type Props = {
-    render: string;
-    display?: boolean;
-  };
-  let { render, display = true }: Props = $props();
-  let ref: HTMLElement;
-
-  $effect(() => {
-    katex.render(render.trim(), ref, {
-      displayMode: display,
-      throwOnError: false
-    });
-  });
+  export { math };
 </script>
 
-<span bind:this={ref}></span>
+{#snippet math(tex: string, displayMode = false)}
+  {@html katex.renderToString(tex, {
+    displayMode,
+    throwOnError: false
+  })}
+{/snippet}
