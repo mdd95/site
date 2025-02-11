@@ -1,87 +1,86 @@
 import { browser } from '$app/environment';
 
-export type Theme = {
-  mode: 'system' | 'light' | 'dark';
+type ThemeMode = 'system' | 'light' | 'dark';
+
+interface ThemeData {
+  mode: ThemeMode;
   primary: string;
   secondary: string;
+}
+
+const STORE_KEY = 'theme';
+const DEFAULT_THEME: ThemeData = {
+  mode: 'system',
+  primary: 'oklch(65.32% 0.1854 33.46)',
+  secondary: 'oklch(0.735 0.1195 61.68)'
 };
 
-export function createThemeState() {
-  const DEFAULT: Theme = {
-    mode: 'system',
-    primary: 'oklch(0.6532 0.1854 33.46)',
-    secondary: 'oklch(0.735 0.1195 61.68)'
-  };
-
-  let theme = $state(DEFAULT);
-
-  if (browser) {
-    const stored = localStorage.getItem('theme');
-    if (stored) {
-      try {
-        theme = JSON.parse(stored);
-      } catch (err) {}
-    }
+function retrieveStoredTheme(): ThemeData {
+  if (!browser) return DEFAULT_THEME;
+  try {
+    const storedTheme = localStorage.getItem(STORE_KEY);
+    return storedTheme ? (JSON.parse(storedTheme) as ThemeData) : DEFAULT_THEME;
+  } catch {
+    return DEFAULT_THEME;
   }
+}
+
+function useThemeStore() {
+  const theme = $state(retrieveStoredTheme());
 
   function handleChange() {
-    const { mode, primary, secondary } = theme;
+    if (!browser) return;
+
     const root = document.documentElement;
+    root.style.colorScheme = theme.mode === 'system' ? '' : theme.mode;
+    root.style.setProperty('--primary', theme.primary);
+    root.style.setProperty('--secondary', theme.secondary);
 
-    switch (mode) {
-      case 'light':
-        root.style.colorScheme = 'light';
-        break;
-      case 'dark':
-        root.style.colorScheme = 'dark';
-        break;
-      case 'system':
-        root.style.removeProperty('color-scheme');
-        break;
-    }
-
-    root.style.setProperty('--primary', primary);
-    root.style.setProperty('--secondary', secondary);
-    localStorage.setItem('theme', JSON.stringify(theme));
+    localStorage.setItem(STORE_KEY, JSON.stringify(theme));
   }
 
   return {
-    isDarkMode() {
+    isDarkMode(): boolean {
       if (!browser) return false;
       return (
         theme.mode === 'dark' ||
-        (theme.mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        (theme.mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
       );
     },
 
-    get mode() {
+    get mode(): ThemeMode {
       return theme.mode;
     },
-    set mode(value) {
+    set mode(value: ThemeMode) {
       theme.mode = value;
       handleChange();
     },
     toggleMode() {
-      theme.mode = this.isDarkMode() ? 'light' : 'dark';
+      if (theme.mode === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        theme.mode = prefersDark ? 'light' : 'dark';
+      } else {
+        theme.mode = theme.mode === 'dark' ? 'light' : 'dark';
+      }
       handleChange();
     },
 
-    get primary() {
+    get primary(): string {
       return theme.primary;
     },
-    set primary(value) {
+    set primary(value: string) {
       theme.primary = value;
       handleChange();
     },
 
-    get secondary() {
+    get secondary(): string {
       return theme.secondary;
     },
-    set secondary(value) {
+    set secondary(value: string) {
       theme.secondary = value;
       handleChange();
     }
   };
 }
 
-export const theme = createThemeState();
+export const theme = useThemeStore();

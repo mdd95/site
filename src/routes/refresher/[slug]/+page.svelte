@@ -1,4 +1,5 @@
 <script lang="ts">
+  import 'katex/dist/katex.css';
   import type { PageProps } from './$types';
   let { data }: PageProps = $props();
 </script>
