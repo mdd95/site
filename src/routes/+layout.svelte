@@ -2,7 +2,6 @@
   import 'inter-ui/inter.css';
   import 'inter-ui/inter-variable.css';
   import '../app.css';
-  import { setContext } from 'svelte';
   import { ModeWatcher, toggleMode } from 'mode-watcher';
   import Moon from 'svelte-lucide/Moon.svelte';
   import Sun from 'svelte-lucide/Sun.svelte';
@@ -10,15 +9,14 @@
   import type { LayoutProps } from './$types';
 
   let { children }: LayoutProps = $props();
-  setContext('iconCtx', { size: '20' });
 </script>
 
 <ModeWatcher />
 
-<header class="bg-background-800">
+<header>
   <div>
-    <Button class="ghost" onclick={() => toggleMode()}>
-      <Moon class="not-dark:hidden" />
+    <Button class="ghost icon" onclick={() => toggleMode()}>
+      <Moon size="30" class="not-dark:hidden" />
       <Sun class="dark:hidden" />
     </Button>
   </div>
@@ -26,13 +24,10 @@
 {@render children?.()}
 
 <style>
+  @reference '../app.css';
+
   header > div {
-    margin-inline: auto;
-    padding-inline: 1rem;
-    width: min(100%, 80rem);
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    @apply container mx-auto p-4;
+    @apply flex items-center justify-end;
   }
 </style>
