@@ -1,3 +1,22 @@
 @import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: light-dark(var(--color-neutral-100), var(--color-neutral-950));
+  --color-foreground: light-dark(var(--color-neutral-900), var(--color-neutral-300));
+  --color-primary: var(--color-orange-600);
+  --color-primary-foreground: var(--color-neutral-100);
+}
+
+@layer base {
+  html {
+    @apply bg-background text-foreground;
+    font-family: Inter, var(--font-sans);
+  }
+  @supports (font-variation-settings: normal) {
+    html {
+      font-family: InterVariable, var(--font-sans);
+    }
+  }
+}

@@ -1,22 +1,26 @@
 <script lang="ts">
+  import 'inter-ui/inter.css';
+  import 'inter-ui/inter-variable.css';
   import '../app.css';
-  import IconSun from 'svelte-lucide/Sun.svelte';
-  import IconMoon from 'svelte-lucide/Moon.svelte';
-  import { theme } from '$lib/theme.svelte.js';
+  import { setContext } from 'svelte';
+  import { ModeWatcher, toggleMode } from 'mode-watcher';
+  import Moon from 'svelte-lucide/Moon.svelte';
+  import Sun from 'svelte-lucide/Sun.svelte';
+  import { Button } from '$lib/components';
   import type { LayoutProps } from './$types';
 
   let { children }: LayoutProps = $props();
+  setContext('iconCtx', { size: '20' });
 </script>
 
-<header>
+<ModeWatcher />
+
+<header class="bg-background-800">
   <div>
-    <button onclick={() => theme.toggleMode()}>
-      {#if theme.isDarkMode()}
-        <IconMoon size="20" />
-      {:else}
-        <IconSun size="20" />
-      {/if}
-    </button>
+    <Button class="ghost" onclick={() => toggleMode()}>
+      <Moon class="not-dark:hidden" />
+      <Sun class="dark:hidden" />
+    </Button>
   </div>
 </header>
 {@render children?.()}
@@ -30,23 +34,5 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-  }
-
-  button {
-    width: 2.25rem;
-    height: 2.25rem;
-    padding-inline: 1rem;
-    align-content: center;
-    justify-items: center;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition-property: background-color, color;
-    transition-duration: var(--transition-duration);
-    transition-timing-function: var(--transition-easing);
-  }
-  @media (hover: hover) {
-    button:hover {
-      background-color: color-mix(in oklab, var(--primary) 10%, var(--light-dark));
-    }
   }
 </style>

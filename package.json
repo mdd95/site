@@ -20,26 +20,27 @@
     "@sveltejs/kit": "^2.17.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tailwindcss/vite": "^4.0.6",
+    "bits-ui": "^1.1.0",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-svelte": "^2.46.1",
-    "globals": "^15.14.0",
+    "globals": "^15.15.0",
+    "inter-ui": "^4.1.0",
+    "katex": "^0.16.21",
     "mdsvex": "^0.12.3",
+    "mode-watcher": "^0.5.1",
     "prettier": "^3.5.0",
     "prettier-plugin-svelte": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "rehype-katex-svelte": "^1.2.0",
-    "remark-math": "^3",
-    "svelte": "^5.19.10",
+    "remark-math": "^3.0.0",
+    "svelte": "^5.20.0",
     "svelte-check": "^4.1.4",
     "svelte-lucide": "^2.0.1",
     "tailwindcss": "^4.0.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0",
     "vite": "^6.1.0"
-  },
-  "dependencies": {
-    "katex": "^0.16.21"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
