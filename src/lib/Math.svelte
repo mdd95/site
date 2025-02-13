@@ -1,13 +1,19 @@
 <script lang="ts" module>
   import 'katex/dist/katex.css';
   import katex from 'katex';
-
-  export { math };
+  export { inline, display };
 </script>
 
-{#snippet math(tex: string, displayMode = false)}
+{#snippet inline(tex: string)}
   {@html katex.renderToString(tex, {
-    displayMode,
+    displayMode: false,
+    throwOnError: false
+  })}
+{/snippet}
+
+{#snippet display(tex: string)}
+  {@html katex.renderToString(tex, {
+    displayMode: true,
     throwOnError: false
   })}
 {/snippet}

@@ -1,0 +1,72 @@
+---
+title: Compression Members
+---
+
+# Compression members
+
+$$
+P_{cr} = \frac{\pi^2EI}{L^2} = \frac{\pi^2EA}{(L/r)^2}
+$$
+
+where:
+
+- radius of gyration: $r = \sqrt{\frac{I}{A}}$
+- slenderness ratio: $L/r$
+
+Nominal compressive strength, $P_n$
+
+$$
+P_n = F_{cr} A_g
+$$
+
+The flexural buckling stress, $F_{cr}$, is determined as follows:
+
+when $\dfrac{KL}{r} \le 4.71\sqrt{\dfrac{E}{F_y}} \qquad \text{or} \qquad F_e \ge 0.44Fy$
+
+$$
+F_{cr} = \left[0.658^{\frac{F_y}{F_e}}\right] F_y
+$$
+
+when $\dfrac{KL}{r} \gt 4.71\sqrt{\dfrac{E}{F_y}} \qquad \text{or} \qquad F_e \lt 0.44Fy$
+
+$$
+F_{cr} = 0.877F_e
+$$
+
+Elastic critical buckling stress
+
+$$
+F_e = \frac{\pi^2E}{(\frac{KL}{r})^2}
+$$
+
+**Members with Slender Elements**
+
+Nominal compressive strength
+
+$$
+P_n = F_{cr} A_g
+$$
+
+when $\dfrac{KL}{r} \le 4.71\sqrt{\dfrac{E}{QF_y}} \qquad \text{or} \qquad F_e \ge 0.44QFy$
+
+$$
+F_{cr} = \left[0.658^{\frac{QF_y}{F_e}}\right] QF_y
+$$
+
+when $\dfrac{KL}{r} \gt 4.71\sqrt{\dfrac{E}{QF_y}} \qquad \text{or} \qquad F_e \lt 0.44QFy$
+
+$$
+F_{cr} = 0.877F_e
+$$
+
+where
+
+$Q = 1$ for members with compact and noncompact sections
+
+$Q = Q_sQ_a$ for members with slender-element sections
+
+**Slender Unstiffened Elements, $Q_s$**
+
+when $\dfrac{b}{t} \le 0.56\sqrt{\dfrac{E}{F_y}} \qquad \qquad \qquad Q=1.0$
+
+when $0.56\sqrt{\dfrac{E}{F_y}} \lt \dfrac{b}{t} \lt 0.56\sqrt{\dfrac{E}{F_y}} \qquad Q=1.0$
