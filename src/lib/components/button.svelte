@@ -22,25 +22,26 @@
     a,
     button {
       @apply inline-flex items-center justify-center gap-2;
-      @apply cursor-pointer rounded-md transition-colors;
-      @apply bg-primary hover:bg-primary/90 text-primary-foreground;
-      @apply h-10 px-4 whitespace-nowrap;
+      @apply cursor-pointer rounded-md whitespace-nowrap transition-colors;
+      @apply h-10 px-4;
+      @apply focus-visible:ring-2 focus-visible:outline-none;
+      @apply disabled:pointer-events-none disabled:opacity-50;
 
-      &:focus-visible {
-        @apply ring-primary/50 ring-offset-background ring-2 ring-offset-2 outline-none;
-      }
-      &:disabled {
-        @apply pointer-events-none opacity-50;
-      }
       & :global(svg) {
         @apply pointer-events-none size-5 shrink-0;
       }
-    }
-    .ghost {
-      @apply hover:bg-primary/40 text-foreground bg-transparent;
-    }
-    .icon {
-      @apply size-10;
+      &.sky {
+        @apply bg-sky-600 text-sky-100 hover:bg-sky-700 focus-visible:ring-sky-600/50;
+      }
+      &.ghost {
+        @apply bg-transparent hover:bg-slate-900 focus-visible:ring-slate-900/50;
+      }
+      &.link {
+        @apply text-sky-600 underline-offset-2 hover:underline;
+      }
+      &.icon {
+        @apply size-10;
+      }
     }
   }
 </style>
