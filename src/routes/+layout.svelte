@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import { ModeWatcher } from 'mode-watcher';
-  import { ThemeSelect } from '$lib/components/index.js';
+  import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
   import type { LayoutProps } from './$types';
 
   let { children }: LayoutProps = $props();
