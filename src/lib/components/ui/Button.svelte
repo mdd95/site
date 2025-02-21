@@ -19,7 +19,7 @@
 {/if}
 
 <style>
-  @reference '../../../../app.css';
+  @reference '../../../app.css';
 
   @layer components {
     a,

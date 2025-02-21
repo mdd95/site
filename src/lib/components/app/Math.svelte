@@ -1,6 +1,7 @@
 <script lang="ts" module>
   import 'katex/dist/katex.css';
   import katex from 'katex';
+
   export { inline, display };
 </script>
 

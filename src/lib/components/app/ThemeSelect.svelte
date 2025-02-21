@@ -1,8 +1,8 @@
 <script lang="ts">
   import { fromStore } from 'svelte/store';
   import { setMode, userPrefersMode } from 'mode-watcher';
-  import { DropdownMenu } from '$lib/components/ui/dropdown-menu/index.js';
-  import { Button } from '$lib/components/ui/button/index.js';
+  import DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+  import Button from '$lib/components/ui/Button.svelte';
   import Moon from 'svelte-lucide/Moon.svelte';
   import Sun from 'svelte-lucide/Sun.svelte';
 

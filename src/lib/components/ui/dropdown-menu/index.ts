@@ -1,12 +1,12 @@
-import * as Bits from 'bits-ui';
+import { DropdownMenu } from 'bits-ui';
 import Content from './Content.svelte';
 import Item from './Item.svelte';
 import CheckboxItem from './CheckboxItem.svelte';
 import SubContent from './SubContent.svelte';
 
-export const DropdownMenu = {
-  Root: Bits.DropdownMenu.Root,
-  Trigger: Bits.DropdownMenu.Trigger,
+export default {
+  Root: DropdownMenu.Root,
+  Trigger: DropdownMenu.Trigger,
   Content,
   Item,
   CheckboxItem,

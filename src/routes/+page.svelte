@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button/index.js';
-  import { Dialog } from '$lib/components/ui/dialog/index.js';
+  import Button from '$lib/components/ui/Button.svelte';
+  import Dialog from '$lib/components/ui/dialog/index.js';
 </script>
 
 <main class="container mx-auto px-4">
