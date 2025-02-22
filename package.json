@@ -1,50 +1,51 @@
 {
-  "name": "mjayar-site",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && eslint ."
-  },
-  "devDependencies": {
-    "@eslint/compat": "^1.2.6",
-    "@eslint/js": "^9.20.0",
-    "@sveltejs/adapter-node": "^5.2.12",
-    "@sveltejs/kit": "^2.17.1",
-    "@sveltejs/vite-plugin-svelte": "^5.0.3",
-    "@tailwindcss/vite": "^4.0.6",
-    "bits-ui": "^1.1.0",
-    "eslint": "^9.20.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-svelte": "^2.46.1",
-    "globals": "^15.15.0",
-    "inter-ui": "^4.1.0",
-    "katex": "^0.16.21",
-    "mdsvex": "^0.12.3",
-    "mode-watcher": "^0.5.1",
-    "prettier": "^3.5.0",
-    "prettier-plugin-svelte": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
-    "rehype-katex-svelte": "^1.2.0",
-    "remark-math": "^3.0.0",
-    "svelte": "^5.20.0",
-    "svelte-check": "^4.1.4",
-    "svelte-lucide": "^2.0.1",
-    "tailwindcss": "^4.0.6",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0",
-    "vite": "^6.1.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  }
+	"name": "mjayar-site",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write .",
+		"lint": "prettier --check . && eslint ."
+	},
+	"devDependencies": {
+		"@eslint/compat": "^1.2.6",
+		"@eslint/js": "^9.20.0",
+		"@number-flow/svelte": "^0.3.3",
+		"@sveltejs/adapter-node": "^5.2.12",
+		"@sveltejs/kit": "^2.17.1",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@tailwindcss/vite": "^4.0.6",
+		"bits-ui": "^1.1.0",
+		"eslint": "^9.20.0",
+		"eslint-config-prettier": "^10.0.1",
+		"eslint-plugin-svelte": "^2.46.1",
+		"globals": "^15.15.0",
+		"inter-ui": "^4.1.0",
+		"katex": "^0.16.21",
+		"mdsvex": "^0.12.3",
+		"mode-watcher": "^0.5.1",
+		"prettier": "^3.5.0",
+		"prettier-plugin-svelte": "^3.3.3",
+		"prettier-plugin-tailwindcss": "^0.6.11",
+		"rehype-katex-svelte": "^1.2.0",
+		"remark-math": "^3.0.0",
+		"svelte": "^5.20.0",
+		"svelte-check": "^4.1.4",
+		"svelte-lucide": "^2.0.1",
+		"tailwindcss": "^4.0.6",
+		"typescript": "^5.7.3",
+		"typescript-eslint": "^8.24.0",
+		"vite": "^6.1.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	}
 }

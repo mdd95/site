@@ -4,9 +4,9 @@ import Title from './Title.svelte';
 import Description from './Description.svelte';
 
 export default {
-  Root: Dialog.Root,
-  Trigger: Dialog.Trigger,
-  Content,
-  Title,
-  Description
+	Root: Dialog.Root,
+	Trigger: Dialog.Trigger,
+	Content,
+	Title,
+	Description
 };

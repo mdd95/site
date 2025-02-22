@@ -5,10 +5,10 @@ import CheckboxItem from './CheckboxItem.svelte';
 import SubContent from './SubContent.svelte';
 
 export default {
-  Root: DropdownMenu.Root,
-  Trigger: DropdownMenu.Trigger,
-  Content,
-  Item,
-  CheckboxItem,
-  SubContent
+	Root: DropdownMenu.Root,
+	Trigger: DropdownMenu.Trigger,
+	Content,
+	Item,
+	CheckboxItem,
+	SubContent
 };

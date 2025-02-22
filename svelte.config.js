@@ -6,17 +6,17 @@ import rehypeKatexSvelte from 'rehype-katex-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: [
-    vitePreprocess(),
-    mdsvex({
-      remarkPlugins: [remarkMath],
-      rehypePlugins: [rehypeKatexSvelte]
-    })
-  ],
-  kit: {
-    adapter: adapter()
-  },
-  extensions: ['.svelte', '.svx']
+	preprocess: [
+		vitePreprocess(),
+		mdsvex({
+			remarkPlugins: [remarkMath],
+			rehypePlugins: [rehypeKatexSvelte]
+		})
+	],
+	kit: {
+		adapter: adapter()
+	},
+	extensions: ['.svelte', '.svx']
 };
 
 export default config;

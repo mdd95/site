@@ -2,19 +2,19 @@
 // for information about these interfaces
 
 declare global {
-  namespace App {
-    // interface Error {}
-    // interface Locals {}
-    // interface PageData {}
-    // interface PageState {}
-    // interface Platform {}
-  }
+	namespace App {
+		// interface Error {}
+		// interface Locals {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
+	}
 
-  declare module '*.svx' {
-    const component: import('svelte').Component;
-    export default component;
-    export const metadata: Record<string, any>;
-  }
+	declare module '*.svx' {
+		const component: import('svelte').Component;
+		export default component;
+		export const metadata: Record<string, unknown>;
+	}
 }
 
 export {};
