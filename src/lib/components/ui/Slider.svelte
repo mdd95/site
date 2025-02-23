@@ -10,7 +10,7 @@
 
 <Slider.Root bind:value={value as never} {orientation} {...restProps}>
 	{#snippet child({ props, thumbs })}
-		<span {...props} class={['slider', props.class]}>
+		<span class="slider" {...props}>
 			<span class="track" data-orientation={orientation}>
 				{@render sliderRange()}
 			</span>
@@ -24,7 +24,7 @@
 {#snippet sliderRange()}
 	<Slider.Range>
 		{#snippet child({ props })}
-			<span {...props} class={['range', props.class]}></span>
+			<span class="range" {...props}></span>
 		{/snippet}
 	</Slider.Range>
 {/snippet}
@@ -32,7 +32,7 @@
 {#snippet sliderThumbs(thumb: number)}
 	<Slider.Thumb index={thumb}>
 		{#snippet child({ props })}
-			<span {...props} class={['thumb', props.class]}></span>
+			<span class="thumb" {...props}></span>
 		{/snippet}
 	</Slider.Thumb>
 {/snippet}
@@ -64,7 +64,14 @@
 		}
 
 		.range {
-			@apply bg-primary absolute data-[orientation='horizontal']:h-full data-[orientation='vertical']:w-full;
+			@apply bg-primary absolute;
+
+			&[data-orientation='horizontal'] {
+				@apply h-full;
+			}
+			&[data-orientation='vertical'] {
+				@apply w-full;
+			}
 		}
 
 		.thumb {

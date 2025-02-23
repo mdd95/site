@@ -4,12 +4,16 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Dialog from '$lib/components/ui/dialog/index.js';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
-	import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
 	import Slider from '$lib/components/ui/Slider.svelte';
+	import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
 
 	let counter = $state(0);
 	let addend = $state(1);
 </script>
+
+<svelte:head>
+	<title>Click Counter</title>
+</svelte:head>
 
 <div class="layout">
 	<Navbar>
@@ -26,7 +30,7 @@
 			</Button>
 		</div>
 		<div class="flex justify-center space-x-2 py-4">
-			<Button class="ghost" onclick={() => (counter = 0)}>Reset</Button>
+			<Button class="elevated" onclick={() => (counter = 0)}>Reset</Button>
 			{@render optionsDialog()}
 		</div>
 	</div>
@@ -34,7 +38,7 @@
 
 {#snippet optionsDialog()}
 	<Dialog.Root>
-		<Dialog.Trigger class="ghost">
+		<Dialog.Trigger class="elevated">
 			{#snippet child({ props })}
 				<Button {...props}>Options</Button>
 			{/snippet}

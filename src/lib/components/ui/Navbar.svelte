@@ -15,7 +15,7 @@
 
 	@layer components {
 		header {
-			@apply bg-background/95 backdrop-blur-lg;
+			@apply bg-background;
 		}
 		div {
 			@apply container mx-auto flex h-16 items-center justify-between px-4;

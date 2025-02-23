@@ -40,6 +40,9 @@
 			&.ghost {
 				@apply hover:bg-ghost bg-transparent text-inherit;
 			}
+			&.elevated {
+				@apply bg-elevated text-inherit;
+			}
 			&.link {
 				@apply text-primary/80 hover:text-primary;
 			}
