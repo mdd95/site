@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { AnimationFrames } from 'runed';
 	import NumberFlow from '@number-flow/svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
@@ -22,8 +21,10 @@
 	let isPaused = $state(false);
 	let isCompleted = $state(false);
 
+	const ticksPerSecond = 4;
 	let audioEl: HTMLAudioElement;
 	let audioCtx: AudioContext;
+	let intervalId: number;
 
 	onMount(() => {
 		audioCtx = new AudioContext();
@@ -60,17 +61,17 @@
 		}
 	}
 
-	const animation = new AnimationFrames(() => {
+	function loop() {
 		msDiff = timeEnd - Date.now();
 
 		if (msDiff <= 0) {
 			msDiff = 0;
 			isCompleted = true;
 			isActive = false;
-			animation.stop();
+			clearInterval(intervalId);
 			playAlarmSound();
 		}
-	});
+	}
 
 	function startTimer() {
 		timeRemaining = inputHours * 3600000 + inputMinutes * 60000 + inputSeconds * 1000;
@@ -79,11 +80,11 @@
 		timeEnd = Date.now() + timeRemaining;
 		isActive = true;
 		isPaused = false;
-		animation.start();
+		intervalId = setInterval(loop, 1000 / ticksPerSecond);
 	}
 
 	function pauseTimer() {
-		animation.stop();
+		clearInterval(intervalId);
 		timeRemaining = timeEnd - Date.now();
 		isPaused = true;
 	}
@@ -91,11 +92,11 @@
 	function resumeTimer() {
 		timeEnd = Date.now() + timeRemaining;
 		isPaused = false;
-		animation.start();
+		intervalId = setInterval(loop, 1000 / ticksPerSecond);
 	}
 
 	function resetTimer() {
-		animation.stop();
+		clearInterval(intervalId);
 		stopAlarmSound();
 		msDiff = 0;
 		timeRemaining = 0;
