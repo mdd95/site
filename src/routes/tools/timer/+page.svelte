@@ -101,6 +101,7 @@
 		timeRemaining = 0;
 		isActive = false;
 		isPaused = false;
+		isCompleted = false;
 	}
 
 	function clamp(value: number, min: number, max: number) {
@@ -131,7 +132,12 @@
 		<ThemeSelect />
 	</Navbar>
 
-	<div class="timer-display flex items-center justify-center text-5xl tabular-nums md:text-8xl">
+	<div
+		class={[
+			'timer-display flex items-center justify-center text-5xl tabular-nums md:text-8xl',
+			isCompleted && 'text-primary'
+		]}
+	>
 		<NumberFlow
 			value={getHours()}
 			animated={isActive}
@@ -159,7 +165,7 @@
 		/>
 	</div>
 
-	{#if !isActive}
+	{#if !isActive && !isCompleted}
 		<div
 			class="timer-input *:caret-primary z-1 flex items-center justify-center text-5xl tabular-nums *:field-sizing-content *:text-transparent *:outline-none md:text-8xl"
 		>
