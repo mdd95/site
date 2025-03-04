@@ -18,7 +18,7 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="w-32" align="end">
+	<DropdownMenu.Content class="z-50 w-36" align="end">
 		<DropdownMenu.CheckboxItem
 			bind:checked={() => mode.current === 'light', () => setMode('light')}
 		>

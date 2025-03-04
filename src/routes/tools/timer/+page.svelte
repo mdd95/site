@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { AnimationFrames } from 'runed';
 	import NumberFlow from '@number-flow/svelte';
 	import Button from '$lib/components/ui/Button.svelte';
@@ -7,6 +8,7 @@
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Play from 'phosphor-svelte/lib/Play';
 	import Pause from 'phosphor-svelte/lib/Pause';
+	import AlarmSound from '$lib/assets/sounds/alarm.mp3';
 
 	let msDiff = $state(0);
 	let timeRemaining = 0;
@@ -20,6 +22,44 @@
 	let isPaused = $state(false);
 	let isCompleted = $state(false);
 
+	let audioEl: HTMLAudioElement;
+	let audioCtx: AudioContext;
+
+	onMount(() => {
+		audioCtx = new AudioContext();
+		const audioTrack = new MediaElementAudioSourceNode(audioCtx, {
+			mediaElement: audioEl
+		});
+		audioTrack.connect(audioCtx.destination);
+
+		function applyAudioDataset() {
+			audioEl.dataset.playing = 'false';
+		}
+		applyAudioDataset();
+		audioEl.addEventListener('ended', applyAudioDataset);
+		return () => {
+			audioEl.removeEventListener('ended', applyAudioDataset);
+		};
+	});
+
+	function playAlarmSound() {
+		if (audioCtx.state === 'suspended') {
+			audioCtx.resume();
+		}
+		if (audioEl.dataset.playing === 'false') {
+			audioEl.play();
+			audioEl.dataset.playing = 'true';
+		}
+	}
+
+	function stopAlarmSound() {
+		if (audioEl.dataset.playing === 'true') {
+			audioEl.pause();
+			audioEl.currentTime = 0;
+			audioEl.dataset.playing = 'false';
+		}
+	}
+
 	const animation = new AnimationFrames(() => {
 		msDiff = timeEnd - Date.now();
 
@@ -28,6 +68,7 @@
 			isCompleted = true;
 			isActive = false;
 			animation.stop();
+			playAlarmSound();
 		}
 	});
 
@@ -55,6 +96,7 @@
 
 	function resetTimer() {
 		animation.stop();
+		stopAlarmSound();
 		msDiff = 0;
 		timeRemaining = 0;
 		isActive = false;
@@ -160,7 +202,11 @@
 	{/if}
 
 	<div class="timer-controls grid items-center justify-items-center py-12">
-		<div></div>
+		<div>
+			<audio loop bind:this={audioEl}>
+				<source src={AlarmSound} type="audio/mpeg" />
+			</audio>
+		</div>
 		<Button onclick={resetTimer} class="icon ghost size-14 rounded-full *:size-6">
 			<ArrowCounterClockwise weight="fill" />
 		</Button>
