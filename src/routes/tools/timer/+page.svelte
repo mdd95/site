@@ -22,6 +22,7 @@
 	let isCompleted = $state(false);
 
 	const ticksPerSecond = 4;
+	const timeInterval = 1000 / ticksPerSecond;
 	let audioEl: HTMLAudioElement;
 	let audioCtx: AudioContext;
 	let intervalId: number;
@@ -80,7 +81,7 @@
 		timeEnd = Date.now() + timeRemaining;
 		isActive = true;
 		isPaused = false;
-		intervalId = setInterval(loop, 1000 / ticksPerSecond);
+		intervalId = setInterval(loop, timeInterval);
 	}
 
 	function pauseTimer() {
@@ -92,7 +93,7 @@
 	function resumeTimer() {
 		timeEnd = Date.now() + timeRemaining;
 		isPaused = false;
-		intervalId = setInterval(loop, 1000 / ticksPerSecond);
+		intervalId = setInterval(loop, timeInterval);
 	}
 
 	function resetTimer() {
@@ -127,24 +128,18 @@
 	<title>Timer</title>
 </svelte:head>
 
-<div class="app-layout grid min-h-screen">
+<div class="layout">
 	<Navbar>
 		<div></div>
 		<ThemeSelect />
 	</Navbar>
 
-	<div
-		class={[
-			'timer-display flex items-center justify-center text-5xl tabular-nums md:text-8xl',
-			isCompleted && 'text-primary'
-		]}
-	>
+	<div class="display" data-completed={isCompleted}>
 		<NumberFlow
 			value={getHours()}
 			animated={isActive}
 			trend={-1}
 			format={{ minimumIntegerDigits: 2 }}
-			class="pointer-events-none"
 		/>
 		<NumberFlow
 			value={getMinutes()}
@@ -153,7 +148,6 @@
 			digits={{ 1: { max: 5 } }}
 			format={{ minimumIntegerDigits: 2 }}
 			prefix=":"
-			class="pointer-events-none"
 		/>
 		<NumberFlow
 			value={getSeconds()}
@@ -162,19 +156,16 @@
 			digits={{ 1: { max: 5 } }}
 			format={{ minimumIntegerDigits: 2 }}
 			prefix=":"
-			class="pointer-events-none"
 		/>
 	</div>
 
 	{#if !isActive && !isCompleted}
-		<div
-			class="timer-input *:caret-primary z-1 flex items-center justify-center text-5xl tabular-nums *:field-sizing-content *:text-transparent *:outline-none md:text-8xl"
-		>
+		<div class="input">
 			<input
 				type="number"
 				bind:value={
 					() => inputHours.toString().padStart(2, '0'),
-					(value) => (inputHours = clamp(~~+value, 0, 23))
+					(value) => (inputHours = clamp(Math.floor(Number(value)), 0, 23))
 				}
 				min="0"
 				max="23"
@@ -186,7 +177,7 @@
 				type="number"
 				bind:value={
 					() => inputMinutes.toString().padStart(2, '0'),
-					(value) => (inputMinutes = clamp(~~+value, 0, 59))
+					(value) => (inputMinutes = clamp(Math.floor(Number(value)), 0, 59))
 				}
 				min="0"
 				max="59"
@@ -198,7 +189,7 @@
 				type="number"
 				bind:value={
 					() => inputSeconds.toString().padStart(2, '0'),
-					(value) => (inputSeconds = clamp(~~+value, 0, 59))
+					(value) => (inputSeconds = clamp(Math.floor(Number(value)), 0, 59))
 				}
 				min="0"
 				max="59"
@@ -208,13 +199,12 @@
 		</div>
 	{/if}
 
-	<div class="timer-controls grid items-center justify-items-center py-12">
-		<div>
-			<audio loop bind:this={audioEl}>
-				<source src={AlarmSound} type="audio/mpeg" />
-			</audio>
-		</div>
-		<Button onclick={resetTimer} class="icon ghost size-14 rounded-full *:size-6">
+	<div class="controls">
+		<Button
+			onclick={resetTimer}
+			class="icon ghost size-14 rounded-full *:size-6"
+			style="justify-self: end"
+		>
 			<ArrowCounterClockwise weight="fill" />
 		</Button>
 		{#if !isActive}
@@ -231,20 +221,59 @@
 			</Button>
 		{/if}
 		<div></div>
-		<div></div>
 	</div>
 </div>
+<audio loop bind:this={audioEl}>
+	<source src={AlarmSound} type="audio/mpeg" />
+</audio>
 
 <style>
-	.app-layout {
-		grid-template-areas: 'navbar' 'timer-display' 'timer-controls';
-		grid-template-rows: calc(var(--spacing) * 16) 1fr auto;
+	.layout {
+		height: 100vh;
+		display: grid;
+		grid-template-areas: 'navbar' 'display' 'controls';
+		grid-template-rows: 4rem 1fr auto;
 	}
-	.timer-display {
-		grid-area: timer-display;
+
+	.display {
+		grid-area: display;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 3rem;
+		font-variant-numeric: tabular-nums;
+
+		@media (width >= 48rem) {
+			font-size: 6rem;
+		}
+
+		&[data-completed='true'] {
+			color: var(--color-primary);
+		}
+
+		& :global(number-flow-svelte) {
+			pointer-events: none;
+		}
 	}
-	.timer-input {
-		grid-area: timer-display;
+	.input {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		grid-area: display;
+		font-size: 3rem;
+		font-variant-numeric: tabular-nums;
+		z-index: 5;
+
+		@media (width >= 48rem) {
+			font-size: 6rem;
+		}
+
+		& input[type='number'] {
+			color: transparent;
+			caret-color: var(--color-primary);
+			outline: none;
+			field-sizing: content;
+		}
 
 		& input[type='number']::-webkit-inner-spin-button,
 		& input[type='number']::-webkit-outer-spin-button {
@@ -255,11 +284,12 @@
 			-moz-appearance: textfield;
 		}
 	}
-	.timer-controls {
-		grid-area: timer-controls;
-		grid-template-columns:
-			auto calc(var(--spacing) * 20)
-			calc(var(--spacing) * 32)
-			calc(var(--spacing) * 20) auto;
+	.controls {
+		padding-block: 4rem;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		grid-area: controls;
+		grid-template-columns: 1fr 8rem 1fr;
 	}
 </style>
