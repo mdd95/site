@@ -122,6 +122,17 @@
 		if (msDiff > 0) return Math.floor((msDiff / 3600000) % 24);
 		return inputHours;
 	}
+
+	function setByWheel(getter: () => number, setter: (value: number) => void) {
+		return (e: WheelEvent) => {
+			const inputEl = e.target as HTMLInputElement;
+			const min = Number(inputEl.min);
+			const max = Number(inputEl.max);
+			const value = getter() + Math.floor(-e.deltaY / 100);
+			if (value < min || value > max) return;
+			setter(value);
+		};
+	}
 </script>
 
 <svelte:head>
@@ -167,6 +178,10 @@
 					() => inputHours.toString().padStart(2, '0'),
 					(value) => (inputHours = clamp(Math.floor(Number(value)), 0, 23))
 				}
+				onwheel={setByWheel(
+					() => inputHours,
+					(value) => (inputHours = value)
+				)}
 				min="0"
 				max="23"
 				step="1"
@@ -179,6 +194,10 @@
 					() => inputMinutes.toString().padStart(2, '0'),
 					(value) => (inputMinutes = clamp(Math.floor(Number(value)), 0, 59))
 				}
+				onwheel={setByWheel(
+					() => inputMinutes,
+					(value) => (inputMinutes = value)
+				)}
 				min="0"
 				max="59"
 				step="1"
@@ -191,6 +210,10 @@
 					() => inputSeconds.toString().padStart(2, '0'),
 					(value) => (inputSeconds = clamp(Math.floor(Number(value)), 0, 59))
 				}
+				onwheel={setByWheel(
+					() => inputSeconds,
+					(value) => (inputSeconds = value)
+				)}
 				min="0"
 				max="59"
 				step="1"
