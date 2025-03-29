@@ -22,47 +22,48 @@
 	let isCompleted = $state(false);
 
 	const ticksPerSecond = 4;
-	const timeInterval = 1000 / ticksPerSecond;
-	let audioEl: HTMLAudioElement;
-	let audioCtx: AudioContext;
+	const timeDuration = 1000 / ticksPerSecond;
+	let audioElement: HTMLAudioElement;
+	let audioContext: AudioContext;
+	let audioSource: MediaElementAudioSourceNode;
 	let intervalId: number;
 
 	onMount(() => {
-		audioCtx = new AudioContext();
-		const audioTrack = new MediaElementAudioSourceNode(audioCtx, {
-			mediaElement: audioEl
+		audioContext = new AudioContext();
+		audioSource = new MediaElementAudioSourceNode(audioContext, {
+			mediaElement: audioElement
 		});
-		audioTrack.connect(audioCtx.destination);
+		audioSource.connect(audioContext.destination);
 
-		function applyAudioDataset() {
-			audioEl.dataset.playing = 'false';
+		function resetAudioDataset() {
+			audioElement.dataset.playing = 'false';
 		}
-		applyAudioDataset();
-		audioEl.addEventListener('ended', applyAudioDataset);
+		resetAudioDataset();
+		audioElement.addEventListener('ended', resetAudioDataset);
 		return () => {
-			audioEl.removeEventListener('ended', applyAudioDataset);
+			audioElement.removeEventListener('ended', resetAudioDataset);
 		};
 	});
 
-	function playAlarmSound() {
-		if (audioCtx.state === 'suspended') {
-			audioCtx.resume();
+	function playAlarm() {
+		if (audioContext.state === 'suspended') {
+			audioContext.resume();
 		}
-		if (audioEl.dataset.playing === 'false') {
-			audioEl.play();
-			audioEl.dataset.playing = 'true';
-		}
-	}
-
-	function stopAlarmSound() {
-		if (audioEl.dataset.playing === 'true') {
-			audioEl.pause();
-			audioEl.currentTime = 0;
-			audioEl.dataset.playing = 'false';
+		if (audioElement.dataset.playing === 'false') {
+			audioElement.play();
+			audioElement.dataset.playing = 'true';
 		}
 	}
 
-	function loop() {
+	function stopAlarm() {
+		if (audioElement.dataset.playing === 'true') {
+			audioElement.pause();
+			audioElement.currentTime = 0;
+			audioElement.dataset.playing = 'false';
+		}
+	}
+
+	function timerLoop() {
 		msDiff = timeEnd - Date.now();
 
 		if (msDiff <= 0) {
@@ -70,7 +71,7 @@
 			isCompleted = true;
 			isActive = false;
 			clearInterval(intervalId);
-			playAlarmSound();
+			playAlarm();
 		}
 	}
 
@@ -81,7 +82,7 @@
 		timeEnd = Date.now() + timeRemaining;
 		isActive = true;
 		isPaused = false;
-		intervalId = setInterval(loop, timeInterval);
+		intervalId = setInterval(timerLoop, timeDuration);
 	}
 
 	function pauseTimer() {
@@ -93,12 +94,12 @@
 	function resumeTimer() {
 		timeEnd = Date.now() + timeRemaining;
 		isPaused = false;
-		intervalId = setInterval(loop, timeInterval);
+		intervalId = setInterval(timerLoop, timeDuration);
 	}
 
 	function resetTimer() {
 		clearInterval(intervalId);
-		stopAlarmSound();
+		stopAlarm();
 		msDiff = 0;
 		timeRemaining = 0;
 		isActive = false;
@@ -110,27 +111,28 @@
 		return Math.min(Math.max(value, min), max);
 	}
 
-	function getSeconds() {
-		if (msDiff > 0) return Math.floor((msDiff / 1000) % 60);
-		return inputSeconds;
-	}
-	function getMinutes() {
-		if (msDiff > 0) return Math.floor((msDiff / 60000) % 60);
-		return inputMinutes;
-	}
-	function getHours() {
-		if (msDiff > 0) return Math.floor((msDiff / 3600000) % 24);
-		return inputHours;
+	function getRemainingSeconds() {
+		return msDiff > 0 ? Math.floor((msDiff / 1000) % 60) : inputSeconds;
 	}
 
-	function setByWheel(getter: () => number, setter: (value: number) => void) {
-		return (e: WheelEvent) => {
-			const inputEl = e.target as HTMLInputElement;
-			const min = Number(inputEl.min);
-			const max = Number(inputEl.max);
-			const value = getter() + Math.floor(-e.deltaY / 100);
-			if (value < min || value > max) return;
-			setter(value);
+	function getRemainingMinutes() {
+		return msDiff > 0 ? Math.floor((msDiff / 60000) % 60) : inputMinutes;
+	}
+
+	function getRemainingHours() {
+		return msDiff > 0 ? Math.floor((msDiff / 3600000) % 24) : inputHours;
+	}
+
+	function handleWheel(getValue: () => number, setValue: (newValue: number) => void) {
+		return (event: WheelEvent) => {
+			const inputElement = event.target as HTMLInputElement;
+			const minValue = Number(inputElement.min);
+			const maxValue = Number(inputElement.max);
+			const newValue = getValue() + Math.floor(-event.deltaY / 100);
+
+			if (newValue >= minValue && newValue <= maxValue) {
+				setValue(newValue);
+			}
 		};
 	}
 </script>
@@ -147,13 +149,13 @@
 
 	<div class="display" data-completed={isCompleted}>
 		<NumberFlow
-			value={getHours()}
+			value={getRemainingHours()}
 			animated={isActive}
 			trend={-1}
 			format={{ minimumIntegerDigits: 2 }}
 		/>
 		<NumberFlow
-			value={getMinutes()}
+			value={getRemainingMinutes()}
 			animated={isActive}
 			trend={-1}
 			digits={{ 1: { max: 5 } }}
@@ -161,7 +163,7 @@
 			prefix=":"
 		/>
 		<NumberFlow
-			value={getSeconds()}
+			value={getRemainingSeconds()}
 			animated={isActive}
 			trend={-1}
 			digits={{ 1: { max: 5 } }}
@@ -178,7 +180,7 @@
 					() => inputHours.toString().padStart(2, '0'),
 					(value) => (inputHours = clamp(Math.floor(Number(value)), 0, 23))
 				}
-				onwheel={setByWheel(
+				onwheel={handleWheel(
 					() => inputHours,
 					(value) => (inputHours = value)
 				)}
@@ -194,7 +196,7 @@
 					() => inputMinutes.toString().padStart(2, '0'),
 					(value) => (inputMinutes = clamp(Math.floor(Number(value)), 0, 59))
 				}
-				onwheel={setByWheel(
+				onwheel={handleWheel(
 					() => inputMinutes,
 					(value) => (inputMinutes = value)
 				)}
@@ -210,7 +212,7 @@
 					() => inputSeconds.toString().padStart(2, '0'),
 					(value) => (inputSeconds = clamp(Math.floor(Number(value)), 0, 59))
 				}
-				onwheel={setByWheel(
+				onwheel={handleWheel(
 					() => inputSeconds,
 					(value) => (inputSeconds = value)
 				)}
@@ -246,7 +248,7 @@
 		<div></div>
 	</div>
 </div>
-<audio loop bind:this={audioEl}>
+<audio loop bind:this={audioElement}>
 	<source src={AlarmSound} type="audio/mpeg" />
 </audio>
 
