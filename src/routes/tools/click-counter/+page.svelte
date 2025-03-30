@@ -1,9 +1,9 @@
 <script lang="ts">
 	import NumberFlow from '@number-flow/svelte';
-	import Plus from 'svelte-lucide/Plus.svelte';
+	import Plus from '@lucide/svelte/icons/plus';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Navbar from '$lib/components/ui/Navbar.svelte';
+	import { Navbar } from '$lib/components/ui/navbar/index.js';
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import ThemeSelect from '$lib/components/app/theme-select.svelte';
 

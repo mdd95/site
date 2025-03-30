@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import NumberFlow from '@number-flow/svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import Navbar from '$lib/components/ui/Navbar.svelte';
+	import { Navbar } from '$lib/components/ui/navbar/index.js';
 	import ThemeSelect from '$lib/components/app/theme-select.svelte';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Play from 'phosphor-svelte/lib/Play';
@@ -142,8 +142,7 @@
 </svelte:head>
 
 <div
-	class="grid min-h-screen grid-rows-[--spacing(16)_1fr_auto]"
-	style="grid-template-areas: 'navbar' 'display' 'controls';"
+	class="template-areas-['navbar'_'display'_'controls'] grid min-h-screen grid-rows-[--spacing(16)_1fr_auto]"
 >
 	<Navbar>
 		<div></div>
@@ -151,8 +150,7 @@
 	</Navbar>
 
 	<div
-		class="data-[completed=true]:text-primary flex items-center justify-center text-5xl tabular-nums md:text-8xl"
-		style="grid-area: display"
+		class="data-[completed=true]:text-primary area-[display] flex items-center justify-center text-5xl tabular-nums md:text-8xl"
 		data-completed={isCompleted}
 	>
 		<NumberFlow
@@ -184,8 +182,7 @@
 
 	{#if !isActive && !isCompleted}
 		<div
-			class="flex items-center justify-center text-5xl tabular-nums md:text-8xl"
-			style="grid-area: display"
+			class="area-[display] flex items-center justify-center text-5xl tabular-nums md:text-8xl"
 		>
 			<input
 				type="number"
@@ -201,7 +198,7 @@
 				max="23"
 				step="1"
 				inputmode="numeric"
-				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
+				class="spin-button-none caret-primary field-sizing-content text-transparent outline-none"
 			/>
 			<span>:</span>
 			<input
@@ -218,7 +215,7 @@
 				max="59"
 				step="1"
 				inputmode="numeric"
-				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
+				class="spin-button-none caret-primary field-sizing-content text-transparent outline-none"
 			/>
 			<span>:</span>
 			<input
@@ -235,14 +232,13 @@
 				max="59"
 				step="1"
 				inputmode="numeric"
-				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
+				class="spin-button-none caret-primary field-sizing-content text-transparent outline-none"
 			/>
 		</div>
 	{/if}
 
 	<div
-		class="grid grid-cols-[1fr_8rem_1fr] items-center justify-items-center py-16"
-		style="grid-area: controls"
+		class="area-[controls] grid grid-cols-[1fr_8rem_1fr] items-center justify-items-center py-16"
 	>
 		<Button
 			variant="secondary"

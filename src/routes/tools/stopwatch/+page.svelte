@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ThemeSelect from '$lib/components/app/theme-select.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import Navbar from '$lib/components/ui/Navbar.svelte';
+	import { Navbar } from '$lib/components/ui/navbar/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Pause from 'phosphor-svelte/lib/Pause';
 	import Play from 'phosphor-svelte/lib/Play';

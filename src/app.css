@@ -31,7 +31,7 @@
 	--color-ring: hsl(346.8 77.2% 49.8%);
 }
 
-@utility input-no-spin {
+@utility spin-button-none {
 	-moz-appearance: textfield;
 
 	&::-webkit-outer-spin-button,
@@ -39,6 +39,14 @@
 		-webkit-appearance: none;
 		margin: 0;
 	}
+}
+
+@utility template-areas-* {
+	grid-template-areas: --value([ *]);
+}
+
+@utility area-* {
+	grid-area: --value([ *]);
 }
 
 @layer base {
