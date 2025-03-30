@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import NumberFlow from '@number-flow/svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
-	import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
+	import ThemeSelect from '$lib/components/app/theme-select.svelte';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Play from 'phosphor-svelte/lib/Play';
 	import Pause from 'phosphor-svelte/lib/Pause';
@@ -141,18 +141,26 @@
 	<title>Timer</title>
 </svelte:head>
 
-<div class="layout">
+<div
+	class="grid min-h-screen grid-rows-[--spacing(16)_1fr_auto]"
+	style="grid-template-areas: 'navbar' 'display' 'controls';"
+>
 	<Navbar>
 		<div></div>
 		<ThemeSelect />
 	</Navbar>
 
-	<div class="display" data-completed={isCompleted}>
+	<div
+		class="data-[completed=true]:text-primary flex items-center justify-center text-5xl tabular-nums md:text-8xl"
+		style="grid-area: display"
+		data-completed={isCompleted}
+	>
 		<NumberFlow
 			value={getRemainingHours()}
 			animated={isActive}
 			trend={-1}
 			format={{ minimumIntegerDigits: 2 }}
+			class="pointer-events-none"
 		/>
 		<NumberFlow
 			value={getRemainingMinutes()}
@@ -161,6 +169,7 @@
 			digits={{ 1: { max: 5 } }}
 			format={{ minimumIntegerDigits: 2 }}
 			prefix=":"
+			class="pointer-events-none"
 		/>
 		<NumberFlow
 			value={getRemainingSeconds()}
@@ -169,11 +178,15 @@
 			digits={{ 1: { max: 5 } }}
 			format={{ minimumIntegerDigits: 2 }}
 			prefix=":"
+			class="pointer-events-none"
 		/>
 	</div>
 
 	{#if !isActive && !isCompleted}
-		<div class="input">
+		<div
+			class="flex items-center justify-center text-5xl tabular-nums md:text-8xl"
+			style="grid-area: display"
+		>
 			<input
 				type="number"
 				bind:value={
@@ -188,6 +201,7 @@
 				max="23"
 				step="1"
 				inputmode="numeric"
+				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
 			/>
 			<span>:</span>
 			<input
@@ -204,6 +218,7 @@
 				max="59"
 				step="1"
 				inputmode="numeric"
+				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
 			/>
 			<span>:</span>
 			<input
@@ -220,28 +235,32 @@
 				max="59"
 				step="1"
 				inputmode="numeric"
+				class="input-no-spin caret-primary field-sizing-content text-transparent outline-none"
 			/>
 		</div>
 	{/if}
 
-	<div class="controls">
+	<div
+		class="grid grid-cols-[1fr_8rem_1fr] items-center justify-items-center py-16"
+		style="grid-area: controls"
+	>
 		<Button
+			variant="secondary"
 			onclick={resetTimer}
-			class="icon ghost size-14 rounded-full *:size-6"
-			style="justify-self: end"
+			class="size-14 justify-self-end rounded-full *:size-6"
 		>
 			<ArrowCounterClockwise weight="fill" />
 		</Button>
 		{#if !isActive}
-			<Button onclick={startTimer} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={startTimer} class="size-20 rounded-full [&>svg]:size-8">
 				<Play weight="fill" />
 			</Button>
 		{:else if !isPaused}
-			<Button onclick={pauseTimer} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={pauseTimer} class="size-20 rounded-full [&>svg]:size-8">
 				<Pause weight="fill" />
 			</Button>
 		{:else}
-			<Button onclick={resumeTimer} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={resumeTimer} class="size-20 rounded-full [&>svg]:size-8">
 				<Play weight="fill" />
 			</Button>
 		{/if}
@@ -251,70 +270,3 @@
 <audio loop bind:this={audioElement}>
 	<source src={AlarmSound} type="audio/mpeg" />
 </audio>
-
-<style>
-	.layout {
-		height: 100vh;
-		display: grid;
-		grid-template-areas: 'navbar' 'display' 'controls';
-		grid-template-rows: 4rem 1fr auto;
-	}
-
-	.display {
-		grid-area: display;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 3rem;
-		font-variant-numeric: tabular-nums;
-
-		@media (width >= 48rem) {
-			font-size: 6rem;
-		}
-
-		&[data-completed='true'] {
-			color: var(--color-primary);
-		}
-
-		& :global(number-flow-svelte) {
-			pointer-events: none;
-		}
-	}
-	.input {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		grid-area: display;
-		font-size: 3rem;
-		font-variant-numeric: tabular-nums;
-		z-index: 5;
-
-		@media (width >= 48rem) {
-			font-size: 6rem;
-		}
-
-		& input[type='number'] {
-			color: transparent;
-			caret-color: var(--color-primary);
-			outline: none;
-			field-sizing: content;
-		}
-
-		& input[type='number']::-webkit-inner-spin-button,
-		& input[type='number']::-webkit-outer-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-		& input[type='number'] {
-			-moz-appearance: textfield;
-		}
-	}
-	.controls {
-		padding-block: 4rem;
-		display: grid;
-		align-items: center;
-		justify-items: center;
-		grid-area: controls;
-		grid-template-columns: 1fr 8rem 1fr;
-	}
-</style>

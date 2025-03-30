@@ -9,18 +9,42 @@
 		'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
 		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-	--color-background: light-dark(var(--color-neutral-50), var(--color-neutral-950));
-	--color-foreground: light-dark(var(--color-neutral-900), var(--color-neutral-100));
-	--color-primary: var(--color-rose-500);
-	--color-primary-foreground: var(--color-neutral-100);
-	--color-muted: light-dark(var(--color-neutral-400), var(--color-neutral-600));
-	--color-muted-foreground: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-	--color-elevated: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-	--color-elevated-2: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-	--color-ghost: light-dark(var(--color-neutral-200), var(--color-neutral-900));
+	--color-*: initial;
+	--color-background: light-dark(hsl(0 0% 100%), hsl(20 14.3% 4.1%));
+	--color-foreground: light-dark(hsl(240 10% 3.9%), hsl(0 0% 95%));
+	--color-card: light-dark(hsl(0 0% 100%), hsl(24 9.8% 10%));
+	--color-card-foreground: light-dark(hsl(240 10% 3.9%), hsl(0 0% 95%));
+	--color-popover: light-dark(hsl(0 0% 100%), hsl(0 0% 9%));
+	--color-popover-foreground: light-dark(hsl(240 10% 3.9%), hsl(0 0% 95%));
+	--color-primary: hsl(346.8 77.2% 49.8%);
+	--color-primary-foreground: hsl(355.7 100% 97.3%);
+	--color-secondary: light-dark(hsl(240 4.8% 95.9%), hsl(240 3.7% 15.9%));
+	--color-secondary-foreground: light-dark(hsl(240 5.9% 10%), hsl(0 0% 98%));
+	--color-muted: light-dark(hsl(240 4.8% 95.9%), hsl(0 0% 15%));
+	--color-muted-foreground: light-dark(hsl(240 3.8% 46.1%), hsl(240 5% 64.9%));
+	--color-accent: light-dark(hsl(240 4.8% 95.9%), hsl(12 6.5% 15.1%));
+	--color-accent-foreground: light-dark(hsl(240 5.9% 10%), hsl(0 0% 98%));
+	--color-destructive: light-dark(hsl(0 72.22% 50.59%), hsl(0 62.8% 30.6%));
+	--color-destructive-foreground: light-dark(hsl(0 0% 98%), hsl(0 85.7% 97.3%));
+	--color-border: light-dark(hsl(240 5.9% 90%), hsl(240 3.7% 15.9%));
+	--color-input: light-dark(hsl(240 5.9% 90%), hsl(240 3.7% 15.9%));
+	--color-ring: hsl(346.8 77.2% 49.8%);
+}
+
+@utility input-no-spin {
+	-moz-appearance: textfield;
+
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
 }
 
 @layer base {
+	* {
+		@apply border-border;
+	}
 	body {
 		@apply bg-background text-foreground;
 	}

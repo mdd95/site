@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { fromStore } from 'svelte/store';
 	import { setMode, userPrefersMode } from 'mode-watcher';
-	import DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Moon from 'svelte-lucide/Moon.svelte';
-	import Sun from 'svelte-lucide/Sun.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import Moon from '@lucide/svelte/icons/moon';
+	import Sun from '@lucide/svelte/icons/sun';
 
 	const mode = fromStore(userPrefersMode);
 </script>
@@ -12,7 +12,7 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger>
 		{#snippet child({ props })}
-			<Button type="button" class="ghost icon" {...props}>
+			<Button variant="ghost" size="icon" {...props}>
 				<Moon class="not-dark:hidden" />
 				<Sun class="dark:hidden" />
 			</Button>

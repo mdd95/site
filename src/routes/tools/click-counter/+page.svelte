@@ -1,11 +1,11 @@
 <script lang="ts">
 	import NumberFlow from '@number-flow/svelte';
 	import Plus from 'svelte-lucide/Plus.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
-	import Slider from '$lib/components/ui/Slider.svelte';
-	import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
+	import { Slider } from '$lib/components/ui/slider/index.js';
+	import ThemeSelect from '$lib/components/app/theme-select.svelte';
 
 	let counter = $state(0);
 	let addend = $state(1);
@@ -15,22 +15,25 @@
 	<title>Click Counter</title>
 </svelte:head>
 
-<div class="layout">
+<div class="grid min-h-screen grid-rows-[--spacing(16)_1fr_auto]">
 	<Navbar>
 		<div></div>
 		<ThemeSelect />
 	</Navbar>
-	<div class="display">
+	<div class="grid place-content-center text-5xl tabular-nums md:text-8xl">
 		<NumberFlow value={counter} animated={true} willChange />
 	</div>
 	<div class="flex flex-col space-y-4">
 		<div class="flex justify-center py-8">
-			<Button class="btn" onclick={() => (counter += addend)}>
+			<Button
+				class="size-20 rounded-full [&>svg]:size-10"
+				onclick={() => (counter += addend)}
+			>
 				<Plus />
 			</Button>
 		</div>
 		<div class="flex justify-center space-x-2 py-4">
-			<Button class="elevated" onclick={() => (counter = 0)}>Reset</Button>
+			<Button variant="secondary" onclick={() => (counter = 0)}>Reset</Button>
 			{@render optionsDialog()}
 		</div>
 	</div>
@@ -38,9 +41,9 @@
 
 {#snippet optionsDialog()}
 	<Dialog.Root>
-		<Dialog.Trigger class="elevated">
+		<Dialog.Trigger>
 			{#snippet child({ props })}
-				<Button {...props}>Options</Button>
+				<Button variant="secondary" {...props}>Options</Button>
 			{/snippet}
 		</Dialog.Trigger>
 		<Dialog.Content>
@@ -50,23 +53,3 @@
 		</Dialog.Content>
 	</Dialog.Root>
 {/snippet}
-
-<style>
-	@reference '../../../app.css';
-
-	@layer components {
-		.layout {
-			@apply grid min-h-screen;
-			grid-template-rows: calc(var(--spacing) * 16) 1fr auto;
-		}
-
-		.display {
-			@apply grid place-items-center;
-			@apply text-8xl tabular-nums;
-		}
-
-		.layout :global(.btn) {
-			@apply size-20 rounded-full [&>svg]:size-10;
-		}
-	}
-</style>

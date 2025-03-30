@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ThemeSelect from '$lib/components/app/ThemeSelect.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import ThemeSelect from '$lib/components/app/theme-select.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Pause from 'phosphor-svelte/lib/Pause';
@@ -69,19 +69,19 @@
 		<p>{getElapsedTime()}</p>
 	</div>
 	<div class="grid grid-cols-[1fr_8rem_1fr] items-center justify-items-center py-16">
-		<Button class="icon ghost size-14 justify-self-end rounded-full *:size-6">
+		<Button variant="secondary" class="size-14 justify-self-end rounded-full [&>svg]:size-4">
 			<ArrowCounterClockwise weight="fill" />
 		</Button>
 		{#if !isActive}
-			<Button onclick={startStopwatch} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={startStopwatch} class="size-20 rounded-full [&>svg]:size-6">
 				<Play weight="fill" />
 			</Button>
 		{:else if !isPaused}
-			<Button onclick={pauseStopwatch} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={pauseStopwatch} class="size-20 rounded-full [&>svg]:size-6">
 				<Pause weight="fill" />
 			</Button>
 		{:else}
-			<Button onclick={resumeStopwatch} class="icon size-20 rounded-full *:size-8">
+			<Button onclick={resumeStopwatch} class="size-20 rounded-full [&>svg]:size-6">
 				<Play weight="fill" />
 			</Button>
 		{/if}
