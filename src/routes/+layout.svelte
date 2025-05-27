@@ -4,8 +4,9 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Sun from '@lucide/svelte/icons/sun';
+	import type { LayoutProps } from './$types';
 
-	let { children } = $props();
+	let { children }: LayoutProps = $props();
 </script>
 
 <ModeWatcher />
@@ -19,4 +20,4 @@
 		</Button>
 	</div>
 </header>
-{@render children?.()}
+{@render children()}
