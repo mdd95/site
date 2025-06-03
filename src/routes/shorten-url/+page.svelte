@@ -71,6 +71,11 @@
 	let isCreateDialogOpen = $state(false);
 </script>
 
+<svelte:head>
+	<title>Shorten URL</title>
+	<meta name="description" content="Shorten URL" />
+</svelte:head>
+
 {#snippet createForm()}
 	<form
 		method="POST"

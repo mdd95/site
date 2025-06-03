@@ -10,7 +10,7 @@
 </script>
 
 <ModeWatcher />
-<header class="container flex justify-between p-4">
+<header class="container mx-auto flex justify-between p-4">
 	<div></div>
 	<div>
 		<Button variant="ghost" size="icon" onclick={() => toggleMode()}>
