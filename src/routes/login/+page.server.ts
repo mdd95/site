@@ -1,19 +1,22 @@
-import { fail, redirect } from '@sveltejs/kit';
-import { login } from '$lib/schema.js';
-import type { Actions } from './$types';
+import { superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import { fail } from '@sveltejs/kit';
+import { schema } from './+page.svelte';
+import type { Actions, PageServerLoad } from './$types';
 
-export const actions: Actions = {
-	default: async ({ request, url }) => {
-		const formData = await request.formData();
-		const email = formData.get('email');
-		const password = formData.get('password');
-		const validate = login.safeParse({ email, password });
-
-		if (!validate.success) {
-			return fail(400);
-		}
-
-		// const redirectUrl = url.searchParams.get('r');
-		// return redirect(302, redirectUrl || '/');
-	}
+export const load: PageServerLoad = async () => {
+	return {
+		form: await superValidate(zod4(schema))
+	};
 };
+
+export const actions = {
+	default: async ({ request }) => {
+		const form = await superValidate(request, zod4(schema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+		return { form };
+	}
+} satisfies Actions;

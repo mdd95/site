@@ -1,7 +1,15 @@
+<script lang="ts" module>
+	import { z } from 'zod/v4-mini';
+
+	export const schema = z.object({
+		slug: z.string().check(z.minLength(6)),
+		url: z.string().check(z.url())
+	});
+</script>
+
 <script lang="ts">
 	import { createRawSnippet } from 'svelte';
 	import { getCoreRowModel, type ColumnDef } from '@tanstack/table-core';
-	import { applyAction, enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import {
 		createSvelteTable,
@@ -11,30 +19,33 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { Control, Field, FieldErrors, Label } from '$lib/components/ui/form/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { IsMobile } from '$lib/utils.js';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Share from '@lucide/svelte/icons/share';
+	import { superForm } from 'sveltekit-superforms';
+	import type { PageProps } from './$types';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	type ShortUrl = {
 		id: string;
-		createdAt: string;
+		dateCreated: Date;
 		slug: string;
 		url: string;
 	};
 
-	// let { data }: Props = $props();
-	let data: ShortUrl[] = $state.raw([]);
+	let { data }: PageProps = $props();
+	let tableData: ShortUrl[] = $state([]);
+	$inspect(tableData);
 
 	const columns: ColumnDef<ShortUrl>[] = [
 		{
-			accessorKey: 'createdAt',
+			accessorKey: 'dateCreated',
 			header: 'Date Created',
 			cell: ({ row }) => {
-				const date = new Date(row.getValue('createdAt'));
 				const dateString = Intl.DateTimeFormat('en-US', {
 					year: 'numeric',
 					month: 'long',
@@ -42,7 +53,8 @@
 				});
 				return renderSnippet(
 					createRawSnippet(() => ({
-						render: () => `<span>${dateString.format(date)}</span>`
+						render: () =>
+							`<span>${dateString.format(row.getValue('dateCreated'))}</span>`
 					}))
 				);
 			}
@@ -61,7 +73,7 @@
 
 	const table = createSvelteTable({
 		get data() {
-			return data;
+			return tableData;
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel()
@@ -69,6 +81,25 @@
 
 	const isMobile = new IsMobile();
 	let isCreateDialogOpen = $state(false);
+
+	const form = superForm(data.form, {
+		validators: zod4Client(schema),
+		onResult({ result }) {
+			if (result.type === 'success') {
+				tableData = [
+					...tableData,
+					{
+						id: crypto.randomUUID(),
+						dateCreated: new Date(),
+						...result.data?.form.data
+					}
+				];
+				isCreateDialogOpen = false;
+			}
+		}
+	});
+
+	const { form: formData, enhance } = form;
 </script>
 
 <svelte:head>
@@ -77,37 +108,28 @@
 </svelte:head>
 
 {#snippet createForm()}
-	<form
-		method="POST"
-		action="?/create"
-		use:enhance={() => {
-			return async ({ formData, result }) => {
-				if (result.type === 'success') {
-					data = [
-						...data,
-						{
-							id: crypto.randomUUID(),
-							slug: formData.get('slug') as string,
-							url: formData.get('url') as string,
-							createdAt: new Date().toISOString()
-						}
-					];
-					// data = [...data, result.data as ShortUrl];
-					isCreateDialogOpen = false;
-				} else {
-					await applyAction(result);
-				}
-			};
-		}}
-		class="p-4"
-	>
-		<Label class="my-2">Slug</Label>
-		<Input name="slug" />
+	<form method="POST" action="?/create" use:enhance>
+		<Field {form} name="slug">
+			<Control>
+				{#snippet children({ props })}
+					<Label>Slug</Label>
+					<Input {...props} bind:value={$formData.slug} />
+				{/snippet}
+			</Control>
+			<FieldErrors />
+		</Field>
 
-		<Label class="my-2">URL</Label>
-		<Input type="url" name="url" autocomplete="url" />
+		<Field {form} name="url">
+			<Control>
+				{#snippet children({ props })}
+					<Label>URL</Label>
+					<Input {...props} bind:value={$formData.url} />
+				{/snippet}
+			</Control>
+			<FieldErrors />
+		</Field>
 
-		<Button type="submit" class="mt-4 w-full">Shorten</Button>
+		<Button type="submit" class="w-full">Shorten</Button>
 	</form>
 {/snippet}
 
@@ -212,7 +234,7 @@
 				<DropdownMenu.Item>Archive</DropdownMenu.Item>
 				<DropdownMenu.Item
 					onclick={() => {
-						data = data.filter((shortUrl) => shortUrl.id !== props.id);
+						tableData = tableData.filter((shortUrl) => shortUrl.id !== props.id);
 					}}
 				>
 					Delete
