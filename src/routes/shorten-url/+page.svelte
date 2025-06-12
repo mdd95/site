@@ -1,14 +1,21 @@
 <script lang="ts" module>
 	import { z } from 'zod/v4-mini';
 
-	export const schema = z.object({
-		slug: z.string().check(z.minLength(6)),
-		url: z.string().check(z.url())
-	});
+	export const schema = {
+		create: z.object({
+			slug: z.string().check(z.minLength(6)),
+			url: z.string().check(z.url())
+		}),
+		delete: z.object({
+			id: z.string().check(z.uuidv4())
+		})
+	};
 </script>
 
 <script lang="ts">
 	import { createRawSnippet } from 'svelte';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { getCoreRowModel, type ColumnDef } from '@tanstack/table-core';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import {
@@ -16,19 +23,22 @@
 		FlexRender,
 		renderSnippet
 	} from '$lib/components/ui/data-table/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Drawer from '$lib/components/ui/drawer/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { Dialog, DialogContent } from '$lib/components/ui/dialog/index.js';
+	import { Drawer, DrawerContent } from '$lib/components/ui/drawer/index.js';
+	import {
+		DropdownMenu,
+		DropdownMenuContent,
+		Item,
+		Trigger
+	} from '$lib/components/ui/dropdown-menu/index.js';
 	import { Control, Field, FieldErrors, Label } from '$lib/components/ui/form/index.js';
-	import * as Table from '$lib/components/ui/table/index.js';
+	import { Body, Cell, Head, Header, Row, Table } from '$lib/components/ui/table/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Plus from '@lucide/svelte/icons/plus';
 	import Share from '@lucide/svelte/icons/share';
-	import { superForm } from 'sveltekit-superforms';
+	import Spinner from '$lib/components/svg/spinner.svelte';
 	import type { PageProps } from './$types';
-	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	type ShortUrl = {
 		id: string;
@@ -82,8 +92,13 @@
 	const isMobile = new IsMobile();
 	let isCreateDialogOpen = $state(false);
 
+	let isLoading = $state(false);
+
 	const form = superForm(data.form, {
-		validators: zod4Client(schema),
+		validators: zod4Client(schema.create),
+		onSubmit() {
+			isLoading = true;
+		},
 		onResult({ result }) {
 			if (result.type === 'success') {
 				tableData = [
@@ -100,6 +115,10 @@
 	});
 
 	const { form: formData, enhance } = form;
+
+	const getOpenDialog = () => !isMobile.current && isCreateDialogOpen;
+	const getOpenDrawer = () => isMobile.current && isCreateDialogOpen;
+	const setOpen = (value: boolean) => (isCreateDialogOpen = value);
 </script>
 
 <svelte:head>
@@ -108,7 +127,14 @@
 </svelte:head>
 
 {#snippet createForm()}
-	<form method="POST" action="?/create" use:enhance>
+	<form method="POST" action="?/create" use:enhance class="space-y-4">
+		<div class="">
+			<h1 class="text-2xl font-bold">Create Short URL</h1>
+			<p class="text-muted-foreground text-sm text-balance">
+				Shorten a long URL to a short URL
+			</p>
+		</div>
+
 		<Field {form} name="slug">
 			<Control>
 				{#snippet children({ props })}
@@ -129,89 +155,68 @@
 			<FieldErrors />
 		</Field>
 
-		<Button type="submit" class="w-full">Shorten</Button>
+		<Button type="submit" class="w-full">
+			<Spinner class={[!isLoading && 'hidden']} />
+			Shorten
+		</Button>
 	</form>
 {/snippet}
 
-<Drawer.Root
-	bind:open={
-		() => {
-			return isMobile.current && isCreateDialogOpen;
-		},
-		(value) => {
-			isCreateDialogOpen = value;
-		}
-	}
->
-	<Drawer.Content>
-		{@render createForm()}
-	</Drawer.Content>
-</Drawer.Root>
+<Drawer bind:open={getOpenDrawer, setOpen}>
+	<DrawerContent>
+		<div class="mx-auto w-full max-w-sm px-4 py-8">
+			{@render createForm()}
+		</div>
+	</DrawerContent>
+</Drawer>
 
-<Dialog.Root
-	bind:open={
-		() => {
-			return !isMobile.current && isCreateDialogOpen;
-		},
-		(value) => {
-			isCreateDialogOpen = value;
-		}
-	}
->
-	<Dialog.Content>
+<Dialog bind:open={getOpenDialog, setOpen}>
+	<DialogContent class="w-sm">
 		{@render createForm()}
-	</Dialog.Content>
-</Dialog.Root>
+	</DialogContent>
+</Dialog>
 
 <div class="container mx-auto px-4 pb-2">
-	<Button
-		onclick={() => {
-			isCreateDialogOpen = true;
-		}}
-	>
-		Shorten URL
-	</Button>
+	<Button onclick={() => setOpen(true)}>Shorten URL</Button>
 </div>
 
 <div class="container mx-auto px-4">
-	<Table.Root>
-		<Table.Header>
+	<Table>
+		<Header>
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-				<Table.Row>
+				<Row>
 					{#each headerGroup.headers as header (header.id)}
-						<Table.Head>
+						<Head>
 							{#if !header.isPlaceholder}
 								<FlexRender
 									content={header.column.columnDef.header}
 									context={header.getContext()}
 								/>
 							{/if}
-						</Table.Head>
+						</Head>
 					{/each}
-				</Table.Row>
+				</Row>
 			{/each}
-		</Table.Header>
-		<Table.Body>
+		</Header>
+		<Body>
 			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row data-state={row.getIsSelected() && 'selected'}>
+				<Row data-state={row.getIsSelected() && 'selected'}>
 					{#each row.getVisibleCells() as cell (cell.id)}
-						<Table.Cell>
+						<Cell>
 							<FlexRender
 								content={cell.column.columnDef.cell}
 								context={cell.getContext()}
 							/>
-						</Table.Cell>
+						</Cell>
 					{/each}
-				</Table.Row>
+				</Row>
 			{:else}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="h-24 text-center">
-						No results.
-					</Table.Cell>
-				</Table.Row>
+				<Row>
+					<Cell colspan={columns.length} class="h-24 text-center">No results.</Cell>
+				</Row>
 			{/each}
-		</Table.Body>
-	</Table.Root>
+		</Body>
+	</Table>
 </div>
 
 {#snippet dataTableAction({ props }: { props: { id: string } })}
@@ -220,26 +225,26 @@
 			<span class="sr-only">Share link</span>
 			<Share />
 		</Button>
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
+		<DropdownMenu>
+			<Trigger>
 				{#snippet child({ props })}
 					<Button {...props} variant="ghost" size="icon">
 						<span class="sr-only">Open menu</span>
 						<Ellipsis />
 					</Button>
 				{/snippet}
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="end" preventScroll={false}>
-				<DropdownMenu.Item>Info</DropdownMenu.Item>
-				<DropdownMenu.Item>Archive</DropdownMenu.Item>
-				<DropdownMenu.Item
-					onclick={() => {
-						tableData = tableData.filter((shortUrl) => shortUrl.id !== props.id);
-					}}
-				>
-					Delete
-				</DropdownMenu.Item>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+			</Trigger>
+			<DropdownMenuContent align="end" preventScroll={false}>
+				<Item>Info</Item>
+				<Item>Archive</Item>
+
+				<form method="POST" action="?/delete" class="contents">
+					<input type="hidden" name="id" value={props.id} />
+					<button type="submit" class="contents">
+						<Item>Delete</Item>
+					</button>
+				</form>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	</div>
 {/snippet}
