@@ -4,6 +4,7 @@
 	import Scene from '$lib/components/roll-dice/Scene.svelte';
 	import type { Body } from '$lib/components/roll-dice/types.js';
 	import { Button } from '$lib/components/ui/button';
+	('bits-ui');
 
 	let counter = 0;
 	let bodies: Body[] = $state([
@@ -33,6 +34,6 @@
 	</Canvas>
 </div>
 
-<div class="absolute bottom-0 w-full py-12">
+<div class="fixed bottom-0 flex w-full justify-center py-12">
 	<Button onclick={add}>Add</Button>
 </div>

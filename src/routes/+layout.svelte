@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import { BitsConfig } from 'bits-ui';
 	import { ModeWatcher, toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import Moon from '@lucide/svelte/icons/moon';
@@ -20,4 +21,6 @@
 		</Button>
 	</div>
 </header>
-{@render children()}
+<BitsConfig defaultPortalTo="#app">
+	{@render children()}
+</BitsConfig>
