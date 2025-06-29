@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 
 	type Props = {
@@ -15,6 +16,7 @@
 		width: number;
 		length: number;
 		thickness: number;
+		remarks: string;
 	};
 	let data = $state<FootingData[]>([]);
 	$inspect(data);
@@ -25,7 +27,8 @@
 			label: '',
 			width: 200,
 			length: 200,
-			thickness: 100
+			thickness: 100,
+			remarks: 'centerFooting'
 		});
 	}
 </script>
@@ -78,7 +81,13 @@
 					<input type="text" class="w-full outline-none" />
 				</Table.Cell>
 				<Table.Cell class="ring-inset focus-within:ring">
-					<input type="text" class="w-full outline-none" />
+					<Select.Root type="single" bind:value={footing.remarks}>
+						<Select.Trigger>{footing.remarks}</Select.Trigger>
+						<Select.Content>
+							<Select.Item value="centerFooting">Center Footing</Select.Item>
+							<Select.Item value="edgeFooting">Edge Footing</Select.Item>
+						</Select.Content>
+					</Select.Root>
 				</Table.Cell>
 			</Table.Row>
 		{/each}
