@@ -1,17 +1,36 @@
 <script lang="ts">
+	import { Portal } from 'bits-ui';
+	import { Vector3 } from 'three';
 	import { T } from '@threlte/core';
 	import { OrbitControls, useDraco, useGltf } from '@threlte/extras';
 	import { AutoColliders, Collider, RigidBody } from '@threlte/rapier';
 	import diceAssetPath from '$lib/assets/dice.glb?url';
-	import type { Body } from './types.js';
-
-	type Props = {
-		bodies: Body[];
-	};
-	let { bodies }: Props = $props();
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 
 	const dracoLoader = useDraco();
 	const model = useGltf(diceAssetPath, { dracoLoader });
+
+	let count = $state(2);
+	let bodies = $state<RapierRigidBody[]>([]);
+	$inspect(bodies);
+
+	function createRigidBody(ref: RapierRigidBody, i: number) {
+		let position = new Vector3(0, i + 3, 0);
+		ref.setTranslation(position, true);
+		bodies.push(ref);
+	}
+
+	function add() {
+		count += 1;
+	}
+
+	function reroll() {
+		for (let i = 0; i < count; i++) {
+			let position = new Vector3(0, i + 3, 0);
+			bodies[i].setTranslation(position, true);
+		}
+	}
 </script>
 
 <T.Color args={[0x000000]} attach="background" />
@@ -36,9 +55,9 @@
 		</T.Mesh>
 	</AutoColliders>
 </T.Group>
-{#each bodies as body (body.id)}
-	<T.Group position={body.position}>
-		<RigidBody>
+{#each { length: count }, i}
+	<T.Group>
+		<RigidBody oncreate={(ref) => createRigidBody(ref, i)}>
 			<Collider shape="cuboid" args={[0.1, 0.1, 0.1]} />
 			{#if $model}
 				<T is={$model.scene.clone()} scale={0.1} />
@@ -46,3 +65,10 @@
 		</RigidBody>
 	</T.Group>
 {/each}
+
+<Portal>
+	<div class="fixed bottom-0 z-10 flex w-full justify-center gap-2 py-12">
+		<Button variant="secondary" onclick={add}>Add</Button>
+		<Button onclick={reroll}>Reroll</Button>
+	</div>
+</Portal>
