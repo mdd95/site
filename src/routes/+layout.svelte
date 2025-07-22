@@ -3,11 +3,11 @@
 	import { THEME_STORAGE_KEY } from '$lib/theme-mode.svelte.js';
 	import type { LayoutProps } from './$types';
 
-	let { children }: LayoutProps = $props();
+	let { children, data }: LayoutProps = $props();
 	provideThemeContext();
 </script>
 
 <svelte:head>
-	{@html `<script>(${initializeTheme.toString()})("${THEME_STORAGE_KEY}");</script>`}
+	{@html `<script nonce="${data.nonce}">(${initializeTheme.toString()})("${THEME_STORAGE_KEY}");</script>`}
 </svelte:head>
 {@render children()}
