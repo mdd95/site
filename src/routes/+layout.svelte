@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { initializeTheme, provideThemeContext } from '$lib/theme-context.js';
-	import { THEME_STORAGE_KEY } from '$lib/theme-mode.svelte.js';
+	import '../app.css';
+	import { provideThemeContext } from '$lib/theme-context.js';
 	import type { LayoutProps } from './$types';
 
-	let { children, data }: LayoutProps = $props();
+	let { children }: LayoutProps = $props();
 	provideThemeContext();
 </script>
 
-<svelte:head>
-	{@html `<script nonce="${data.nonce}">(${initializeTheme.toString()})("${THEME_STORAGE_KEY}");</script>`}
-</svelte:head>
 {@render children()}
