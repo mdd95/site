@@ -1,14 +1,14 @@
+import { initializeTheme, THEME_STORAGE_KEY } from '$lib/theme-manager.svelte.js';
+import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
-import { initializeTheme } from '$lib/theme-context.js';
 
-export const handle: Handle = async ({ event, resolve }) => {
-	const response = await resolve(event, {
-		transformPageChunk: ({ html }) => {
-			return html.replace(
+const handleInlineScript: Handle = ({ event, resolve }) =>
+	resolve(event, {
+		transformPageChunk: ({ html }) =>
+			html.replace(
 				/\/\*\*%inline-script%\*\*\//,
-				`(${initializeTheme.toString()})();`
-			);
-		}
+				`(${initializeTheme.toString()})("${THEME_STORAGE_KEY}");`
+			)
 	});
-	return response;
-};
+
+export const handle: Handle = sequence(handleInlineScript);

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import '../app.css';
-	import { provideThemeContext } from '$lib/theme-context.js';
+	import { setThemeContext } from '$lib/theme-manager.svelte.js';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
-	provideThemeContext();
+	setThemeContext();
 </script>
 
 {@render children()}

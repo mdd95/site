@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getThemeContext } from '$lib/theme-context.js';
+	import { getThemeContext } from '$lib/theme-manager.svelte.js';
 
 	let theme = getThemeContext();
 </script>
