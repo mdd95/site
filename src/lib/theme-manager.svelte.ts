@@ -1,4 +1,4 @@
-import { getContext, setContext, untrack } from 'svelte';
+import { getContext, setContext } from 'svelte';
 import { MediaQuery } from 'svelte/reactivity';
 import * as v from 'valibot';
 
@@ -46,13 +46,13 @@ export class ThemeModeManager {
 	}
 
 	get mode(): ResolvedThemeMode {
-		$effect(() => {
-			if (untrack(() => this.#userPreferred) === THEME_MODES.SYSTEM) {
+		if (this.#userPreferred === THEME_MODES.SYSTEM) {
+			$effect(() => {
 				this.#updateRootStyles(
 					this.#systemDarkMode.current ? THEME_MODES.DARK : THEME_MODES.LIGHT
 				);
-			}
-		});
+			});
+		}
 		const systemDarkMode = this.#systemDarkMode.current ? THEME_MODES.DARK : THEME_MODES.LIGHT;
 		return this.#userPreferred === THEME_MODES.SYSTEM ? systemDarkMode : this.#userPreferred;
 	}
