@@ -1,10 +1,15 @@
 <script lang="ts">
 	import '../app.css';
-	import { setThemeContext } from '$lib/theme-manager.svelte.js';
+	import favicon from '$lib/assets/favicon.svg';
+	import { setThemeMode } from '$lib/theme-manager.svelte.js';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
-	setThemeContext();
+	setThemeMode();
 </script>
 
-{@render children()}
+<svelte:head>
+	<link rel="icon" href={favicon} />
+</svelte:head>
+
+{@render children?.()}
