@@ -47,21 +47,25 @@ export class ThemeModeManager {
 
 	get mode(): ResolvedThemeMode {
 		if (this.#userPreferred === THEME_MODES.SYSTEM) {
+			const systemDarkMode = this.#systemDarkMode.current
+				? THEME_MODES.DARK
+				: THEME_MODES.LIGHT;
 			$effect(() => {
-				this.#updateRootStyles(
-					this.#systemDarkMode.current ? THEME_MODES.DARK : THEME_MODES.LIGHT
-				);
+				this.#updateRootStyles(systemDarkMode);
 			});
+			return systemDarkMode;
 		}
-		const systemDarkMode = this.#systemDarkMode.current ? THEME_MODES.DARK : THEME_MODES.LIGHT;
-		return this.#userPreferred === THEME_MODES.SYSTEM ? systemDarkMode : this.#userPreferred;
+		return this.#userPreferred;
 	}
 
-	setMode(mode: UserThemeMode) {
-		this.#userPreferred = mode;
-		const systemDarkMode = this.#systemDarkMode.current ? THEME_MODES.DARK : THEME_MODES.LIGHT;
+	setMode(themeMode: UserThemeMode) {
+		this.#userPreferred = themeMode;
 		this.#updateRootStyles(
-			this.#userPreferred === THEME_MODES.SYSTEM ? systemDarkMode : this.#userPreferred
+			this.#userPreferred === THEME_MODES.SYSTEM
+				? this.#systemDarkMode.current
+					? THEME_MODES.DARK
+					: THEME_MODES.LIGHT
+				: this.#userPreferred
 		);
 		this.#updateLocalStorage();
 	}
@@ -69,14 +73,14 @@ export class ThemeModeManager {
 	toggleMode() {
 		const userPreferred =
 			this.#userPreferred === THEME_MODES.LIGHT ? THEME_MODES.DARK : THEME_MODES.LIGHT;
-		const system = this.#systemDarkMode.current ? THEME_MODES.LIGHT : THEME_MODES.DARK;
-		this.setMode(this.#userPreferred === THEME_MODES.SYSTEM ? system : userPreferred);
+		const systemThemeMode = this.#systemDarkMode.current ? THEME_MODES.LIGHT : THEME_MODES.DARK;
+		this.setMode(this.#userPreferred === THEME_MODES.SYSTEM ? systemThemeMode : userPreferred);
 	}
 
-	#updateRootStyles(mode: ResolvedThemeMode) {
+	#updateRootStyles(themeMode: ResolvedThemeMode) {
 		const rootElement = document.documentElement;
-		rootElement.style.colorScheme = mode;
-		mode === THEME_MODES.DARK
+		rootElement.style.colorScheme = themeMode;
+		themeMode === THEME_MODES.DARK
 			? rootElement.classList.add(THEME_MODES.DARK)
 			: rootElement.classList.remove(THEME_MODES.DARK);
 	}
