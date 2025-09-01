@@ -46,28 +46,17 @@ export class ThemeModeManager {
 	}
 
 	get mode(): ResolvedThemeMode {
-		if (this.#userPreferred === THEME_MODES.SYSTEM) {
-			const systemDarkMode = this.#systemDarkMode.current
+		return this.#userPreferred === THEME_MODES.SYSTEM
+			? this.#systemDarkMode.current
 				? THEME_MODES.DARK
-				: THEME_MODES.LIGHT;
-			$effect(() => {
-				this.#updateRootStyles(systemDarkMode);
-			});
-			return systemDarkMode;
-		}
-		return this.#userPreferred;
+				: THEME_MODES.LIGHT
+			: this.#userPreferred;
 	}
 
 	setMode(themeMode: UserThemeMode) {
 		this.#userPreferred = themeMode;
-		this.#updateRootStyles(
-			this.#userPreferred === THEME_MODES.SYSTEM
-				? this.#systemDarkMode.current
-					? THEME_MODES.DARK
-					: THEME_MODES.LIGHT
-				: this.#userPreferred
-		);
-		this.#updateLocalStorage();
+		this.#updateRootStyles(themeMode);
+		this.#updateLocalStorage(themeMode);
 	}
 
 	toggleMode() {
@@ -77,16 +66,17 @@ export class ThemeModeManager {
 		this.setMode(this.#userPreferred === THEME_MODES.SYSTEM ? systemThemeMode : userPreferred);
 	}
 
-	#updateRootStyles(themeMode: ResolvedThemeMode) {
+	#updateRootStyles(themeMode: UserThemeMode) {
 		const rootElement = document.documentElement;
-		rootElement.style.colorScheme = themeMode;
-		themeMode === THEME_MODES.DARK
-			? rootElement.classList.add(THEME_MODES.DARK)
-			: rootElement.classList.remove(THEME_MODES.DARK);
+		if (themeMode === 'system') {
+			rootElement.style.removeProperty('color-scheme');
+		} else {
+			rootElement.style.colorScheme = themeMode;
+		}
 	}
 
-	#updateLocalStorage() {
-		localStorage.setItem(THEME_MODE_STORAGE_KEY, this.#userPreferred);
+	#updateLocalStorage(themeMode: UserThemeMode) {
+		localStorage.setItem(THEME_MODE_STORAGE_KEY, themeMode);
 	}
 }
 
@@ -104,10 +94,7 @@ export function getThemeMode() {
 
 export function initializeThemeMode(storageKey: string) {
 	const storedThemeMode = (localStorage.getItem(storageKey) as UserThemeMode | null) ?? 'system';
-	const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-	const themeMode =
-		storedThemeMode === 'system' ? (systemDarkMode ? 'dark' : 'light') : storedThemeMode;
-	const rootElement = document.documentElement;
-	rootElement.style.colorScheme = themeMode;
-	themeMode === 'dark' ? rootElement.classList.add('dark') : rootElement.classList.remove('dark');
+	if (storedThemeMode !== 'system') {
+		document.documentElement.style.colorScheme = storedThemeMode;
+	}
 }

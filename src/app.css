@@ -2,27 +2,37 @@
 
 :root,
 :host {
+	color-scheme: light dark;
 	--font-sans:
 		ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
-	--font-mono: ;
-	--background: oklch(0.9702 0 0);
-	--foreground: oklch(0.141 0.005 285.823);
-	--primary: oklch(0.623 0.214 259.815);
-	--primary-foreground: oklch(0.97 0.014 254.604);
-	--mute: ;
-	--mute-foreground: ;
-	--border: oklch(0.92 0.004 286.32);
+	--font-mono:
+		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+		monospace;
 	--radius: 0.5rem;
-	--shadow: oklch(0 0 0 / 0.1) 0px 1px 3px 0px, oklch(0 0 0 / 0.1) 0px 1px 2px -1px;
+	--background: light-dark(oklch(1 0 0), oklch(0.141 0.005 285.823));
+	--foreground: light-dark(oklch(0.141 0.005 285.823), oklch(0.985 0 0));
+	--card: light-dark(oklch(1 0 0), oklch(0.21 0.006 285.885));
+	--card-foreground: light-dark(oklch(0.141 0.005 285.823), oklch(0.985 0 0));
+	--popover: light-dark(oklch(1 0 0), oklch(0.21 0.006 285.885));
+	--popover-foreground: light-dark(oklch(0.141 0.005 285.823), oklch(0.985 0 0));
+	--primary: light-dark(oklch(0.623 0.214 259.815), oklch(0.546 0.245 262.881));
+	--primary-foreground: light-dark(oklch(0.97 0.014 254.604), oklch(0.379 0.146 265.522));
+	--secondary: light-dark(oklch(0.967 0.001 286.375), oklch(0.274 0.006 286.033));
+	--secondary-foreground: light-dark(oklch(0.21 0.006 285.885), oklch(0.985 0 0));
+	--muted: light-dark(oklch(0.967 0.001 286.375), oklch(0.274 0.006 286.033));
+	--muted-foreground: light-dark(oklch(0.552 0.016 285.938), oklch(0.705 0.015 286.067));
+	--accent: light-dark(oklch(0.967 0.001 286.375), oklch(0.274 0.006 286.033));
+	--accent-foreground: light-dark(oklch(0.21 0.006 285.885), oklch(0.985 0 0));
+	--destructive: light-dark(oklch(0.577 0.245 27.325), oklch(0.704 0.191 22.216));
+	--border: light-dark(oklch(0.92 0.004 286.32), oklch(1 0 0 / 10%));
+	--input: light-dark(oklch(0.92 0.004 286.32), oklch(1 0 0 / 15%));
+	--ring: light-dark(oklch(0.623 0.214 259.815), oklch(0.488 0.243 264.376));
+	--shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-:where(.dark) * {
-	--background: oklch(0.141 0.005 285.823);
-	--foreground: oklch(0.985 0 0);
-}
-
-html,
 body {
 	min-height: 100vh;
 	background-color: var(--background);
@@ -33,9 +43,9 @@ body {
 button {
 	height: 2.25rem;
 	padding-inline: 1rem;
-	border: 0.125rem solid transparent;
 	border-radius: var(--radius);
-
+	background-color: var(--secondary);
+	color: var(--secondary-foreground);
 	&:focus-visible {
 		outline: 0.125rem solid var(--primary);
 		outline-offset: 0.125rem;
@@ -44,9 +54,9 @@ button {
 
 .primary {
 	background-color: var(--primary);
-	color: var(--primary-foreground);
-
+	color: oklch(0.985 0 0);
+	&:is(button, input[type='button']):hover,
 	&.hover:hover {
-		background-color: color-mix(in oklab, var(--primary) 90%, var(--background));
+		background-color: color-mix(in oklab, var(--primary) 90%, transparent);
 	}
 }
