@@ -1,0 +1,17 @@
+.primary {
+	background-color: var(--primary);
+	color: var(--light);
+	&:is(button):hover,
+	&.hover:hover {
+		background-color: color-mix(in oklab, var(--primary) 90%, transparent);
+	}
+}
+
+.destructive {
+	background-color: var(--destructive);
+	color: var(--light);
+	&:is(button):hover,
+	&.hover:hover {
+		background-color: color-mix(in oklab, var(--destructive) 90%, transparent);
+	}
+}

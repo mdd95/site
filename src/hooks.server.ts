@@ -2,7 +2,7 @@ import { initializeThemeMode, THEME_MODE_STORAGE_KEY } from '$lib/theme-manager.
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 
-const inlineScriptRegExp = /\/\*\*%inline-script%\*\*\//;
+const inlineScriptRegExp = /\/\*\*%inline-script%\*\*\//g;
 const inlineScript = `
 	(${initializeThemeMode.toString()})("${THEME_MODE_STORAGE_KEY}");
 `;
