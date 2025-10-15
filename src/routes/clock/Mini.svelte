@@ -10,8 +10,8 @@
 
 	let { x, y, rot }: Props = $props();
 
-	let rot1 = Tween.of(() => rot[0], { easing: cubicInOut });
-	let rot2 = Tween.of(() => rot[1], { easing: cubicInOut });
+	let rot1 = Tween.of(() => rot[0], { easing: cubicInOut, duration: 200 });
+	let rot2 = Tween.of(() => rot[1], { easing: cubicInOut, duration: 200 });
 
 	let color = 'green';
 </script>
