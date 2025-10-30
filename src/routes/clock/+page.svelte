@@ -4,14 +4,18 @@
 	import Mini from './Mini.svelte';
 
 	let date = $state(new Date());
-	let h = $derived(date.getHours());
-	let m = $derived(date.getMinutes());
-	let s = $derived(date.getSeconds());
+	let time = $derived({
+		hours: date.getHours(),
+		minutes: date.getMinutes(),
+		seconds: date.getSeconds(),
+	});
+
+	function update() {
+		date = new Date();
+	}
 
 	onMount(() => {
-		setInterval(() => {
-			date = new Date();
-		}, 1000);
+		setInterval(update, 1000);
 	});
 </script>
 
@@ -21,32 +25,32 @@
 			<Mini
 				x={100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[Math.floor(h / 10)][i]]}
+				rot={angles[numbers[Math.floor(time.hours / 10)][i]]}
 			/>
 			<Mini
 				x={400 + 100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[h % 10][i]]}
+				rot={angles[numbers[time.hours % 10][i]]}
 			/>
 			<Mini
 				x={900 + 100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[Math.floor(m / 10)][i]]}
+				rot={angles[numbers[Math.floor(time.minutes / 10)][i]]}
 			/>
 			<Mini
 				x={1300 + 100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[m % 10][i]]}
+				rot={angles[numbers[time.minutes % 10][i]]}
 			/>
 			<Mini
 				x={1800 + 100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[Math.floor(s / 10)][i]]}
+				rot={angles[numbers[Math.floor(time.seconds / 10)][i]]}
 			/>
 			<Mini
 				x={2200 + 100 * (i % 4)}
 				y={100 * Math.floor(i / 4)}
-				rot={angles[numbers[s % 10][i]]}
+				rot={angles[numbers[time.seconds % 10][i]]}
 			/>
 		{/each}
 	</svg>
