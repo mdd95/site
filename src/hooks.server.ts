@@ -1,5 +1,6 @@
-import { initializeThemeMode, THEME_MODE_STORAGE_KEY } from '$lib/theme-manager.svelte.js';
 import { sequence } from '@sveltejs/kit/hooks';
+import { initializeThemeMode, THEME_MODE_STORAGE_KEY } from '$lib/theme-manager.svelte.js';
+import * as auth from '$lib/auth/auth.js';
 import type { Handle } from '@sveltejs/kit';
 
 const inlineScriptRegExp = /\/\*\*%inline-script%\*\*\//g;
@@ -13,4 +14,4 @@ const handleInlineScript: Handle = ({ event, resolve }) => {
 	});
 };
 
-export const handle: Handle = sequence(handleInlineScript);
+export const handle: Handle = sequence(handleInlineScript, auth.hooks);

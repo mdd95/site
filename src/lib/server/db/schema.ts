@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
-import { boolean, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
 	id: uuid('id').defaultRandom().primaryKey(),
-	email: varchar('email', { length: 255 }).notNull().unique(),
+	email: varchar('email', { length: 320 }).notNull().unique(),
 	username: varchar('username', { length: 50 }).notNull().unique(),
-	passwordHash: text('password_hash').notNull(),
+	passwordHash: varchar('password_hash', { length: 128 }).notNull(),
 	isActive: boolean('is_active').default(true).notNull(),
 	isDeleted: boolean('is_deleted').default(false).notNull(),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -14,12 +14,12 @@ export const users = pgTable('users', {
 });
 
 export const sessions = pgTable('sessions', {
-	id: uuid('id').defaultRandom().primaryKey(),
+	id: varchar('id', { length: 64 }).primaryKey(),
 	userId: uuid('user_id')
 		.notNull()
 		.references(() => users.id, { onDelete: 'cascade' }),
 	ipAddress: varchar('ip_address', { length: 45 }),
-	userAgent: text('user_agent'),
+	userAgent: varchar('user_agent', { length: 512 }),
 	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
 });

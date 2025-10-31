@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { db } from '$lib/server/db/index.js';
-import * as table from '$lib/server/db/schema.js';
-import type { RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
+import { db } from '../server/db/index.js';
+import * as table from '../server/db/schema.js';
+import type { Handle, RequestEvent } from '@sveltejs/kit';
 
 const sessionCookieName = 'auth_session_token';
 const DAY = 1000 * 60 * 60 * 24;
@@ -13,13 +13,15 @@ export function generateSessionToken() {
 	return encodeBase64url(bytes);
 }
 
+export function getSessionId(token: string) {
+	return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+}
+
 export async function createSession(event: RequestEvent, token: string, userId: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: table.Session = {
+	const sessionId = getSessionId(token);
+	const session = {
 		id: sessionId,
 		userId,
-		ipAddress: null,
-		userAgent: null,
 		createdAt: new Date(),
 		expiresAt: new Date(Date.now() + DAY * 30),
 	};
@@ -28,7 +30,7 @@ export async function createSession(event: RequestEvent, token: string, userId: 
 }
 
 export async function validateSessionToken(token: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const sessionId = getSessionId(token);
 	const [result] = await db
 		.select({
 			user: {
@@ -74,3 +76,22 @@ export function setSessionTokenCookie(event: RequestEvent, token: string, expire
 export function deleteSessionTokenCookie(event: RequestEvent) {
 	event.cookies.delete(sessionCookieName, { path: '/' });
 }
+
+export const hooks: Handle = async ({ event, resolve }) => {
+	const sessionToken = event.cookies.get(sessionCookieName);
+	if (!sessionToken) {
+		event.locals.user = null;
+		event.locals.session = null;
+		return resolve(event);
+	}
+	const { session, user } = await validateSessionToken(sessionToken);
+	if (session) {
+		setSessionTokenCookie(event, sessionToken, session.expiresAt);
+	} else {
+		deleteSessionTokenCookie(event);
+	}
+
+	event.locals.session = session;
+	event.locals.user = user;
+	return resolve(event);
+};
