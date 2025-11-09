@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { db } from '../server/db/index.js';
-import * as table from '../server/db/schema/index.js';
+import { eq } from 'drizzle-orm';
+import { db } from '../server/db';
+import * as table from '../server/db/schema';
 import type { RequestEvent } from '@sveltejs/kit';
 
 export const KEY = 'auth_session_token';
@@ -44,8 +44,7 @@ export async function validate(token: string) {
 				id: table.users.id,
 				username: table.users.username,
 				email: table.users.email,
-				bio: table.users.bio,
-				birthdate: table.users.birthdate,
+				role: table.users.role,
 			},
 			session: {
 				id: table.sessions.id,
