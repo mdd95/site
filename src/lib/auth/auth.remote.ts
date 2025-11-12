@@ -13,13 +13,26 @@ const config = {
 	parallelism: 1,
 };
 
-export const user = query(() => {
+export const user = query(async () => {
 	const event = getRequestEvent();
 
-	return {
-		user: event.locals.user,
-		session: event.locals.session,
-	};
+	if (!event.locals.user) {
+		return null;
+	}
+
+	const [result] = await db
+		.select({
+			id: table.users.id,
+			username: table.users.username,
+			email: table.users.email,
+			bio: table.users.bio,
+			birthdate: table.users.birthdate,
+			role: table.users.role,
+		})
+		.from(table.users)
+		.where(eq(table.users.id, event.locals.user.id));
+
+	return result;
 });
 
 export const login = form(schema.login, async (data) => {
