@@ -36,22 +36,34 @@ export const user = query(async () => {
 });
 
 export const login = form(schema.login, async (data) => {
-	const [result] = await db.select().from(table.users).where(eq(table.users.email, data.email));
+	const [result] = await db
+		.select({
+			id: table.users.id,
+			passwordHash: table.users.passwordHash,
+			isBanned: table.users.isBanned,
+		})
+		.from(table.users)
+		.where(eq(table.users.email, data.email));
 
 	if (!result) {
 		// User does not exist
 		return;
 	}
 
-	if (!(await argon2.verify(result.passwordHash, data.password, config))) {
-		// Invalid password
+	const valid = await argon2.verify(result.passwordHash, data.password, config);
+	if (!valid) {
+		return;
+	}
+
+	if (result.isBanned) {
 		return;
 	}
 
 	const event = getRequestEvent();
 	const token = session.generateToken();
+	const _session = await session.create(event, token, result.id);
 
-	session.setCookie(event, token, (await session.create(event, token, result.id)).expiresAt);
+	session.setCookie(event, token, _session.expiresAt);
 });
 
 export const signup = form(schema.signup, async (data) => {
