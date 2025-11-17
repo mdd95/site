@@ -4,11 +4,25 @@ export function sudoku_generator() {
 	const box_mask = new Uint16Array(9);
 	const numbers = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
-	let seed = 1 >>> 0;
+	const c_row = new Uint8Array(81);
+	const c_col = new Uint8Array(81);
+	const c_box = new Uint8Array(81);
+
+	for (let i = 0; i < 81; i++) {
+		const r = (i / 9) | 0;
+		const c = i % 9;
+		const b = ((r / 3) | 0) * 3 + ((c / 3) | 0);
+
+		c_row[i] = r;
+		c_col[i] = c;
+		c_box[i] = b;
+	}
+
+	let seed = 1;
 	function rng() {
-		seed ^= (seed << 13) >>> 0;
+		seed ^= seed << 13;
 		seed ^= seed >>> 17;
-		seed ^= (seed << 5) >>> 0;
+		seed ^= seed << 5;
 		return seed >>> 0;
 	}
 
@@ -22,20 +36,16 @@ export function sudoku_generator() {
 		return arr;
 	}
 
-	function box_index(r: number, c: number) {
-		return ((r / 3) | 0) * 3 + ((c / 3) | 0);
-	}
-
 	function find_best_cell(grid: Uint8Array) {
-		let best_i = -1;
+		let best_idx = -1;
 		let best_count = 10;
 
 		for (let i = 0; i < 81; i++) {
 			if (grid[i] !== 0) continue;
 
-			const r = (i / 9) | 0;
-			const c = i % 9;
-			const b = box_index(r, c);
+			const r = c_row[i];
+			const c = c_col[i];
+			const b = c_box[i];
 
 			const mask = row_mask[r] | col_mask[c] | box_mask[b];
 
@@ -46,20 +56,21 @@ export function sudoku_generator() {
 
 			if (count < best_count) {
 				best_count = count;
-				best_i = i;
+				best_idx = i;
 				if (count === 1) return i;
 			}
 		}
-		return best_i;
+		return best_idx;
 	}
 
 	function fill_sudoku(grid: Uint8Array): boolean {
 		const idx = find_best_cell(grid);
 		if (idx < 0) return true;
 
-		const r = (idx / 9) | 0;
-		const c = idx % 9;
-		const b = box_index(r, c);
+		const r = c_row[idx];
+		const c = c_col[idx];
+		const b = c_box[idx];
+
 		const used = row_mask[r] | col_mask[c] | box_mask[b];
 		shuffle(numbers);
 
@@ -97,83 +108,86 @@ export function sudoku_generator() {
 
 	function find_best_cell_flat(
 		grid: Uint8Array,
-		rm: Uint16Array,
-		cm: Uint16Array,
-		bm: Uint16Array
+		r_mask: Uint16Array,
+		c_mask: Uint16Array,
+		b_mask: Uint16Array
 	) {
-		let bestIdx = -1;
-		let bestCnt = 10;
+		let best_idx = -1;
+		let best_count = 10;
 
 		for (let i = 0; i < 81; i++) {
 			if (grid[i] !== 0) continue;
 
-			const r = (i / 9) | 0;
-			const c = i % 9;
-			const b = box_index(r, c);
+			const r = c_row[i];
+			const c = c_col[i];
+			const b = c_box[i];
 
-			const used = rm[r] | cm[c] | bm[b];
-			let cnt = 0;
+			const used = r_mask[r] | c_mask[c] | b_mask[b];
+			let count = 0;
 			for (let n = 1; n <= 9; n++) {
-				if (!(used & (1 << n))) cnt++;
+				if (!(used & (1 << n))) count++;
 			}
 
-			if (cnt < bestCnt) {
-				bestCnt = cnt;
-				bestIdx = i;
-				if (cnt === 1) return i;
+			if (count < best_count) {
+				best_count = count;
+				best_idx = i;
+				if (count === 1) return i;
 			}
 		}
-		return bestIdx;
+		return best_idx;
 	}
 
 	function count_solutions(puzzle: Uint8Array, limit = 2) {
 		const grid = new Uint8Array(puzzle);
-		const rm = new Uint16Array(9);
-		const cm = new Uint16Array(9);
-		const bm = new Uint16Array(9);
+		const r_mask = new Uint16Array(9);
+		const c_mask = new Uint16Array(9);
+		const b_mask = new Uint16Array(9);
 
 		for (let i = 0; i < 81; i++) {
 			const v = grid[i];
 			if (!v) continue;
-			const r = (i / 9) | 0;
-			const c = i % 9;
-			const b = box_index(r, c);
+
+			const r = c_row[i];
+			const c = c_col[i];
+			const b = c_box[i];
+
 			const bit = 1 << v;
-			if (rm[r] & bit || cm[c] & bit || bm[b] & bit) return 0;
-			rm[r] |= bit;
-			cm[c] |= bit;
-			bm[b] |= bit;
+			if (r_mask[r] & bit || c_mask[c] & bit || b_mask[b] & bit) return 0;
+
+			r_mask[r] |= bit;
+			c_mask[c] |= bit;
+			b_mask[b] |= bit;
 		}
 
 		let count = 0;
 
 		function solve() {
-			const i = find_best_cell_flat(grid, rm, cm, bm);
+			const i = find_best_cell_flat(grid, r_mask, c_mask, b_mask);
 			if (i < 0) {
 				count++;
 				return count < limit;
 			}
 
-			const r = (i / 9) | 0;
-			const c = i % 9;
-			const b = box_index(r, c);
-			const used = rm[r] | cm[c] | bm[b];
+			const r = c_row[i];
+			const c = c_col[i];
+			const b = c_box[i];
+			const used = r_mask[r] | c_mask[c] | b_mask[b];
 
 			for (let num = 1; num <= 9; num++) {
 				const bit = 1 << num;
 				if (used & bit) continue;
 
 				grid[i] = num;
-				rm[r] |= bit;
-				cm[c] |= bit;
-				bm[b] |= bit;
+				r_mask[r] |= bit;
+				c_mask[c] |= bit;
+				b_mask[b] |= bit;
 
 				if (!solve()) return false;
 
 				grid[i] = 0;
-				rm[r] &= ~bit;
-				cm[c] &= ~bit;
-				bm[b] &= ~bit;
+				r_mask[r] &= ~bit;
+				c_mask[c] &= ~bit;
+				b_mask[b] &= ~bit;
 			}
 			return true;
 		}
@@ -203,7 +217,7 @@ export function sudoku_generator() {
 				removed++;
 			}
 		}
-		return puzzle;
+		return [puzzle, solution];
 	}
 
 	return { generate: generate_puzzle };

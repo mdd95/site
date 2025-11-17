@@ -3,29 +3,31 @@
 	import Sudoku from './sudoku-worker.js?worker';
 
 	let game: Worker;
-	let d = $state.raw(new Uint8Array(81));
+
+	let grid = $state.raw(new Uint8Array(81));
+	let loading = $state(false);
 
 	onMount(() => {
 		game = new Sudoku();
 
 		game.addEventListener('message', (e) => {
-			console.log(e.data);
-			d = e.data;
+			grid = e.data[0];
+			loading = false;
 		});
 	});
 
 	function generate() {
+		loading = true;
 		game.postMessage('generate');
 	}
 </script>
 
-<button onclick={generate}>Generate</button>
-
 <div class="grid">
-	{#each d as m, i (i)}
+	{#each grid as m, i (i)}
 		<div class="cell">{m === 0 ? ' ' : m}</div>
 	{/each}
 </div>
+<button onclick={generate} disabled={loading}>Generate</button>
 
 <style>
 	.grid {
