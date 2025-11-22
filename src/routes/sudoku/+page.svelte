@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Sudoku from './sudoku-worker.js?worker';
+	import RendererCanvas from './renderer-canvas.svelte';
 
 	let game: Worker;
 
@@ -101,6 +102,7 @@
 	{/each}
 </svg>
 <button onclick={generate} disabled={loading}>Generate</button>
+<RendererCanvas />
 
 <style>
 	.sudoku {
