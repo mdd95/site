@@ -1,3 +1,3 @@
-export { users } from './users';
-export { sessions } from './sessions';
-export { shortUrls } from './short-urls';
+export * from './users';
+export * from './sessions';
+export * from './short-urls';
