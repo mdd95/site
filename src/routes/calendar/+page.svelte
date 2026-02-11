@@ -18,9 +18,20 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Calendar</title>
+</svelte:head>
+
 <div class="year">
 	<button onclick={() => (year -= 1)}>Prev</button>
-	<span class="year-label">{year}</span>
+	<select bind:value={year}>
+		<button>
+			<selectedcontent></selectedcontent>
+		</button>
+		{#each { length: 100 }, i}
+			<option value={1980 + i}>{1980 + i}</option>
+		{/each}
+	</select>
 	<button onclick={() => (year += 1)}>Next</button>
 </div>
 
@@ -59,8 +70,18 @@
 		gap: 4rem;
 	}
 
-	.year-label {
+	select,
+	::picker(select) {
+		appearance: base-select;
+	}
+
+	select {
 		font-size: 2.5rem;
+		border-radius: 0.25rem;
+	}
+
+	option {
+		font-size: 1rem;
 	}
 
 	.calendar {
