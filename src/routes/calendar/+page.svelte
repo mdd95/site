@@ -4,6 +4,10 @@
 	let year = $state(new Date().getFullYear());
 </script>
 
+<svelte:head>
+	<title>Calendar</title>
+</svelte:head>
+
 <div class="header">
 	<button onclick={() => (year -= 1)}>Prev</button>
 	<select bind:value={year}>
