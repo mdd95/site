@@ -11,7 +11,7 @@
 	type Props = {
 		content?: string;
 	};
-	let { content }: Props = $props();
+	let { content = $bindable() }: Props = $props();
 
 	let editor: HTMLElement;
 

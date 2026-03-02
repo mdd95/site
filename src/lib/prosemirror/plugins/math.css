@@ -28,7 +28,7 @@
 	/*color: theme(colors.accent.foreground);*/
 	color: grey;
 	tab-size: 4;
-	font-size: 0.85em;
+	font-size: 1rem;
 }
 
 .math-node.ProseMirror-selectednode .math-src {
@@ -45,7 +45,7 @@ math-inline {
 
 math-inline .math-render {
 	display: inline-block;
-	font-size: 0.85em;
+	font-size: 1em;
 	cursor: pointer;
 }
 
