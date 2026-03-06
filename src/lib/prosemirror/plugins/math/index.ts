@@ -106,9 +106,7 @@ export class MathView implements NodeView {
 				plugins: [
 					keymap({
 						Tab: (state, dispatch) => {
-							if (dispatch) {
-								dispatch(state.tr.insertText('\t'));
-							}
+							if (dispatch) dispatch(state.tr.insertText('\t'));
 							return true;
 						},
 						Backspace: chainCommands(deleteSelection, (state) => {
@@ -478,6 +476,9 @@ export const math: EditorPlugin = {
 					mathInlineInputRule(schema.nodes.math_inline),
 					mathDisplayInputRule(schema.nodes.math_display),
 				],
+			}),
+			keymap({
+				'Alt-=': insertMath(schema.nodes.math_inline),
 			}),
 		];
 	},

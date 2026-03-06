@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { pcBaseKeymap, toggleMark } from 'prosemirror-commands';
+	import { history, redo, undo } from 'prosemirror-history';
+	import { keymap } from 'prosemirror-keymap';
 	import { DOMParser } from 'prosemirror-model';
+	import { schema } from 'prosemirror-schema-basic';
 	import { EditorState } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
+	import 'prosemirror-view/style/prosemirror.css';
 	import type { Plugin } from 'prosemirror-state';
 	import type { EditorPlugin } from './plugins/types.js';
-	import 'prosemirror-view/style/prosemirror.css';
-	import { schema } from 'prosemirror-schema-basic';
 
 	type Props = {
 		content?: string;
@@ -35,7 +38,17 @@
 				doc: DOMParser.fromSchema(editorSchema).parse(
 					new globalThis.DOMParser().parseFromString(content ?? '', 'text/html')
 				),
-				plugins: editorPlugins,
+				plugins: [
+					history(),
+					keymap({
+						...pcBaseKeymap,
+						'Mod-b': toggleMark(editorSchema.marks.strong),
+						'Mod-i': toggleMark(editorSchema.marks.em),
+						'Mod-z': undo,
+						'Mod-y': redo,
+					}),
+					...editorPlugins,
+				],
 			}),
 		});
 
