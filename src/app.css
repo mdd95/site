@@ -1,0 +1,90 @@
+:root {
+	--font-sans:
+		'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+	--radius: 0.25rem;
+	--color-background: light-dark(oklch(1 0 0), oklch(0.148 0.004 228.8));
+	--color-primary: light-dark(oklch(0.555 0.163 48.998), oklch(0.473 0.137 46.201));
+	--color-primary-foreground: oklch(0.987 0.022 95.277);
+	--color-muted: light-dark(oklch(0.963 0.002 197.1), oklch(0.275 0.011 216.9));
+	--color-muted-foreground: light-dark(oklch(0.56 0.021 213.5), oklch(0.723 0.014 214.4));
+	--outline-style: dashed;
+	--outline-width: 0.125rem;
+}
+
+*,
+::before,
+::after,
+::backdrop,
+::file-selector-button {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: 0 solid;
+}
+
+html,
+:host {
+	tab-size: 4;
+	font-family: var(--font-sans);
+	line-height: 1.5;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	background-color: var(--color-background);
+}
+
+::view-transition-old(root) {
+	animation-delay: 0.5s;
+}
+
+::view-transition-new(root) {
+	animation: circle-in 0.5s;
+	animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes circle-in {
+	from {
+		clip-path: circle(0% at 100% 0%);
+	}
+	to {
+		clip-path: circle(150% at 100% 0%);
+	}
+}
+
+button,
+[data-button-root] {
+	height: 2rem;
+	padding-inline: 0.875rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius);
+	outline: none;
+	user-select: none;
+	color: currentColor;
+	font-size: 0.875rem;
+	font-weight: 500;
+	text-decoration: none;
+
+	&:disabled {
+		pointer-events: none;
+		opacity: 0.5;
+	}
+
+	&:focus-visible {
+		outline: var(--outline-width) var(--outline-style)
+			color-mix(in lab, var(--color-primary) 80%, transparent);
+	}
+
+	& svg {
+		pointer-events: none;
+	}
+}
+
+.primary {
+	background-color: var(--color-primary);
+	color: var(--color-primary-foreground);
+}
