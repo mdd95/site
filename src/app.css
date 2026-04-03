@@ -2,8 +2,9 @@
 	--font-sans:
 		'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
 		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-	--radius: 0.25rem;
+	--radius: 0.5rem;
 	--color-background: light-dark(oklch(1 0 0), oklch(0.148 0.004 228.8));
+	--color-foreground: light-dark(oklch(0.148 0.004 228.8), oklch(0.987 0.002 197.1));
 	--color-primary: light-dark(oklch(0.555 0.163 48.998), oklch(0.473 0.137 46.201));
 	--color-primary-foreground: oklch(0.987 0.022 95.277);
 	--color-muted: light-dark(oklch(0.963 0.002 197.1), oklch(0.275 0.011 216.9));
@@ -25,15 +26,13 @@
 
 html,
 :host {
-	tab-size: 4;
+	background-color: var(--color-background);
+	color: var(--color-foreground);
 	font-family: var(--font-sans);
 	line-height: 1.5;
+	tab-size: 4;
 	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color: transparent;
-}
-
-body {
-	background-color: var(--color-background);
 }
 
 ::view-transition-old(root) {
@@ -41,8 +40,7 @@ body {
 }
 
 ::view-transition-new(root) {
-	animation: circle-in 0.5s;
-	animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+	animation: circle-in 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 @keyframes circle-in {
@@ -56,15 +54,18 @@ body {
 
 button,
 [data-button-root] {
+	--button-background: var(--color-background);
+	--button-foreground: var(--color-foreground);
 	height: 2rem;
 	padding-inline: 0.875rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	background-color: var(--button-background);
+	color: var(--button-foreground);
 	border-radius: var(--radius);
 	outline: none;
 	user-select: none;
-	color: currentColor;
 	font-size: 0.875rem;
 	font-weight: 500;
 	text-decoration: none;
@@ -82,9 +83,13 @@ button,
 	& svg {
 		pointer-events: none;
 	}
-}
 
-.primary {
-	background-color: var(--color-primary);
-	color: var(--color-primary-foreground);
+	&:hover {
+		background-color: color-mix(in lab, var(--button-background) 85%, var(--color-background));
+	}
+
+	&.primary {
+		--button-background: var(--color-primary);
+		--button-foreground: var(--color-primary-foreground);
+	}
 }
