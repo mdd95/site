@@ -3,9 +3,7 @@
 
 	let text = $state('');
 	let list = $derived(text.split('\n'));
-	// TODO: Dynamic color palette
-	// prettier-ignore
-	let colors = ['#dc2626','#ea580c','#d97706','#ca8a04','#65a30d','#16a34a','#059669','#0d9488','#0891b2','#0284c7','#2563eb','#4f46e5','#7c3aed','#9333ea','#c026d3','#db2777','#e11d48'];
+	let colorPalette = $state(['#f3dad8', '#f4c3c2']);
 
 	type Maybe<T> = T | null | undefined;
 	let ctx: Maybe<CanvasRenderingContext2D>;
@@ -35,8 +33,10 @@
 				tmp.moveTo(cx, cy);
 				tmp.arc(cx, cy, 470, arcLen * i, arcLen * (i + 1));
 				tmp.lineTo(cx, cy);
-				tmp.fillStyle = colors[i % colors.length];
+				tmp.lineWidth = 3;
+				tmp.fillStyle = colorPalette[i % colorPalette.length];
 				tmp.fill();
+				tmp.stroke();
 
 				tmp.save();
 				tmp.translate(cx, cy);
