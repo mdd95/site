@@ -1,11 +1,12 @@
+import type { Maybe } from '../types.js';
+
 export function useInterval(callback: () => void, delay: number = 1000) {
-	let intervalId: NodeJS.Timeout | null = null;
+	let id: Maybe<NodeJS.Timeout>;
 
 	$effect(() => {
-		intervalId = setInterval(callback, delay);
-
+		id = setInterval(callback, delay);
 		return () => {
-			if (intervalId) clearInterval(intervalId);
+			if (id) clearInterval(id);
 		};
 	});
 }
