@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { cubicInOut } from 'svelte/easing';
 	import { Tween } from 'svelte/motion';
+	import type { TweenOptions } from 'svelte/motion';
 
 	type Props = {
 		x: number;
@@ -8,13 +9,18 @@
 		b: number;
 	};
 
+	const tweenOptions: TweenOptions<number> = {
+		easing: cubicInOut,
+		duration: 200
+	};
+
 	let { x, y, b }: Props = $props();
 	let r1 = $derived(b >> 2);
 	let r2 = $derived(b & 3);
 	let a = $derived(r1 === 0 && r2 === 0);
 
-	let t1 = Tween.of(() => (a ? 45 : r1 * 90), { easing: cubicInOut, duration: 200 });
-	let t2 = Tween.of(() => (a ? 45 : r2 * 90), { easing: cubicInOut, duration: 200 });
+	let t1 = Tween.of(() => (a ? 45 : r1 * 90), tweenOptions);
+	let t2 = Tween.of(() => (a ? 45 : r2 * 90), tweenOptions);
 </script>
 
 <circle cx={x + 50} cy={y + 50} r={49} />
