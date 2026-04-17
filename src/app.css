@@ -15,9 +15,7 @@
 
 *,
 ::before,
-::after,
-::backdrop,
-::file-selector-button {
+::after {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -92,4 +90,13 @@ button,
 		--button-background: var(--color-primary);
 		--button-foreground: var(--color-primary-foreground);
 	}
+}
+
+dialog {
+	margin: auto;
+	background-color: color-mix(in lab, var(--color-background) 90%, var(--color-foreground));
+	border-radius: var(--radius);
+}
+::backdrop {
+	background-color: rgb(0 0 0 / 0.2);
 }
