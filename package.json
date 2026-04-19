@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@fontsource-variable/inter": "^5.2.8",
 		"@internationalized/date": "^3.12.0",
+		"@lucide/svelte": "^1.8.0",
 		"bits-ui": "^2.17.2",
 		"mode-watcher": "^1.1.0"
 	}
