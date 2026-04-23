@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as v from 'valibot';
+	import { getLocalTimeZone, now } from '@internationalized/date';
 	import X from '@lucide/svelte/icons/x';
 	import { createId } from '$lib/utils/create-id.js';
 
@@ -130,21 +132,31 @@
 	const id = $props.id();
 	let tasks = $state<Task[]>(SAMPLE);
 
+	const createTaskSchema = v.object({
+		name: v.string(),
+		description: v.string()
+	});
+
 	function createTask(e: SubmitEvent) {
-		const form = new FormData(e.target as HTMLFormElement);
-		const name = form.get('name')?.toString() ?? '';
-		const description = form.get('description')?.toString() ?? '';
-		tasks.push({
-			id: createId(),
-			name,
-			description,
-			status: 'pending',
-			priority: 'low',
-			due_date: null,
-			tags: [''],
-			created_at: new Date().toString(),
-			updated_at: new Date().toString()
-		});
+		try {
+			const form = new FormData(e.target as HTMLFormElement);
+			const data = v.parse(createTaskSchema, Object.fromEntries(form.entries()));
+			const date = now(getLocalTimeZone()).toAbsoluteString();
+
+			tasks.push({
+				id: createId(),
+				name: data.name,
+				description: data.description,
+				status: 'pending',
+				priority: 'low',
+				due_date: null,
+				tags: [''],
+				created_at: date,
+				updated_at: date
+			});
+		} catch (err) {
+			console.error('Failed to create task: ', err);
+		}
 	}
 
 	function deleteTask(id: string) {
@@ -153,8 +165,9 @@
 </script>
 
 <div class="toolbar">
-	<button command="show-modal" commandfor="create-task-dialog-{id}" class="primary">Create</button
-	>
+	<button command="show-modal" commandfor="create-task-dialog-{id}" class="primary">
+		Create
+	</button>
 </div>
 
 <dialog id="create-task-dialog-{id}" closedby="closerequest">
@@ -168,9 +181,7 @@
 			<input type="text" id="task-description-{id}" name="description" />
 		</div>
 		<div class="actions">
-			<button type="button" command="close" commandfor="create-task-dialog-{id}"
-				>Cancel</button
-			>
+			<button type="button" command="close" commandfor="create-task-dialog-{id}">Cancel</button>
 			<button class="primary">Create</button>
 		</div>
 	</form>
