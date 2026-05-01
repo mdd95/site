@@ -2,7 +2,7 @@
 	import * as v from 'valibot';
 	import { getLocalTimeZone, now } from '@internationalized/date';
 	import X from '@lucide/svelte/icons/x';
-	import { createId } from '$lib/utils/create-id.js';
+	import { createId } from '$lib/utils.svelte.js';
 
 	type Task = {
 		id: string;
@@ -181,7 +181,9 @@
 			<input type="text" id="task-description-{id}" name="description" />
 		</div>
 		<div class="actions">
-			<button type="button" command="close" commandfor="create-task-dialog-{id}">Cancel</button>
+			<button type="button" command="close" commandfor="create-task-dialog-{id}">
+				Cancel
+			</button>
 			<button class="primary">Create</button>
 		</div>
 	</form>
