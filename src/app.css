@@ -27,7 +27,7 @@ html,
 	background-color: var(--color-background);
 	color: var(--color-foreground);
 	font-family: var(--font-sans);
-	line-height: 1.5;
+	line-height: 2;
 	tab-size: 4;
 	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color: transparent;
@@ -99,4 +99,19 @@ dialog {
 }
 ::backdrop {
 	background-color: rgb(0 0 0 / 0.2);
+}
+
+.content-grid {
+	--_cw: 80ch;
+	--_px: 1rem;
+
+	display: grid;
+	grid-template-columns:
+		minmax(var(--_px), 1fr)
+		[content-start] min(100% - 2 * var(--_px), var(--_cw))
+		[content-end] minmax(var(--_px), 1fr);
+
+	& > * {
+		grid-column: content;
+	}
 }
