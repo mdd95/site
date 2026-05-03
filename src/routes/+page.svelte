@@ -3,7 +3,7 @@
 	import { Button } from 'bits-ui';
 	import { toggleMode } from 'mode-watcher';
 	import { resolve } from '$app/paths';
-	import { createViewTransition } from '$lib/utils/create-view-transition.js';
+	import { createViewTransition } from '$lib/utils.svelte.js';
 	import Palette from '@lucide/svelte/icons/palette';
 	import PaperCrane from '$lib/assets/icons/PaperCrane.svelte';
 

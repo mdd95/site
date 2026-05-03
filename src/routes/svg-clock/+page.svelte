@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useInterval } from '$lib/hooks/use-interval.svelte.js';
+	import { useInterval } from '$lib/utils.svelte.js';
 	import MiniClock from './MiniClock.svelte';
 
 	const numbers = [
