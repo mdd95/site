@@ -25,3 +25,17 @@ export function useInterval(callback: () => void, delay: number = 1000) {
 		};
 	});
 }
+
+export function useAnimationFrame(callback: () => void) {
+	$effect(() => {
+		let id: number;
+		const fn = () => {
+			callback();
+			id = window.requestAnimationFrame(fn);
+		};
+		id = window.requestAnimationFrame(fn);
+		return () => {
+			window.cancelAnimationFrame(id);
+		};
+	});
+}
