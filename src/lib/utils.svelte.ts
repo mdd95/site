@@ -15,27 +15,40 @@ export function createViewTransition(callback: () => void | Promise<void>) {
 }
 
 export function useInterval(callback: () => void, delay: number = 1000) {
-	let id: ReturnType<typeof setInterval>;
+	let fn = callback;
 
 	$effect(() => {
-		id = setInterval(callback, delay);
+		fn = callback;
+	});
 
-		return () => {
-			clearInterval(id);
-		};
+	$effect(() => {
+		const id = setInterval(() => {
+			fn();
+		}, delay);
+
+		return () => clearInterval(id);
 	});
 }
 
-export function useAnimationFrame(callback: () => void) {
+export function useAnimationFrame(callback: (delta: number) => void) {
+	let fn = callback;
+
+	$effect(() => {
+		fn = callback;
+	});
+
 	$effect(() => {
 		let id: number;
-		const fn = () => {
-			callback();
-			id = window.requestAnimationFrame(fn);
+		let prev = performance.now();
+
+		const frame = (time: number) => {
+			const delta = time - prev;
+			prev = time;
+			fn(delta);
+			id = requestAnimationFrame(frame);
 		};
-		id = window.requestAnimationFrame(fn);
-		return () => {
-			window.cancelAnimationFrame(id);
-		};
+
+		id = requestAnimationFrame(frame);
+		return () => cancelAnimationFrame(id);
 	});
 }
