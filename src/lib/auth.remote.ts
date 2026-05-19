@@ -1,7 +1,7 @@
-// import { redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 import * as v from 'valibot';
-import { form } from '$app/server';
+import { form, getRequestEvent, query } from '$app/server';
 import { auth } from './server/auth.js';
 
 export const signInEmail = form(
@@ -20,7 +20,7 @@ export const signInEmail = form(
 		} catch (err) {
 			return handleAuthError(err);
 		}
-		// redirect(302, '');
+		redirect(302, '/');
 	}
 );
 
@@ -54,6 +54,20 @@ export const signUpEmail = form(
 		}
 	}
 );
+
+export const signOut = form('unchecked', async () => {
+	const { request } = getRequestEvent();
+	await auth.api.signOut({
+		headers: request.headers
+	});
+});
+
+export const user = query(async () => {
+	const { request } = getRequestEvent();
+	return await auth.api.getSession({
+		headers: request.headers
+	});
+});
 
 function handleAuthError(err: unknown) {
 	if (err instanceof APIError) {
