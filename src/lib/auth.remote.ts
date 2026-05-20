@@ -7,7 +7,7 @@ import { auth } from './server/auth.js';
 export const signInEmail = form(
 	v.object({
 		email: v.pipe(v.string(), v.email()),
-		password: v.string()
+		password: v.pipe(v.string(), v.nonEmpty())
 	}),
 	async (data) => {
 		try {
@@ -27,9 +27,10 @@ export const signInEmail = form(
 export const signUpEmail = form(
 	v.pipe(
 		v.object({
+			name: v.pipe(v.string(), v.nonEmpty()),
 			email: v.pipe(v.string(), v.email()),
-			password: v.string(),
-			passwordConfirm: v.string()
+			password: v.pipe(v.string(), v.minLength(8)),
+			passwordConfirm: v.pipe(v.string(), v.nonEmpty())
 		}),
 		v.forward(
 			v.partialCheck(
@@ -46,7 +47,7 @@ export const signUpEmail = form(
 				body: {
 					email: data.email,
 					password: data.password,
-					name: ''
+					name: data.name
 				}
 			});
 		} catch (err) {

@@ -13,6 +13,7 @@
 </form>
 
 <form {...signUpEmail}>
+	<input {...signUpEmail.fields.name.as('text')} placeholder="Name" />
 	<input {...signUpEmail.fields.email.as('email')} placeholder="Email address" />
 	<input {...signUpEmail.fields.password.as('password')} placeholder="Password" />
 	<input {...signUpEmail.fields.passwordConfirm.as('password')} placeholder="Confirm password" />
