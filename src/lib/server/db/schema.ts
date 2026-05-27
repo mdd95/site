@@ -1,6 +1,6 @@
 import { pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { user } from './auth.schema';
+import { user } from './schema/auth';
 
 export const chatRoom = pgTable('chat_room', {
 	id: text('id').primaryKey(),
@@ -72,4 +72,5 @@ export const chatMessageRelations = relations(chatMessage, ({ one }) => ({
 	})
 }));
 
-export * from './auth.schema';
+export * from './schema/auth';
+export * from './schema/public-chat-message';
