@@ -73,4 +73,5 @@ export const chatMessageRelations = relations(chatMessage, ({ one }) => ({
 }));
 
 export * from './schema/auth';
+export * from './schema/direct-chat-message';
 export * from './schema/public-chat-message';
