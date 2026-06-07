@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { user } from '$lib/auth.remote.js';
-	import { formPublicChat, loadPublicChat } from './chat.remote.js';
+	import { getUserSession } from '$lib/remote/auth.remote.js';
+	import { formPublicChat, loadPublicChat } from '$lib/remote/chat.remote.js';
 
-	const a = $derived(await user());
+	const a = $derived(await getUserSession());
 </script>
 
 <div class="container">
@@ -17,9 +17,9 @@
 	</div>
 
 	<form
-		{...formPublicChat.enhance(async ({ form, submit }) => {
+		{...formPublicChat.enhance(async ({ element, submit }) => {
 			if (await submit()) {
-				form.reset();
+				element.reset();
 				// TODO: Send the new message to the server via WebSocket
 			}
 		})}
