@@ -4,7 +4,7 @@ import { form, getRequestEvent, query } from '$app/server';
 import * as schema from '$lib/schema/form/auth.js';
 import { auth } from '$lib/server/auth.js';
 import { db } from '$lib/server/db/index.js';
-import { userInfo } from '$lib/server/db/schema/user-info.js';
+import { userInfo } from '$lib/server/db/schema/index.js';
 
 export const signInEmail = form(schema.signInEmail, async (data) => {
 	try {
