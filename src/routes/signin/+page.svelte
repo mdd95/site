@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signInEmail, signUpEmail } from '$lib/auth.remote.js';
+	import { signInEmail, signUpEmail } from '$lib/remote/auth.remote.js';
 </script>
 
 <pre>
@@ -13,6 +13,7 @@
 </form>
 
 <form {...signUpEmail}>
+	<input {...signUpEmail.fields.username.as('text')} placeholder="Username" />
 	<input {...signUpEmail.fields.name.as('text')} placeholder="Name" />
 	<input {...signUpEmail.fields.email.as('email')} placeholder="Email address" />
 	<input {...signUpEmail.fields.password.as('password')} placeholder="Password" />

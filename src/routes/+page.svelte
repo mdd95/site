@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { signOut, user } from '$lib/auth.remote.js';
+	import { getUserSession, signOut } from '$lib/remote/auth.remote.js';
+
+	const userSession = getUserSession();
 </script>
 
-<pre>{JSON.stringify(await user(), null, 2)}</pre>
+<pre>{JSON.stringify(await userSession, null, 2)}</pre>
+
 <form {...signOut}>
 	<button type="submit">Sign out</button>
 </form>
