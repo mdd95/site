@@ -43,6 +43,13 @@
       "when": 1780827353943,
       "tag": "0005_fuzzy_mystique",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781364330022,
+      "tag": "0006_striped_zarda",
+      "breakpoints": true
     }
   ]
 }

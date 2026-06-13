@@ -9,6 +9,8 @@ export const userInfo = pgTable(
 		userId: text('user_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
+		avatarUrl: text('avatar_url'),
+		coverUrl: text('cover_url'),
 		bio: text('bio'),
 		birthdate: date('birthdate'),
 		location: text('location'),
