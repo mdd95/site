@@ -5,15 +5,11 @@
 	const profile = $derived(await getUserProfile(params.id));
 </script>
 
-<svelte:head>
-	<title>{profile?.user.username}</title>
-</svelte:head>
-
-<div class="page">
+<div class="layout">
 	<div class="cover">
 		<img src="https://picsum.photos/id/13/2500/1667" alt="Cover" />
 	</div>
-	<div class="header">
+	<div class="avatar">
 		<img src="https://i.pravatar.cc/300?u=3fase" alt="Profile" />
 	</div>
 	<div class="content">
@@ -23,41 +19,39 @@
 	</div>
 </div>
 
-<pre>{JSON.stringify(profile, null, 2)}</pre>
-
 <style>
+	.layout {
+		margin: 0 auto;
+		padding-top: 3rem;
+		width: min(45rem, 100% - 2rem);
+	}
+
 	.cover {
-		height: 16rem;
+		height: clamp(12rem, 35vw, 16rem);
+		border-radius: var(--radius);
 		overflow: hidden;
-
-		& img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			object-position: center;
-		}
 	}
 
-	.header {
-		display: flex;
-		justify-content: center;
-		margin-top: -4.5rem;
-	}
-
-	.header img {
-		width: 9rem;
+	.avatar {
+		margin: -4rem auto 0;
+		width: 8rem;
 		aspect-ratio: 1;
-		border: 0.325rem solid white;
-		border-radius: calc(infinity * 1px);
-		transition: transform 0.3s ease-in-out;
-		cursor: pointer;
+		border-radius: var(--capsule);
+		overflow: hidden;
+	}
 
-		&:hover {
-			transform: scale(1.05);
-		}
+	:where(.cover, .avatar) img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
 	}
 
 	.content {
 		text-align: center;
+
+		& :where(h1, p) {
+			margin: 0;
+		}
 	}
 </style>
