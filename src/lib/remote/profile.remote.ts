@@ -32,6 +32,8 @@ export const updateUserProfile = form(
 	v.object({
 		email: v.pipe(v.string(), v.email()),
 		name: v.pipe(v.string(), v.maxLength(64)),
+		avatarUrl: v.string(),
+		coverUrl: v.string(),
 		bio: v.pipe(v.string(), v.maxLength(200))
 	}),
 	async (data) => {
@@ -53,7 +55,9 @@ export const updateUserProfile = form(
 				db
 					.update(userInfo)
 					.set({
-						bio: data.bio
+						bio: data.bio,
+						coverUrl: data.coverUrl,
+						avatarUrl: data.avatarUrl
 					})
 					.where(eq(userInfo.userId, locals.user.id))
 			]);

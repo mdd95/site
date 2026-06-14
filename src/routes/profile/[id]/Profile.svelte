@@ -22,7 +22,7 @@
 	<div class="header">
 		<div class="avatar">
 			{#if data.user_info?.avatarUrl}
-				<img src={data.user_info.coverUrl} alt="Profile" />
+				<img src={data.user_info.avatarUrl} alt="Profile" />
 			{/if}
 		</div>
 		<EditProfile {data} />
@@ -61,7 +61,7 @@
 	.avatar {
 		margin-left: 2rem;
 		width: 9rem;
-		aspect-ratio: 1;
+		height: 9rem;
 		background-color: oklch(50% 0 0);
 		border: 0.325rem solid var(--background);
 		border-radius: var(--capsule);
@@ -78,8 +78,8 @@
 	}
 
 	:where(.cover, .avatar) img {
-		width: 100%;
-		height: 100%;
+		width: 9rem;
+		height: 9rem;
 		object-fit: cover;
 		object-position: center;
 	}
