@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { UserProfile } from '$lib/remote/profile.remote.js';
+	import EditProfile from './EditProfile.svelte';
 
 	type Props = {
 		data: UserProfile;
@@ -24,7 +25,7 @@
 				<img src={data.user_info.coverUrl} alt="Profile" />
 			{/if}
 		</div>
-		<button>Edit Profile</button>
+		<EditProfile {data} />
 	</div>
 	<div class="content">
 		<h1>{data.user.name}</h1>

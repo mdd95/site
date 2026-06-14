@@ -1,5 +1,3 @@
-import { message } from 'valibot';
-
 export type RequestErrorCode =
 	| 'BAD_REQUEST'
 	| 'UNAUTHORIZED'
@@ -24,8 +22,8 @@ function createRequestError(
 	status: number,
 	code: RequestErrorCode,
 	message?: string
-): RequestError {
-	return { status, code, message };
+): { error: RequestError } {
+	return { error: { status, code, message } };
 }
 
 export const RequestError = {
