@@ -1,6 +1,7 @@
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { registerWebSocket } from './src/websocket/server';
 
 export default defineConfig({
 	plugins: [
@@ -19,6 +20,17 @@ export default defineConfig({
 					include: [...config.include, '../drizzle.config.ts']
 				})
 			}
-		})
+		}),
+		{
+			name: 'websocket-server',
+			configureServer({ httpServer }) {
+				// @ts-ignore
+				if (httpServer) registerWebSocket(httpServer);
+			},
+			configurePreviewServer({ httpServer }) {
+				// @ts-ignore
+				if (httpServer) registerWebSocket(httpServer);
+			}
+		}
 	]
 });
