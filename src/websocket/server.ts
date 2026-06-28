@@ -1,11 +1,27 @@
-import { WebSocketServer } from 'ws';
+import { type WebSocket, WebSocketServer } from 'ws';
 import type { Server } from 'node:http';
 
 export const wss = new WebSocketServer({ noServer: true });
 
-wss.on('connection', (ws) => {
+const listeners = {
+	publicChat: new Set<WebSocket>()
+};
+
+function broadcast(listeners: Set<WebSocket>, data: any) {
+	listeners.forEach((ws) => {
+		if (ws.readyState === ws.OPEN) ws.send(data);
+	});
+}
+
+wss.on('connection', (ws, req) => {
+	if (req.url === '/ws/public-chat') {
+		listeners.publicChat.add(ws);
+	}
+
 	ws.on('message', (data) => {
-		ws.send(data);
+		if (req.url === '/ws/public-chat') {
+			broadcast(listeners.publicChat, data);
+		}
 	});
 });
 

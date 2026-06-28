@@ -8,7 +8,7 @@ export function useWebSocket(url: string, options: UseWebSocketOptions = {}) {
 	let ws: WebSocket;
 
 	const connect = () => {
-		ws = new WebSocket(url);
+		ws = new WebSocket(url.startsWith('ws://') ? url : `ws://${window.location.host}/ws${url}`);
 		ws.onmessage = (e) => options.onmessage?.(e);
 	};
 
