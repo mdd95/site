@@ -13,7 +13,11 @@ export default defineConfig({
 				experimental: { async: true }
 			},
 			adapter: adapter(),
-			experimental: { remoteFunctions: true },
+			experimental: {
+				explicitEnvironmentVariables: true,
+				handleRenderingErrors: true,
+				remoteFunctions: true
+			},
 			typescript: {
 				config: (config) => ({
 					...config,
