@@ -1,4 +1,4 @@
 import { server } from 'SERVER';
 import { registerWebSocket } from './server.js';
 
-registerWebSocket(server.server);
+registerWebSocket(server.server, process.env.SECRET);

@@ -1,5 +1,7 @@
-import { type WebSocket, WebSocketServer } from 'ws';
 import type { Server } from 'node:http';
+import * as cookie from 'cookie';
+import jwt from 'jsonwebtoken';
+import { type WebSocket, WebSocketServer } from 'ws';
 
 export const wss = new WebSocketServer({ noServer: true });
 
@@ -25,12 +27,28 @@ wss.on('connection', (ws, req) => {
 	});
 });
 
-export function registerWebSocket(server: Server) {
+export function registerWebSocket(server: Server, secret: string) {
 	server.on('upgrade', (req, socket, head) => {
-		if (req.url?.startsWith('/ws')) {
-			wss.handleUpgrade(req, socket, head, (ws) => {
-				wss.emit('connection', ws, req);
-			});
+		if (req.url?.startsWith('/app')) {
+			const cookies = cookie.parseCookie(req.headers.cookie ?? '');
+			const token = cookies.token;
+
+			if (!token) {
+				socket.destroy();
+				return;
+			}
+
+			try {
+				const decoded = jwt.verify(token, secret);
+				console.log(decoded);
+
+				wss.handleUpgrade(req, socket, head, (ws) => {
+					wss.emit('connection', ws, req);
+				});
+			} catch (err) {
+				socket.destroy();
+				return;
+			}
 		}
 	});
 }

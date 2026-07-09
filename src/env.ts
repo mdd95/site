@@ -1,6 +1,9 @@
 import { defineEnvVars } from '@sveltejs/kit/hooks';
 
 export const variables = defineEnvVars({
+	SECRET: {
+		public: false
+	},
 	ORIGIN: {
 		public: false
 	},
