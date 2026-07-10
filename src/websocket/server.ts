@@ -29,25 +29,29 @@ wss.on('connection', (ws, req) => {
 
 export function registerWebSocket(server: Server, secret: string) {
 	server.on('upgrade', (req, socket, head) => {
-		if (req.url?.startsWith('/app')) {
+		const url = new URL(req.url ?? '/', 'http://localhost:5173');
+		const match = url.pathname.match(/^\/app\/([^/]+)$/);
+		const slug = match?.at(1);
+
+		if (match && slug) {
 			const cookies = cookie.parseCookie(req.headers.cookie ?? '');
-			const token = cookies.token;
+			const token = cookies['app.token'];
 
 			if (!token) {
+				console.log('No token provided');
 				socket.destroy();
 				return;
 			}
 
 			try {
 				const decoded = jwt.verify(token, secret);
-				console.log(decoded);
 
 				wss.handleUpgrade(req, socket, head, (ws) => {
-					wss.emit('connection', ws, req);
+					wss.emit('connection', ws, req, decoded, slug);
 				});
 			} catch (err) {
+				console.log('Invalid token', err);
 				socket.destroy();
-				return;
 			}
 		}
 	});
