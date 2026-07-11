@@ -17,7 +17,7 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 			SECRET,
 			{ expiresIn: '1h' }
 		);
-		event.cookies.set('token', token, { path: '/' });
+		event.cookies.set('app.token', token, { path: '/' });
 	}
 	return svelteKitHandler({ event, resolve, auth, building });
 };

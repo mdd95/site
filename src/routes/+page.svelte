@@ -1,12 +1,12 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { getUserSession, signOut } from '$lib/remote/auth.remote.js';
-	import { onMount } from 'svelte';
 
 	const userSession = getUserSession();
 
 	onMount(() => {
-		const ws = new WebSocket('ws://localhost:5173/app/chat');
+		const ws = new WebSocket(`ws://localhost:3000/app/chat`);
 	});
 </script>
 

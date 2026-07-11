@@ -7,6 +7,10 @@ export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 
 	return {
+		server: {
+			host: env.HOST ?? '0.0.0.0',
+			port: parseInt(env.PORT ?? '3000')
+		},
 		plugins: [
 			sveltekit({
 				compilerOptions: {
@@ -31,12 +35,24 @@ export default defineConfig(({ mode }) => {
 			{
 				name: 'websocket-server',
 				configureServer({ httpServer }) {
-					// @ts-ignore
-					if (httpServer) registerWebSocket(httpServer, env.SECRET);
+					if (httpServer) {
+						registerWebSocket({
+							origin: env.ORIGIN,
+							secret: env.SECRET,
+							// @ts-ignore
+							server: httpServer
+						});
+					}
 				},
 				configurePreviewServer({ httpServer }) {
-					// @ts-ignore
-					if (httpServer) registerWebSocket(httpServer, env.SECRET);
+					if (httpServer) {
+						registerWebSocket({
+							origin: env.ORIGIN,
+							secret: env.SECRET,
+							// @ts-ignore
+							server: httpServer
+						});
+					}
 				}
 			}
 		]

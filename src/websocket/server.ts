@@ -1,4 +1,4 @@
-import type { Server } from 'node:http';
+import type { IncomingMessage, Server } from 'node:http';
 import * as cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import { type WebSocket, WebSocketServer } from 'ws';
@@ -15,21 +15,30 @@ function broadcast(listeners: Set<WebSocket>, data: any) {
 	});
 }
 
-wss.on('connection', (ws, req) => {
-	if (req.url === '/ws/public-chat') {
-		listeners.publicChat.add(ws);
-	}
-
-	ws.on('message', (data) => {
+wss.on(
+	'connection',
+	(ws: WebSocket, req: IncomingMessage, user: Record<string, unknown>, slug: string) => {
 		if (req.url === '/ws/public-chat') {
-			broadcast(listeners.publicChat, data);
+			listeners.publicChat.add(ws);
 		}
-	});
-});
 
-export function registerWebSocket(server: Server, secret: string) {
+		ws.on('message', (data) => {
+			if (req.url === '/ws/public-chat') {
+				broadcast(listeners.publicChat, data);
+			}
+		});
+	}
+);
+
+type RegisterWebSocketOptions = {
+	origin: string;
+	secret: string;
+	server: Server;
+};
+
+export function registerWebSocket({ origin, secret, server }: RegisterWebSocketOptions) {
 	server.on('upgrade', (req, socket, head) => {
-		const url = new URL(req.url ?? '/', 'http://localhost:5173');
+		const url = new URL(req.url ?? '/', origin);
 		const match = url.pathname.match(/^\/app\/([^/]+)$/);
 		const slug = match?.at(1);
 
