@@ -12,11 +12,12 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 		event.locals.session = session.session;
 		event.locals.user = session.user;
 
-		const token = await jwt.sign(
-			{ name: session.user.name, email: session.user.email },
-			SECRET,
-			{ expiresIn: '1h' }
-		);
+		const data = {
+			id: session.user.id,
+			email: session.user.email,
+			name: session.user.name
+		};
+		const token = jwt.sign(data, SECRET, { expiresIn: '1h' });
 		event.cookies.set('app.token', token, { path: '/' });
 	}
 	return svelteKitHandler({ event, resolve, auth, building });
