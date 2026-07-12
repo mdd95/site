@@ -14,37 +14,33 @@ function forwardTo(clients: Map<string, WebSocket>, data: any) {
 	}
 }
 
-type User = {
-	id: string;
-	email: string;
-	name: string;
-};
-type Data = {
-	url: URL;
-	user: User;
+type ConnectionData = {
 	slug: string;
+	url: URL;
+	user: Record<string, any>;
 };
-wss.on('connection', (ws: WebSocket, req: IncomingMessage, data: Data) => {
-	switch (data.slug) {
+wss.on('connection', (ws: WebSocket, req: IncomingMessage, conn: ConnectionData) => {
+	switch (conn.slug) {
 		case 'chat':
-			const roomId = data.url.searchParams.get('id');
+			const roomId = conn.url.searchParams.get('id');
 			if (roomId) {
 				const room = rooms.getOrInsert(roomId, new Map());
-				room.set(data.user.id, ws);
+				room.set(conn.user.id, ws);
 			}
 			break;
-
 		default:
 			break;
 	}
-	ws.on('message', (msg) => {
-		switch (data.slug) {
+	ws.on('message', (data) => {
+		switch (conn.slug) {
 			case 'chat':
-				const roomId = data.url.searchParams.get('id');
+				const roomId = conn.url.searchParams.get('id');
 				if (roomId) {
 					const room = rooms.get(roomId)!;
-					forwardTo(room, msg);
+					forwardTo(room, data);
 				}
+				break;
+			default:
 				break;
 		}
 	});
