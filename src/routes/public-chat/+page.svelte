@@ -2,23 +2,32 @@
 	import { useWebSocket } from '$lib/hooks/use-websocket.js';
 	import { getMessages, sendMessage } from './public-chat.remote.js';
 
+	let messages = getMessages();
+
 	const { sendJson } = useWebSocket('/public-chat', {
-		onmessage: () => {
-			getMessages().refresh();
+		onmessage: (data) => {
+			messages.withOverride((messages) => [
+				...messages,
+				{
+					id: Date.now().toString(),
+					content: data.content,
+					senderId: '',
+					createdAt: new Date()
+				}
+			]);
 		}
 	});
 </script>
 
-{#each await getMessages() as message (message.id)}
+{#each await messages as message (message.id)}
 	<div>{message.content}</div>
 {/each}
 
 <form
 	{...sendMessage.enhance(async (form) => {
-		if (await form.submit()) {
-			form.element.reset();
-			sendJson({});
-		}
+		await form.submit().updates(messages.withOverride((messages) => messages));
+		sendJson({ _type: 'message', content: form.fields.content.value() });
+		form.element.reset();
 	})}
 >
 	<textarea {...sendMessage.fields.content.as('text')}></textarea>

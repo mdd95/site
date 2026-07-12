@@ -21,5 +21,6 @@ export const sendMessage = form(
 				content: data.content
 			});
 		}
+		void getMessages().refresh();
 	}
 );
