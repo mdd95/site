@@ -2,19 +2,9 @@ import * as cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import type { IncomingMessage, Server } from 'node:http';
 import { type WebSocket, WebSocketServer } from 'ws';
+import { public_chat } from './app/public-chat';
 
 export const wss = new WebSocketServer({ noServer: true });
-
-const rooms = new Map<string, Set<WebSocket>>();
-rooms.set('public-chat', new Set());
-
-function send(clients: Set<WebSocket>, data: any) {
-	for (const ws of clients) {
-		if (ws.readyState === ws.OPEN) {
-			ws.send(data);
-		}
-	}
-}
 
 type ConnectionData = {
 	slug: string;
@@ -22,32 +12,13 @@ type ConnectionData = {
 	user: Record<string, any>;
 };
 wss.on('connection', (ws: WebSocket, req: IncomingMessage, conn: ConnectionData) => {
-	const cleanup = new Set<() => void>();
-
 	switch (conn.slug) {
 		case 'public-chat':
-			const room = rooms.get('public-chat')!;
-			room.add(ws);
-			cleanup.add(() => room.delete(ws));
+			public_chat(ws);
 			break;
 		default:
 			break;
 	}
-
-	ws.on('message', (data) => {
-		switch (conn.slug) {
-			case 'public-chat':
-				const room = rooms.get('public-chat')!;
-				send(room, data);
-				break;
-			default:
-				break;
-		}
-	});
-
-	ws.on('close', () => {
-		for (const fn of cleanup) fn();
-	});
 });
 
 type RegisterWebSocketOptions = {

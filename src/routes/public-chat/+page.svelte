@@ -3,13 +3,14 @@
 	import { getMessages, sendMessage } from './public-chat.remote.js';
 
 	let messages = getMessages();
+	let counter = 0;
 
 	const { sendJson } = useWebSocket('/public-chat', {
 		onmessage: (data) => {
 			messages.withOverride((messages) => [
 				...messages,
 				{
-					id: Date.now().toString(),
+					id: String(counter++),
 					content: data.content,
 					senderId: '',
 					createdAt: new Date()
