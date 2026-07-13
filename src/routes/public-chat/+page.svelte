@@ -3,19 +3,10 @@
 	import { getMessages, sendMessage } from './public-chat.remote.js';
 
 	let messages = getMessages();
-	let counter = 0;
 
 	const { sendJson } = useWebSocket('/public-chat', {
 		onmessage: (data) => {
-			messages.withOverride((messages) => [
-				...messages,
-				{
-					id: String(counter++),
-					content: data.content,
-					senderId: '',
-					createdAt: new Date()
-				}
-			]);
+			messages.withOverride((messages) => [...messages, data.data]);
 		}
 	});
 </script>
@@ -26,9 +17,10 @@
 
 <form
 	{...sendMessage.enhance(async (form) => {
-		await form.submit().updates(messages.withOverride((messages) => messages));
-		sendJson({ _type: 'message', content: form.fields.content.value() });
-		form.element.reset();
+		if (await form.submit()) {
+			form.element.reset();
+			sendJson({ _type: 'message', data: form.result?.data });
+		}
 	})}
 >
 	<textarea {...sendMessage.fields.content.as('text')}></textarea>

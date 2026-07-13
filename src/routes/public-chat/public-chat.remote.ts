@@ -15,11 +15,15 @@ export const sendMessage = form(
 	async (data) => {
 		const { locals } = getRequestEvent();
 		if (locals.user) {
-			await db.insert(publicChatMessage).values({
-				id: generateId(),
-				senderId: locals.user.id,
-				content: data.content
-			});
+			const result = await db
+				.insert(publicChatMessage)
+				.values({
+					id: generateId(),
+					senderId: locals.user.id,
+					content: data.content
+				})
+				.returning();
+			return { data: result[0] };
 		}
 		void getMessages().refresh();
 	}
