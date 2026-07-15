@@ -12,13 +12,10 @@ type ConnectionData = {
 	user: Record<string, any>;
 };
 wss.on('connection', (ws: WebSocket, req: IncomingMessage, conn: ConnectionData) => {
-	switch (conn.slug) {
-		case 'public-chat':
-			public_chat(ws);
-			break;
-		default:
-			break;
-	}
+	const handler: Record<string, (ws: WebSocket) => void> = {
+		'public-chat': public_chat
+	};
+	handler[conn.slug](ws);
 });
 
 type RegisterWebSocketOptions = {
