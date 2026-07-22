@@ -1,24 +1,30 @@
 <script lang="ts">
 	import { io, type Socket } from 'socket.io-client';
-	import { getUser } from '$lib/remote/auth.remote.js';
+	import { onMount } from 'svelte';
 	import { getMessages, sendMessage } from './public-chat.remote.js';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
 
 	let messages = getMessages();
+	let socket: Socket | undefined;
 
-	const user = $derived(await getUser());
-	let socket: Socket;
+	onMount(() => {
+		if (!data.user?.token) return;
 
-	$effect(() => {
 		socket = io({
-			auth: { token: user?.token }
+			auth: {
+				token: data.user.token,
+				room: 'public-chat'
+			}
 		});
 
 		socket.on('chat message', (data) => {
-			messages.withOverride((messages) => [...messages, data.data]);
+			messages.withOverride((current) => [...current, data.data]);
 		});
 
 		() => {
-			socket.close();
+			socket?.disconnect();
 		};
 	});
 </script>
@@ -31,7 +37,7 @@
 	{...sendMessage.enhance(async (form) => {
 		if (await form.submit()) {
 			form.element.reset();
-			socket.emit('chat message', { data: form.result?.data });
+			socket?.emit('chat message', { data: form.result?.data });
 		}
 	})}
 >

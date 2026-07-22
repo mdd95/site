@@ -5,11 +5,12 @@ export function registerSocketIO(server: import('http').Server, secret: string) 
 	const io = new Server(server);
 
 	io.use((socket, next) => {
-		const token = socket.handshake.auth.token;
+		const { room, token } = socket.handshake.auth;
 		if (!token) return next(new Error('Missing token'));
 		try {
 			const payload = jwt.verify(token, secret);
 			socket.data.user = payload;
+			socket.data.room = room;
 			next();
 		} catch {
 			next(new Error(`Invalid token: ${token}`));
@@ -19,8 +20,17 @@ export function registerSocketIO(server: import('http').Server, secret: string) 
 	io.on('connection', (socket) => {
 		console.log('Connected:', socket.data.user);
 
+		const room = socket.data.room;
+		switch (room) {
+			case 'public-chat':
+				socket.join(room);
+				break;
+			default:
+				break;
+		}
+
 		socket.on('chat message', (data) => {
-			socket.broadcast.emit('chat message', data);
+			socket.to(room).emit('chat message', data);
 		});
 	});
 }
