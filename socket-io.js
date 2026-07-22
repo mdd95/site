@@ -5,9 +5,9 @@ import { rolldown } from 'rolldown';
  * @param {string} to
  * @returns {import('rolldown').Plugin}
  */
-function postReplace(from, to) {
+function replace(from, to) {
 	return {
-		name: 'post-replace',
+		name: 'replace',
 		generateBundle(_, bundle) {
 			for (const file of Object.values(bundle)) {
 				if (file.type === 'chunk') {
@@ -19,10 +19,10 @@ function postReplace(from, to) {
 }
 
 const builder = await rolldown({
-	input: 'src/websocket/entry.ts',
-	external: ['SERVER'],
+	input: 'src/socket-io/entry.ts',
+	external: ['SERVER', 'jsonwebtoken', 'socket.io'],
 	platform: 'node',
-	plugins: [postReplace('SERVER', './index.js')]
+	plugins: [replace('SERVER', './index.js')]
 });
 
 await builder.write({

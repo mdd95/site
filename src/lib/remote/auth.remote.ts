@@ -1,5 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { generateId } from 'better-auth';
+import jwt from 'jsonwebtoken';
+import { SECRET } from '$app/env/private';
 import { form, getRequestEvent, query } from '$app/server';
 import * as schema from '$lib/schema/form/auth.js';
 import { auth } from '$lib/server/auth.js';
@@ -36,13 +38,19 @@ export const signOut = form('unchecked', async () => {
 	} catch (err) {}
 });
 
-export const getUserSession = query(async () => {
+export const getUser = query(async () => {
 	const { request } = getRequestEvent();
 
 	try {
 		const result = await auth.api.getSession({
 			headers: request.headers
 		});
-		return result;
+
+		if (!result) throw new Error();
+
+		const { session, user } = result;
+		const token = jwt.sign(user, SECRET);
+
+		return { data: user, session, token };
 	} catch (err) {}
 });

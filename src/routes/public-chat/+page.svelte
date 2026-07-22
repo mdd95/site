@@ -1,13 +1,25 @@
 <script lang="ts">
-	import { useWebSocket } from '$lib/hooks/use-websocket.js';
+	import { io, type Socket } from 'socket.io-client';
+	import { getUser } from '$lib/remote/auth.remote.js';
 	import { getMessages, sendMessage } from './public-chat.remote.js';
 
 	let messages = getMessages();
 
-	const { sendJson } = useWebSocket('/public-chat', {
-		onmessage: (data) => {
+	const user = $derived(await getUser());
+	let socket: Socket;
+
+	$effect(() => {
+		socket = io({
+			auth: { token: user?.token }
+		});
+
+		socket.on('chat message', (data) => {
 			messages.withOverride((messages) => [...messages, data.data]);
-		}
+		});
+
+		() => {
+			socket.close();
+		};
 	});
 </script>
 
@@ -19,7 +31,7 @@
 	{...sendMessage.enhance(async (form) => {
 		if (await form.submit()) {
 			form.element.reset();
-			sendJson({ _type: 'message', data: form.result?.data });
+			socket.emit('chat message', { data: form.result?.data });
 		}
 	})}
 >

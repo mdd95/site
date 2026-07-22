@@ -1,7 +1,7 @@
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, loadEnv } from 'vite';
-import { registerWebSocket } from './src/websocket/server';
+import { registerSocketIO } from './src/socket-io/server.js';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
@@ -36,22 +36,12 @@ export default defineConfig(({ mode }) => {
 				name: 'websocket-server',
 				configureServer({ httpServer }) {
 					if (httpServer) {
-						registerWebSocket({
-							origin: env.ORIGIN,
-							secret: env.SECRET,
-							// @ts-ignore
-							server: httpServer
-						});
+						registerSocketIO(httpServer as import('http').Server, env.SECRET);
 					}
 				},
 				configurePreviewServer({ httpServer }) {
 					if (httpServer) {
-						registerWebSocket({
-							origin: env.ORIGIN,
-							secret: env.SECRET,
-							// @ts-ignore
-							server: httpServer
-						});
+						registerSocketIO(httpServer as import('http').Server, env.SECRET);
 					}
 				}
 			}
