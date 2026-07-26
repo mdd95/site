@@ -23,8 +23,8 @@ export const sendMessage = form(
 					content: data.content
 				})
 				.returning();
+			void getMessages().refresh();
 			return { data: result[0] };
 		}
-		void getMessages().refresh();
 	}
 );

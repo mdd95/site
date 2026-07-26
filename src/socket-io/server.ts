@@ -29,8 +29,8 @@ export function registerSocketIO(server: import('http').Server, secret: string) 
 				break;
 		}
 
-		socket.on('chat message', (data) => {
-			socket.to(room).emit('chat message', data);
+		socket.on('chat:message', (data) => {
+			socket.to(room).emit('chat:message', data);
 		});
 	});
 }
