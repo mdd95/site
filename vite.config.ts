@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
 				}
 			}),
 			{
-				name: 'websocket-server',
+				name: 'socket-io',
 				configureServer({ httpServer }) {
 					if (httpServer) {
 						registerSocketIO(httpServer as import('http').Server, env.SECRET);
