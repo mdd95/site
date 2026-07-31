@@ -73,12 +73,6 @@
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		background: #f4f6f9;
-		font-family: system-ui, sans-serif;
-	}
-
 	.chat-window {
 		width: min(900px, 100%);
 		height: calc(100vh - 40px);
