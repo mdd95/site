@@ -3,10 +3,9 @@
 
 	--color-base: light-dark(oklch(97% 0 0), oklch(17% 0 0));
 	--color-base-text: light-dark(oklch(22% 0 0), oklch(93% 0 0));
-	--color-primary: ;
-	--color-primary-text: ;
-	--color-secondary: ;
-	--color-secondary-text: ;
+	--color-primary: oklch(62% 0.19 258);
+	--color-primary-text: oklch(93% 0 0);
+	--color-secondary: light-dark(oklch(92% 0 0), oklch(26% 0 0));
 
 	--border-radius: 0.5rem;
 	--border-capsule: calc(infinity * 1px);
@@ -35,8 +34,17 @@ html {
 
 button {
 	padding: 0.625rem 0.875rem;
-	background: oklch(from var(--color-base) calc(l + 0.1) c h);
+	background: var(--color-secondary);
 	border-radius: var(--border-radius);
 	cursor: pointer;
 	font: inherit;
+}
+
+.primary {
+	background-color: var(--color-primary);
+	color: var(--color-primary-text);
+}
+
+.secondary {
+	background-color: var(--color-secondary);
 }
