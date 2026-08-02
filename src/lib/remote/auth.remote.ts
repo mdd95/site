@@ -9,48 +9,40 @@ import { db } from '$lib/server/db/index.js';
 import { userInfo } from '$lib/server/db/schema/index.js';
 
 export const signInEmail = form(schema.signInEmail, async (data) => {
-	try {
-		await auth.api.signInEmail({ body: data });
-		redirect(302, '/');
-	} catch (err) {}
+	await auth.api.signInEmail({ body: data });
+	redirect(302, '/');
 });
 
 export const signUpEmail = form(schema.signUpEmail, async (data) => {
-	try {
-		const result = await auth.api.signUpEmail({ body: data });
+	const result = await auth.api.signUpEmail({ body: data });
 
-		await db.insert(userInfo).values({
-			id: generateId(),
-			userId: result.user.id
-		});
-		redirect(302, '/');
-	} catch (err) {}
+	await db.insert(userInfo).values({
+		id: generateId(),
+		userId: result.user.id
+	});
+	redirect(302, '/');
 });
 
 export const signOut = form('unchecked', async () => {
 	const { request } = getRequestEvent();
 
-	try {
-		await auth.api.signOut({
-			headers: request.headers
-		});
-		redirect(302, '/signin');
-	} catch (err) {}
+	await auth.api.signOut({
+		headers: request.headers
+	});
+	redirect(302, '/signin');
 });
 
 export const getUser = query(async () => {
 	const { request } = getRequestEvent();
 
-	try {
-		const result = await auth.api.getSession({
-			headers: request.headers
-		});
+	const result = await auth.api.getSession({
+		headers: request.headers
+	});
 
-		if (!result) throw new Error();
+	if (!result) return { data: null, session: null, token: null };
 
-		const { session, user } = result;
-		const token = jwt.sign(user, SECRET);
+	const { session, user } = result;
+	const token = jwt.sign(user, SECRET);
 
-		return { data: user, session, token };
-	} catch (err) {}
+	return { data: user, session, token };
 });
