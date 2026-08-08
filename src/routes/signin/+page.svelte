@@ -9,7 +9,7 @@
 		{const { fields } = signInEmail}
 		<input {...fields.email.as('email')} placeholder="Email address" />
 		<input {...fields.password.as('password')} placeholder="Password" />
-		<button type="submit">Sign In</button>
+		<button type="submit" class="secondary">Sign In</button>
 	</form>
 </div>
 <hr />
@@ -24,7 +24,7 @@
 		<input {...fields.password.as('password')} placeholder="Password" />
 		<input {...fields.passwordConfirm.as('password')} placeholder="Confirm password" />
 		<span>{signUpEmail.fields.passwordConfirm.issues()?.at(0)?.message}</span>
-		<button type="submit" class="">Sign Up</button>
+		<button type="submit" class="secondary">Sign Up</button>
 	</form>
 </div>
 
@@ -38,6 +38,7 @@
 		width: 100%;
 		margin: 0.5rem 0 0;
 		padding: 0.625rem 0.875rem;
+		background-color: var(--color-base-elevated);
 		border-radius: var(--border-radius);
 		font: inherit;
 	}
