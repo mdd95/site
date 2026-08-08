@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '@fontsource-variable/inter/wght.css';
 	import '../app.css';
 	import { dev } from '$app/env';
 	import favicon from '$lib/assets/favicon.svg';
