@@ -48,7 +48,8 @@ button,
 	padding: 0.625rem 0.875rem;
 	background: transparent;
 	border-radius: var(--border-radius);
-	font: inherit;
+	font-family: inherit;
+	font-size: 0.875rem;
 }
 
 .primary {

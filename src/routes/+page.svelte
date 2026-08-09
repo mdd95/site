@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { Moon, Sun } from 'lucide';
+	import { MorphIcon } from 'morphicons/svelte';
 	import { resolve } from '$app/paths';
 	import { getUser, signOut } from '$lib/remote/auth.remote.js';
 
+	let open = $state(false);
 	let mode = 'light';
 	function toggle() {
 		mode = mode === 'light' ? 'dark' : 'light';
@@ -9,16 +12,27 @@
 	}
 </script>
 
-<div class="page">
+<div class="container">
 	<header>
-		<a href={resolve('/public-chat')}>Public Chat</a>
-		<a href={resolve('/signin')} class="btn">Sign in</a>
-
-		{#if await getUser()}
-			<form {...signOut}>
-				<button type="submit">Sign out</button>
-			</form>
-		{/if}
+		<div><a href="/">mjayar</a></div>
+		<nav aria-label="primary">
+			<ul>
+				<li><a href={resolve('/')} class="btn">Home</a></li>
+				<li><a href={resolve('/projects')} class="btn">Projects</a></li>
+			</ul>
+		</nav>
+		<div class="actions">
+			<button class="icon secondary" onclick={() => (open = !open)}>
+				<MorphIcon icon={open ? Sun : Moon} size="20" />
+			</button>
+			{#if (await getUser()).data}
+				<form {...signOut}>
+					<button type="submit">Sign out</button>
+				</form>
+			{:else}
+				<a href={resolve('/signin')} class="btn">Sign in</a>
+			{/if}
+		</div>
 	</header>
 
 	<main>
@@ -35,10 +49,18 @@
 </div>
 
 <style>
-	.page {
+	.container {
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
+	}
+
+	header {
+		height: 3.5rem;
+		padding: 0 0.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	main {
@@ -49,11 +71,24 @@
 		flex-direction: column;
 	}
 
-	header {
-		padding: 0.5rem 0.75rem;
+	ul {
+		list-style: none;
 		display: flex;
-		justify-content: end;
-		align-items: center;
-		gap: 1rem;
+	}
+
+	.actions {
+		display: flex;
+
+		& > *:has(+ *) {
+			margin-inline-end: 0.5rem;
+		}
+	}
+
+	.icon {
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
+		display: grid;
+		place-items: center;
 	}
 </style>
