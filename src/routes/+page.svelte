@@ -3,34 +3,23 @@
 	import { MorphIcon } from 'morphicons/svelte';
 	import { resolve } from '$app/paths';
 	import { getUser, signOut } from '$lib/remote/auth.remote.js';
-
-	let open = $state(false);
-	let mode = 'light';
-	function toggle() {
-		mode = mode === 'light' ? 'dark' : 'light';
-		document.documentElement.style.colorScheme = mode;
-	}
+	import { mode, toggleMode } from 'mode-watcher';
 </script>
 
 <div class="container">
 	<header>
-		<div><a href="/">mjayar</a></div>
-		<nav aria-label="primary">
-			<ul>
-				<li><a href={resolve('/')} class="btn">Home</a></li>
-				<li><a href={resolve('/projects')} class="btn">Projects</a></li>
-			</ul>
-		</nav>
+		<div></div>
+		<nav aria-label="primary"></nav>
 		<div class="actions">
-			<button class="icon secondary" onclick={() => (open = !open)}>
-				<MorphIcon icon={open ? Sun : Moon} size="20" />
+			<button class="icon secondary" onclick={toggleMode}>
+				<MorphIcon icon={mode.current === 'light' ? Sun : Moon} size="20" />
 			</button>
 			{#if (await getUser()).data}
 				<form {...signOut}>
 					<button type="submit">Sign out</button>
 				</form>
 			{:else}
-				<a href={resolve('/signin')} class="btn">Sign in</a>
+				<a href={resolve('/signin')} class="btn secondary">Sign in</a>
 			{/if}
 		</div>
 	</header>
@@ -58,8 +47,8 @@
 	header {
 		height: 3.5rem;
 		padding: 0 0.5rem;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
 		align-items: center;
 	}
 
@@ -74,14 +63,13 @@
 	ul {
 		list-style: none;
 		display: flex;
+		justify-content: center;
 	}
 
 	.actions {
 		display: flex;
-
-		& > *:has(+ *) {
-			margin-inline-end: 0.5rem;
-		}
+		justify-content: end;
+		gap: 0.5rem;
 	}
 
 	.icon {

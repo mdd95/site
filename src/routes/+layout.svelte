@@ -5,6 +5,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import Debug from '$lib/components/debug.svelte';
 	import { getUser } from '$lib/remote/auth.remote.js';
+	import { ModeWatcher } from 'mode-watcher';
 
 	let { children } = $props();
 </script>
@@ -13,6 +14,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+<ModeWatcher />
 {@render children()}
 
 {#if dev}
