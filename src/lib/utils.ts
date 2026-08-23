@@ -1,13 +1,21 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+export function hexToRgb(hex: string): {
+	r: number;
+	g: number;
+	b: number;
+	toString: () => void;
+} | null {
+	const shorthand = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	hex = hex.replace(shorthand, (_, r, g, b) => r + r + g + g + b + b);
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result
+		? {
+				r: parseInt(result[1], 16),
+				g: parseInt(result[2], 16),
+				b: parseInt(result[3], 16),
+				toString() {
+					const { r, g, b } = this;
+					return `rgb(${r}, ${g}, ${b})`;
+				}
+			}
+		: null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WithoutChild<T> = T extends { child?: any } ? Omit<T, 'child'> : T;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'children'> : T;
-export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
-export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
