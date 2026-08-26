@@ -28,7 +28,7 @@
 		<div></div>
 		<nav aria-label="primary"></nav>
 		<div class="actions">
-			<button class="icon secondary" onclick={toggleMode}>
+			<button class="btn icon ghost" onclick={toggleMode}>
 				<MorphIcon icon={mode.current === 'light' ? Sun : Moon} size="20" />
 			</button>
 			{#if (await getUser()).data}
@@ -48,8 +48,9 @@
 		</p>
 
 		<div style="margin-top: 1rem;">
-			<button class="primary">Get Started</button>
-			<button onclick={toggleMode}>Toggle</button>
+			<button class="btn primary">Get Started</button>
+			<button onclick={toggleMode} class="btn secondary">Toggle</button>
+			<button class="btn success">Accept</button>
 		</div>
 	</main>
 </div>
