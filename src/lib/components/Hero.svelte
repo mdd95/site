@@ -17,6 +17,14 @@
 		align-items: center;
 	}
 
+	.content {
+		text-align: center;
+
+		@media (min-width: 576px) {
+			text-align: start;
+		}
+	}
+
 	.content *:has(+ *) {
 		margin-bottom: 2rem;
 	}
