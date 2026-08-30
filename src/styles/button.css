@@ -1,0 +1,67 @@
+.btn {
+	height: 2.5rem;
+	padding: 0 0.875rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	border: 1px solid transparent;
+	border-radius: var(--radius-md);
+	background-color: transparent;
+	color: var(--color-base-text);
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.25;
+	text-decoration: none;
+	user-select: none;
+	cursor: pointer;
+	transition:
+		background-color 150ms ease,
+		border-color 150ms ease,
+		color 150ms ease,
+		opacity 150ms ease;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.btn:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 2px;
+}
+
+.btn.primary {
+	background-color: var(--color-primary);
+	color: var(--color-primary-text);
+}
+
+.btn.secondary {
+	background-color: var(--color-secondary);
+	color: var(--color-secondary-text);
+}
+
+@media (hover: hover) {
+	.btn.primary:hover {
+		background-color: color-mix(in oklab, var(--color-primary) 90%, currentColor);
+	}
+
+	.btn.secondary:hover {
+		background-color: color-mix(in oklab, var(--color-secondary) 90%, currentColor);
+	}
+}
+
+.btn > svg {
+	width: 1rem;
+	height: 1rem;
+	flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.btn {
+		transition: none;
+	}
+}
