@@ -44,6 +44,11 @@
 	color: var(--color-secondary-text);
 }
 
+.btn.ghost {
+	background-color: transparent;
+	color: var(--color-base-text);
+}
+
 @media (hover: hover) {
 	.btn.primary:hover {
 		background-color: color-mix(in oklab, var(--color-primary) 90%, currentColor);
@@ -52,12 +57,29 @@
 	.btn.secondary:hover {
 		background-color: color-mix(in oklab, var(--color-secondary) 90%, currentColor);
 	}
+
+	.btn.ghost:hover {
+		background-color: var(--color-secondary);
+		color: var(--color-secondary-text);
+	}
 }
 
 .btn > svg {
 	width: 1rem;
 	height: 1rem;
 	flex-shrink: 0;
+}
+
+.btn.icon {
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0;
+	flex-shrink: 0;
+
+	& > svg {
+		width: 1.125rem;
+		height: 1.125rem;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
