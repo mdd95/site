@@ -3,7 +3,11 @@
 		<p class="greeting">HELLO, I'M</p>
 		<h1>mjayar</h1>
 		<h2>Registered Civil Engineer</h2>
-		<p class="introduction"></p>
+		<p class="introduction">I build clean, interactive, and useful digital experiences.</p>
+		<div class="actions">
+			<a href="#" class="btn primary">View My Work</a>
+			<a href="#" class="btn secondary">About me</a>
+		</div>
 	</div>
 </section>
 

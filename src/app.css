@@ -1,4 +1,7 @@
 :root {
+	--color-base-text: oklch(14.5% 0 none);
+	--color-primary: oklch(51.4% 0.222 16.935);
+	--color-primary-text: oklch(98.5% 0 none);
 	--color-border: rgb(0 0 0 / 0.09);
 
 	--radius-md: 0.5rem;
