@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Sun, Moon } from 'lucide';
+	import { MorphIcon } from 'morphicons/svelte';
+	import { mode, toggleMode } from 'mode-watcher';
 	import { resolve } from '$app/paths';
 </script>
 
@@ -14,8 +17,10 @@
 		</ul>
 	</nav>
 	<div class="actions">
-		<button aria-label="Toggle theme mode"></button>
-		<a href="#" class="signin">Sign In</a>
+		<button onclick={toggleMode} class="btn icon ghost" aria-label="Toggle theme mode">
+			<MorphIcon icon={mode.current === 'dark' ? Moon : Sun} size="20" />
+		</button>
+		<a href="#" class="btn ghost">Sign In</a>
 	</div>
 </header>
 
@@ -61,7 +66,10 @@
 		color: #555555;
 	}
 
-	.signin {
-		font-size: 0.875rem;
+	.actions {
+		display: flex;
+		align-items: center;
+		justify-content: end;
+		gap: 0.5rem;
 	}
 </style>
