@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SvelteDate } from 'svelte/reactivity';
+	import Clock from './Clock.svelte';
 
 	const viewDate = new SvelteDate();
 	const currentDate = new SvelteDate();
@@ -35,6 +36,8 @@
 <p>{formatter.format(currentDate)}</p>
 <p>{viewDate}</p>
 <p>{startDay}</p>
+
+<Clock />
 
 <div>
 	<button onclick={() => viewDate.setMonth(viewDate.getMonth() - 1)} class="btn secondary">
