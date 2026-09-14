@@ -6,68 +6,44 @@
 
 	let { year, month }: Props = $props();
 	const date = $derived(new Temporal.PlainDate(year, month, 1));
-	const start = $derived(date.dayOfWeek);
+	const start = $derived(date.dayOfWeek % 7);
 	const end = $derived(date.daysInMonth);
 </script>
 
 <div class="month">
-	<table>
-		<caption>
-			{new Intl.DateTimeFormat('en-PH', {
-				month: 'long'
-			}).format(date)}
-		</caption>
-		<thead>
-			<tr>
-				<th>S</th>
-				<th>M</th>
-				<th>T</th>
-				<th>W</th>
-				<th>T</th>
-				<th>F</th>
-				<th>S</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each { length: 6 }, w}
-				<tr>
-					{#each { length: 7 }, d}
-						{const i = w * 7 + d - start + 1}
-						{#if i <= 0 || i > end}
-							<td>
-								<div></div>
-							</td>
-						{:else}
-							<td>
-								<div>{i}</div>
-							</td>
-						{/if}
-					{/each}
-				</tr>
-			{/each}
-		</tbody>
-	</table>
+	<div class="header">
+		{new Intl.DateTimeFormat(undefined, {
+			month: 'long'
+		}).format(date)}
+	</div>
+	{const formatter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' })}
+	{#each Array.from({ length: 7 }, (_, i) => {
+		const date = new Date(2026, 8, 6 + i);
+		return formatter.format(date);
+	}) as weekday, i (i)}
+		<div>{weekday}</div>
+	{/each}
+	{#each { length: 42 }, i}
+		{#if i < start}
+			<div></div>
+		{:else if i >= start + end}
+			<div></div>
+		{:else}
+			{const date = new Temporal.PlainDate(year, month, i - start + 1)}
+			<div>{date.day}</div>
+		{/if}
+	{/each}
 </div>
 
 <style>
 	.month {
 		padding: 1rem;
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
 		border-radius: var(--radius-md);
 	}
 
-	table {
-		width: 100%;
-		table-layout: fixed;
-		border-collapse: collapse;
-	}
-
-	td div {
-		width: 1rem;
-		aspect-ratio: 1 / 1;
-		display: grid;
-		place-items: center;
-		border-radius: var(--radius-full);
-		font-size: 0.875rem;
-		text-align: center;
+	.header {
+		grid-column: span 7;
 	}
 </style>
