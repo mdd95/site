@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { SvelteDate } from 'svelte/reactivity';
 	import Clock from './Clock.svelte';
-	import Month from './view-year-month.svelte';
+	import YearView from './view-year.svelte';
 
 	const viewDate = new SvelteDate();
 	const currentDate = new SvelteDate();
@@ -71,11 +71,7 @@
 	{/each}
 </div>
 
-<div class="year">
-	{#each { length: 12 }, m}
-		<Month year={2026} month={m + 1} />
-	{/each}
-</div>
+<YearView year={2026} />
 
 <style>
 	.month-view {
@@ -106,13 +102,5 @@
 				background-color: rgb(0 0 0 / 5%);
 			}
 		}
-	}
-
-	.year {
-		width: min(80rem, 100%);
-		margin: 1rem auto;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(17.5rem, 1fr));
-		gap: 1rem;
 	}
 </style>
