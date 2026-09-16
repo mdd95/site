@@ -2,7 +2,7 @@
 	import '@fontsource-variable/inter/wght.css';
 	import '../app.css';
 	import '../styles/button.css';
-	// import 'temporal-polyfill/global';
+	import 'temporal-polyfill/global';
 	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
 
