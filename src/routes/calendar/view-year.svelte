@@ -4,6 +4,9 @@
 	};
 
 	let { year }: Props = $props();
+
+	const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'long' });
+	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
 </script>
 
 <div class="year-view">
@@ -13,22 +16,17 @@
 		{const daysInMonth = $derived(date.daysInMonth)}
 
 		<div class="month">
-			<div class="header">
-				{new Intl.DateTimeFormat(undefined, {
-					month: 'long'
-				}).format(date)}
-			</div>
-			{const formatter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' })}
+			<div class="header">{monthFmt.format(date)}</div>
+
 			{#each Array.from({ length: 7 }, (_, i) => {
 				const date = new Date(2026, 8, 6 + i);
-				return formatter.format(date);
+				return weekdayFmt.format(date);
 			}) as weekday, i (i)}
 				<div>{weekday}</div>
 			{/each}
+
 			{#each { length: 42 }, i}
-				{#if i < dayOfWeek}
-					<div></div>
-				{:else if i >= dayOfWeek + daysInMonth}
+				{#if i < dayOfWeek || i >= dayOfWeek + daysInMonth}
 					<div></div>
 				{:else}
 					{const date = new Temporal.PlainDate(year, month + 1, i - dayOfWeek + 1)}
