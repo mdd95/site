@@ -5,25 +5,24 @@
 	};
 
 	let { year, month }: Props = $props();
+
 	let date = $derived(new Temporal.PlainDate(year, month, 1));
 	let dayOfWeek = $derived(date.dayOfWeek % 7);
 	let daysInMonth = $derived(date.daysInMonth);
 
-	const formatter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
+	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
 </script>
 
 <div class="month-view">
 	{#each Array.from({ length: 7 }, (_, i) => {
 		const date = new Date(2026, 8, 6 + i);
-		return formatter.format(date);
+		return weekdayFmt.format(date);
 	}) as weekday, i (i)}
 		<div class="weekday">{weekday}</div>
 	{/each}
 
 	{#each { length: 42 }, i}
-		{#if i < dayOfWeek}
-			<div class="day"></div>
-		{:else if i >= dayOfWeek + daysInMonth}
+		{#if i < dayOfWeek || i >= dayOfWeek + daysInMonth}
 			<div class="day"></div>
 		{:else}
 			{const date = new Temporal.PlainDate(year, month, i - dayOfWeek + 1)}
