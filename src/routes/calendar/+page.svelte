@@ -2,21 +2,22 @@
 	import YearView from './view-year.svelte';
 	import MonthView from './view-month.svelte';
 
-	let viewDate = $state(Temporal.Now.plainDateISO(Temporal.Now.timeZoneId()).with({ day: 1 }));
+	let tab = $state(0);
 </script>
 
-<div>
-	<button onclick={() => (viewDate = viewDate.subtract({ months: 1 }))} class="btn secondary">
-		&lt;
-	</button>
-	<button onclick={() => (viewDate = viewDate.add({ months: 1 }))} class="btn secondary">
-		&gt;
-	</button>
+<div class="app">
+	<header>
+		<button onclick={() => (tab = 0)}>Year</button>
+		<button onclick={() => (tab = 1)}>Month</button>
+	</header>
+	<main>
+		{#if tab === 0}
+			<YearView />
+		{:else if tab === 1}
+			<MonthView />
+		{/if}
+	</main>
 </div>
-
-<h1>{new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(viewDate)}</h1>
-<MonthView year={viewDate.year} month={viewDate.month} />
-<YearView year={viewDate.year} />
 
 <style>
 </style>

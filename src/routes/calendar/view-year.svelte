@@ -1,17 +1,14 @@
 <script lang="ts">
-	type Props = {
-		year: number;
-	};
-
-	let { year }: Props = $props();
-
+	const today = Temporal.Now.plainDateISO(Temporal.Now.timeZoneId());
 	const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'long' });
 	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
+
+	let base = $state(today.with({ month: 1, day: 1 }));
 </script>
 
 <div class="year-view">
 	{#each { length: 12 }, month}
-		{const date = $derived(new Temporal.PlainDate(year, month + 1, 1))}
+		{const date = $derived(new Temporal.PlainDate(base.year, month + 1, 1))}
 		{const dayOfWeek = $derived(date.dayOfWeek % 7)}
 		{const daysInMonth = $derived(date.daysInMonth)}
 
@@ -29,7 +26,7 @@
 				{#if i < dayOfWeek || i >= dayOfWeek + daysInMonth}
 					<div></div>
 				{:else}
-					{const date = new Temporal.PlainDate(year, month + 1, i - dayOfWeek + 1)}
+					{const date = new Temporal.PlainDate(base.year, month + 1, i - dayOfWeek + 1)}
 					<div>{date.day}</div>
 				{/if}
 			{/each}
