@@ -1,7 +1,10 @@
 <script lang="ts">
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+
 	const today = Temporal.Now.plainDateISO(Temporal.Now.timeZoneId());
 	const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
-	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
+	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 
 	let date = $state(today.with({ day: 1 }));
 	let dayOfWeek = $derived(date.dayOfWeek % 7);
@@ -16,20 +19,20 @@
 </script>
 
 <div class="header">
-	<div class="headline">{monthFmt.format(date)}</div>
+	<h1>{monthFmt.format(date)}</h1>
 	<button
 		onclick={() => (date = date.subtract({ months: 1 }))}
-		class="btn secondary"
+		class="btn icon secondary"
 		aria-label="Previous month"
 	>
-		&lt;
+		<ChevronLeft size="20" />
 	</button>
 	<button
 		onclick={() => (date = date.add({ months: 1 }))}
-		class="btn secondary"
+		class="btn icon secondary"
 		aria-label="Next month"
 	>
-		&gt;
+		<ChevronRight size="20" />
 	</button>
 	<button
 		onclick={() => (date = today.with({ day: 1 }))}
@@ -69,8 +72,9 @@
 		gap: 0.5rem;
 	}
 
-	.headline {
+	h1 {
 		flex-grow: 1;
+		font-size: 1.25rem;
 		font-weight: 700;
 	}
 
