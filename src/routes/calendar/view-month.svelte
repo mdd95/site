@@ -1,6 +1,6 @@
 <script lang="ts">
 	const today = Temporal.Now.plainDateISO(Temporal.Now.timeZoneId());
-	const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
+	const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
 	const weekdayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
 
 	let date = $state(today.with({ day: 1 }));
@@ -17,9 +17,27 @@
 
 <div class="header">
 	<div class="headline">{monthFmt.format(date)}</div>
-	<button onclick={() => (date = date.subtract({ months: 1 }))}>&lt;</button>
-	<button onclick={() => (date = date.add({ months: 1 }))}>&gt;</button>
-	<button onclick={() => (date = today.with({ day: 1 }))}>Today</button>
+	<button
+		onclick={() => (date = date.subtract({ months: 1 }))}
+		class="btn secondary"
+		aria-label="Previous month"
+	>
+		&lt;
+	</button>
+	<button
+		onclick={() => (date = date.add({ months: 1 }))}
+		class="btn secondary"
+		aria-label="Next month"
+	>
+		&gt;
+	</button>
+	<button
+		onclick={() => (date = today.with({ day: 1 }))}
+		class="btn secondary"
+		aria-label="Today"
+	>
+		Today
+	</button>
 </div>
 
 <div class="month-view">
@@ -45,6 +63,7 @@
 
 <style>
 	.header {
+		padding: 0 1rem;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -52,6 +71,7 @@
 
 	.headline {
 		flex-grow: 1;
+		font-weight: 700;
 	}
 
 	.month-view {
