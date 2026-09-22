@@ -82,34 +82,36 @@
 		padding: 1rem;
 		display: grid;
 		grid-template-columns: repeat(7, minmax(0, 1fr));
-		gap: 0.25rem;
 	}
 
 	.weekday {
-		padding: 1rem 0.5rem;
-		color: #52617b;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		font-size: 0.875rem;
+		height: 3.5rem;
+		border-block: 1px solid var(--color-border);
+		display: grid;
+		place-items: center;
 		font-weight: 600;
-		text-align: center;
 	}
 
 	.day {
 		padding: 0.5rem;
 		height: 6rem;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
+		border-width: 0 1px 1px 0;
+		border-color: var(--color-border);
+		border-style: solid;
 
 		@media (hover: hover) {
 			&:hover {
 				background-color: rgb(0 0 0 / 5%);
 			}
 		}
+
+		&:nth-of-type(7n + 1) {
+			border-left: 1px solid var(--color-border);
+		}
 	}
 
 	.prev-month,
 	.next-month {
-		opacity: 0.5;
+		color: oklch(from var(--color-base-text) l c h / 0.5);
 	}
 </style>
