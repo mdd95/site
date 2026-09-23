@@ -7,8 +7,20 @@
 
 <div class="app">
 	<header>
-		<button onclick={() => (tab = 0)}>Year</button>
-		<button onclick={() => (tab = 1)}>Month</button>
+		<button
+			onclick={() => (tab = 0)}
+			class={['btn', tab === 0 ? 'primary' : 'secondary']}
+			aria-label="Year view"
+		>
+			Year
+		</button>
+		<button
+			onclick={() => (tab = 1)}
+			class={['btn', tab === 1 ? 'primary' : 'secondary']}
+			aria-label="Month view"
+		>
+			Month
+		</button>
 	</header>
 	<main>
 		{#if tab === 0}
@@ -20,4 +32,12 @@
 </div>
 
 <style>
+	header {
+		height: 4rem;
+		padding: 0 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: end;
+		gap: 0.5rem;
+	}
 </style>
