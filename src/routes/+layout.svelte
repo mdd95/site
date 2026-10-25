@@ -2,7 +2,7 @@
 	import '@fontsource-variable/inter/wght.css';
 	import '../app.css';
 	import '../styles/button.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '#lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
 
 	let { children } = $props();
