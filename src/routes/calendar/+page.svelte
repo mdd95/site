@@ -1,31 +1,37 @@
 <script lang="ts">
 	import YearView from './view-year.svelte';
 	import MonthView from './view-month.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 
-	let tab = $state(0);
+	const params = $derived(Object.fromEntries(page.url.searchParams));
 </script>
+
+<svelte:head>
+	<title>Calendar</title>
+</svelte:head>
 
 <div class="app">
 	<header>
 		<button
-			onclick={() => (tab = 0)}
-			class={['btn', tab === 0 ? 'primary' : 'secondary']}
+			onclick={() => goto('/calendar?view=year', { replace: true })}
+			class={['btn', params.view === 'year' ? 'primary' : 'secondary']}
 			aria-label="Year view"
 		>
 			Year
 		</button>
 		<button
-			onclick={() => (tab = 1)}
-			class={['btn', tab === 1 ? 'primary' : 'secondary']}
+			onclick={() => goto('/calendar?view=month', { replace: true })}
+			class={['btn', params.view === 'month' ? 'primary' : 'secondary']}
 			aria-label="Month view"
 		>
 			Month
 		</button>
 	</header>
 	<main>
-		{#if tab === 0}
+		{#if params.view === 'year'}
 			<YearView />
-		{:else if tab === 1}
+		{:else if params.view === 'month'}
 			<MonthView />
 		{/if}
 	</main>
