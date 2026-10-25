@@ -22,15 +22,12 @@
 ::before,
 ::after {
 	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	border: 0 solid;
 }
 
 html {
 	font-family: var(--font-sans);
-	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: transparent;
 }
 
 body {
