@@ -29,7 +29,7 @@
 		display: inline-flex;
 		align-items: center;
 		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius);
 	}
 
 	button {
@@ -54,7 +54,7 @@
 	}
 
 	.btn:focus-visible {
-		outline: 2px solid alpha(from var(--color-primary) / 50%);
+		outline: 2px solid var(--color-outline);
 		outline-offset: 2px;
 	}
 </style>

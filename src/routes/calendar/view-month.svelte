@@ -146,11 +146,11 @@
 
 	.prev-month,
 	.next-month {
-		color: oklch(from var(--color-base-text) l c h / 0.5);
+		color: var(--color-muted-text);
 	}
 
 	.today .day-number {
-		background: var(--color-primary, #5b5bf0);
+		background: var(--color-primary);
 		color: white;
 		font-weight: 700;
 	}
