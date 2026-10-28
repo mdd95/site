@@ -51,8 +51,11 @@
 			'events'
 			'tasks';
 	}
+	.sidenav {
+		display: none;
+	}
 
-	@media (min-width: 1080px) {
+	@media (width > 1080px) {
 		.app {
 			grid-template-columns: 18rem minmax(0, 1fr) 18rem;
 			grid-template-rows: 3.5rem auto auto;
@@ -60,6 +63,9 @@
 				'header  header header'
 				'sidenav main   events'
 				'sidenav main   tasks';
+		}
+		.sidenav {
+			display: block;
 		}
 	}
 
