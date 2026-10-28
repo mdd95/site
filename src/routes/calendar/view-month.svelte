@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-	const today = Temporal.Now.plainDateISO();
 	const locale = Intl.DateTimeFormat().resolvedOptions().locale;
 
 	const sunday = new Date(2023, 0, 1);
@@ -15,18 +15,6 @@
 		).toLocaleString(locale, { weekday: 'short' });
 	});
 
-	let date = $state(today.with({ day: 1 }));
-
-	const dayOfWeek = $derived(date.dayOfWeek % 7);
-	const daysInMonth = $derived(date.daysInMonth);
-
-	function navigateMonth(amount: number) {
-		date = date.add({ months: amount });
-	}
-
-	function goToToday() {
-		date = today.with({ day: 1 });
-	}
 	const x = $derived.by(() => {
 		const now = new Date();
 		const currentYear = now.getFullYear();
@@ -43,58 +31,58 @@
 		}
 		return { year, month };
 	});
+	const y = $derived.by(() => {
+		const t = new Temporal.PlainDate(x.year, x.month, 1);
+		return {
+			t,
+			dayOfWeek: t.dayOfWeek % 7,
+			daysInMonth: t.daysInMonth
+		};
+	});
+	function nav(offset: number) {
+		const date = new Date(x.year, x.month - 1 + offset, 1);
+		const y = date.getFullYear();
+		const m = String(date.getMonth() + 1).padStart(2, '0');
+		goto(`/calendar?view=month&p=${y}-${m}`);
+	}
 </script>
 
 <div class="header">
 	<h1>
-		{date.toLocaleString(locale, {
-			month: 'long',
-			year: 'numeric'
-		})}
+		{y.t.toLocaleString(locale, { month: 'long', year: 'numeric' })}
 	</h1>
-
-	<button
-		onclick={() => navigateMonth(-1)}
-		class="btn icon secondary"
-		aria-label="Previous month"
-	>
+	<button onclick={() => nav(-1)} class="btn icon secondary" aria-label="Previous month">
 		<ChevronLeft size={20} />
 	</button>
-
-	<button onclick={() => navigateMonth(1)} class="btn icon secondary" aria-label="Next month">
+	<button onclick={() => nav(1)} class="btn icon secondary" aria-label="Next month">
 		<ChevronRight size={20} />
 	</button>
-
-	<button onclick={goToToday} class="btn secondary"> Today </button>
+	<button onclick={() => {}} class="btn secondary"> Today </button>
 </div>
 
-<div
-	class="month-view"
-	aria-label={date.toLocaleString(locale, {
-		month: 'long',
-		year: 'numeric'
-	})}
->
+<div class="month-view" aria-label={y.t.toLocaleString(locale, { month: 'long', year: 'numeric' })}>
 	{#each weekdays as weekday, i (i)}
 		<div class="weekday">{weekday}</div>
 	{/each}
 
 	{#each { length: 42 } as _, i (i)}
-		{const cellDate = $derived(date.subtract({ days: dayOfWeek - i }))}
+		{const t = $derived(
+			new Temporal.PlainDate(x.year, x.month, 1).subtract({ days: y.dayOfWeek - i })
+		)}
 		<!-- {const isCurrentMonth = $derived(i >= dayOfWeek && i < dayOfWeek + daysInMonth)} -->
-		{const isToday = $derived(cellDate.equals(today))}
+		{const isToday = $derived(y.t.equals(Temporal.Now.plainDateISO()))}
 
 		<div
 			class={[
 				'day',
-				i < dayOfWeek && 'prev-month',
-				i >= dayOfWeek + daysInMonth && 'next-month',
+				i < y.dayOfWeek && 'prev-month',
+				i >= y.dayOfWeek + y.daysInMonth && 'next-month',
 				isToday && 'today'
 			]}
-			aria-label={cellDate.toLocaleString(locale, { dateStyle: 'full' })}
+			aria-label={t.toLocaleString(locale, { dateStyle: 'full' })}
 			aria-current={isToday ? 'date' : undefined}
 		>
-			<span class="day-number">{cellDate.day}</span>
+			<span class="day-number">{t.day}</span>
 		</div>
 	{/each}
 </div>
