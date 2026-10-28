@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
@@ -26,6 +27,22 @@
 	function goToToday() {
 		date = today.with({ day: 1 });
 	}
+	const x = $derived.by(() => {
+		const now = new Date();
+		const currentYear = now.getFullYear();
+		const currentMonth = now.getMonth() + 1;
+		const p = page.url.searchParams.get('p');
+		const match = /^(\d{4})-(\d{2})$/.exec(p ?? '');
+		if (!match) {
+			return { year: currentYear, month: currentMonth };
+		}
+		const year = Number(match[1]);
+		const month = Number(match[2]);
+		if (year < 1 || month < 1 || month > 12) {
+			return { year: currentYear, month: currentMonth };
+		}
+		return { year, month };
+	});
 </script>
 
 <div class="header">
