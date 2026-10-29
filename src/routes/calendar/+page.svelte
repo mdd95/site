@@ -6,6 +6,7 @@
 	import HeaderTab from './header-tab.svelte';
 	import SidenavDialog from './sidenav-dialog.svelte';
 	import Sidenav from './sidenav.svelte';
+	import PanelEvents from './panel-events.svelte';
 
 	const params = $derived(Object.fromEntries(page.url.searchParams));
 	const isMobile = new MediaQuery('(max-width: 768px)');
@@ -36,7 +37,9 @@
 	<aside class="sidenav">
 		<Sidenav />
 	</aside>
-	<aside class="events"></aside>
+	<aside class="events">
+		<PanelEvents />
+	</aside>
 	<aside class="tasks"></aside>
 </div>
 
