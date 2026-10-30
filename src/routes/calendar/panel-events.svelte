@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { nanoid } from 'nanoid';
+
 	type CalendarEvents = {
 		id: string;
 		title: string;
@@ -11,15 +14,11 @@
 
 	function openIndexedDB(): Promise<IDBDatabase> {
 		return new Promise((resolve, reject) => {
-			const req = indexedDB.open('MyAppDB', 1);
+			const req = indexedDB.open('Calendar', 1);
 			req.onupgradeneeded = () => {
 				const db = req.result;
-				if (!db.objectStoreNames.contains('calendar_events')) {
-					const store = db.createObjectStore('calendar_events', {
-						keyPath: 'id',
-						autoIncrement: true
-					});
-					store.createIndex('title', 'title', { unique: false });
+				if (!db.objectStoreNames.contains('events')) {
+					db.createObjectStore('events', { keyPath: 'id' });
 				}
 			};
 			req.onsuccess = () => resolve(req.result);
@@ -27,39 +26,72 @@
 		});
 	}
 
-	async function getEvents() {
+	async function getEvents(): Promise<CalendarEvents[]> {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
-			const tr = db.transaction('calendar_events', 'readonly');
-			const req = tr.objectStore('calendar_events').getAll();
+			const tr = db.transaction('events', 'readonly');
+			const req = tr.objectStore('events').getAll();
+			req.onsuccess = () => resolve(req.result as CalendarEvents[]);
+			req.onerror = () => reject(req.error);
+			tr.oncomplete = () => db.close();
+		});
+	}
+
+	async function insertEvent(data: CalendarEvents) {
+		const db = await openIndexedDB();
+		return new Promise((resolve, reject) => {
+			const tr = db.transaction('events', 'readwrite');
+			const store = tr.objectStore('events');
+			const req = store.add(data);
 			req.onsuccess = () => resolve(req.result);
 			req.onerror = () => reject(req.error);
 			tr.oncomplete = () => db.close();
 		});
 	}
 
-	async function insertEvent(title: string) {
-		const db = await openIndexedDB();
-		return new Promise((resolve, reject) => {
-			const tr = db.transaction('calendar_events', 'readwrite');
-			const store = tr.objectStore('calendar_events');
-			const req = store.add({ title });
-			req.onsuccess = () => resolve(req.result);
-			req.onerror = () => reject(req.error);
-			tr.oncomplete = () => db.close();
-		});
-	}
+	onMount(() => {
+		(async () => {
+			events = await getEvents();
+		})();
+	});
 </script>
 
 <div class="panel">
 	<div class="toolbar">
-		<button type="button" class="btn primary">New Event</button>
+		<button
+			type="button"
+			command="show-modal"
+			commandfor="dialog-create-event"
+			class="btn primary">New Event</button
+		>
+		<dialog id="dialog-create-event" closedby="any">
+			<form
+				method="dialog"
+				onsubmit={async (e) => {
+					const form = new FormData(e.target as HTMLFormElement);
+					await insertEvent({
+						id: nanoid(),
+						title: form.get('title')?.toString() ?? '',
+						description: form.get('description')?.toString() ?? '',
+						start: new Date().toLocaleDateString(),
+						end: new Date().toLocaleDateString()
+					});
+					events = await getEvents();
+				}}
+			>
+				<input type="text" name="title" placeholder="Title" />
+				<input type="text" name="description" placeholder="Description" />
+				<button class="btn">Create</button>
+			</form>
+		</dialog>
 	</div>
 	<ul>
-		<li>
-			<h2></h2>
-			<p></p>
-		</li>
+		{#each events as event (event.id)}
+			<li>
+				<h2>{event.title}</h2>
+				<p>{event.description}</p>
+			</li>
+		{/each}
 	</ul>
 </div>
 
@@ -70,12 +102,17 @@
 	li {
 		padding: 1rem;
 		background-color: color-mix(in lab, var(--color-secondary) 90%, var(--color-base));
+		&:has(+ li) {
+			border-bottom: 1px solid var(--color-border);
+		}
 	}
 	li h2 {
-		margin-block-end: 1rem;
+		margin-block-end: 0.375rem;
+		font-size: 0.875rem;
 		font-weight: bolder;
 	}
 	li p {
-		color: alpha(from var(--color-muted-text) / 0.8);
+		color: var(--color-muted-text);
+		font-size: 0.75rem;
 	}
 </style>
