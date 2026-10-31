@@ -64,11 +64,12 @@
 			commandfor="dialog-create-event"
 			class="btn primary">New Event</button
 		>
-		<dialog id="dialog-create-event" closedby="any">
+		<dialog id="dialog-create-event" closedby="closerequest">
 			<form
 				method="dialog"
 				onsubmit={async (e) => {
-					const form = new FormData(e.target as HTMLFormElement);
+					const el = e.target as HTMLFormElement;
+					const form = new FormData(el);
 					await insertEvent({
 						id: nanoid(),
 						title: form.get('title')?.toString() ?? '',
@@ -77,13 +78,30 @@
 						end: new Date().toLocaleDateString()
 					});
 					events = await getEvents();
+					el.reset();
 				}}
 			>
 				<div class="content">
-					<label for="event-title">Title</label>
-					<input type="text" id="event-title" name="title" />
-					<label for="event-description">Description</label>
-					<input type="text" id="event-description" name="description" />
+					<div class="input-group">
+						<input
+							type="text"
+							id="event-title"
+							name="title"
+							placeholder=""
+							class="input-field"
+						/>
+						<label for="event-title" class="input-label">Title</label>
+					</div>
+					<div class="input-group">
+						<input
+							type="text"
+							id="event-description"
+							name="description"
+							placeholder=""
+							class="input-field"
+						/>
+						<label for="event-description" class="input-label">Description</label>
+					</div>
 				</div>
 				<div class="actions">
 					<button class="btn primary">Create</button>
@@ -123,8 +141,6 @@
 	}
 	dialog {
 		margin: auto;
-		width: min(18rem, 100%);
-		height: min(12rem, 100dvh - 2rem);
 		max-height: 100dvh;
 		background-color: color-mix(in lab, var(--color-base) 94%, var(--color-base-text));
 		opacity: 0;
@@ -161,25 +177,52 @@
 		}
 	}
 	form {
-		width: 100%;
-		height: 100%;
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;
 	}
-	label {
-		display: block;
-		margin-bottom: 0.375rem;
-		color: var(--color-muted-text);
-		font-size: 0.875rem;
-	}
-	input {
-		margin-bottom: 0.5rem;
-		padding: 0.5rem 0.75rem;
-		width: 100%;
-	}
 	.actions {
 		display: inline-flex;
 		justify-content: end;
+	}
+	.input-group {
+		position: relative;
+		margin: 20px 0;
+		width: 300px;
+	}
+	.input-field {
+		box-sizing: border-box;
+		width: 100%;
+		padding: 12px;
+		border: 1px solid color-mix(in lab, var(--color-border) 80%, var(--color-base-text));
+		outline: none;
+		background-color: transparent;
+		color: inherit;
+		transition: border-color 0.2s ease;
+		&:focus {
+			border-color: var(--color-primary);
+		}
+		&:focus ~ .input-label,
+		&:not(:placeholder-shown) ~ .input-label {
+			top: 0;
+			transform: translateY(-50%) scale(0.85);
+			transform-origin: left center;
+			color: var(--color-primary);
+		}
+	}
+	.input-label {
+		position: absolute;
+		left: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		transform-origin: left center;
+		padding: 0 4px;
+		background-color: color-mix(in lab, var(--color-base) 94%, var(--color-base-text));
+		color: #999;
+		pointer-events: none;
+		transition:
+			top 0.2s ease,
+			transform 0.2s ease,
+			color 0.2s ease;
 	}
 </style>
