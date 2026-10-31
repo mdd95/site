@@ -79,9 +79,15 @@
 					events = await getEvents();
 				}}
 			>
-				<input type="text" name="title" placeholder="Title" />
-				<input type="text" name="description" placeholder="Description" />
-				<button class="btn">Create</button>
+				<div class="content">
+					<label for="event-title">Title</label>
+					<input type="text" id="event-title" name="title" />
+					<label for="event-description">Description</label>
+					<input type="text" id="event-description" name="description" />
+				</div>
+				<div class="actions">
+					<button class="btn primary">Create</button>
+				</div>
 			</form>
 		</dialog>
 	</div>
@@ -114,5 +120,33 @@
 	li p {
 		color: var(--color-muted-text);
 		font-size: 0.75rem;
+	}
+	dialog {
+		margin: auto;
+		width: min(18rem, 100%);
+		height: min(12rem, 100dvh - 2rem);
+		background-color: color-mix(in lab, var(--color-base) 80%, var(--color-base-text));
+	}
+	form {
+		width: 100%;
+		height: 100%;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+	}
+	label {
+		display: block;
+		margin-bottom: 0.375rem;
+		color: var(--color-muted-text);
+		font-size: 0.875rem;
+	}
+	input {
+		margin-bottom: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		width: 100%;
+	}
+	.actions {
+		display: inline-flex;
+		justify-content: end;
 	}
 </style>
