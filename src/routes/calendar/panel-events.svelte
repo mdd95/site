@@ -49,6 +49,18 @@
 		});
 	}
 
+	async function deleteEvent(id: string) {
+		const db = await openIndexedDB();
+		return new Promise((resolve, reject) => {
+			const tr = db.transaction('events', 'readwrite');
+			const store = tr.objectStore('events');
+			const req = store.delete(id);
+			req.onsuccess = () => resolve(req.result);
+			req.onerror = () => reject(req.error);
+			tr.oncomplete = () => db.close();
+		});
+	}
+
 	onMount(() => {
 		(async () => {
 			events = await getEvents();
@@ -74,13 +86,16 @@
 						id: nanoid(),
 						title: form.get('title')?.toString() ?? '',
 						description: form.get('description')?.toString() ?? '',
-						start: new Date().toLocaleDateString(),
-						end: new Date().toLocaleDateString()
+						start: new Date(form.get('start')?.toString() ?? '').toLocaleDateString(),
+						end: new Date(form.get('end')?.toString() ?? '').toLocaleDateString()
 					});
 					events = await getEvents();
 					el.reset();
 				}}
 			>
+				<div>
+					<h2>Create new event</h2>
+				</div>
 				<div class="content">
 					<div class="input-group">
 						<input
@@ -102,6 +117,18 @@
 						/>
 						<label for="event-description" class="input-label">Description</label>
 					</div>
+					<div>
+						<label for="event-start">Event starts</label>
+						<input type="date" id="event-start" name="start" />
+					</div>
+					<div>
+						<label for="event-end">Event ends</label>
+						<input type="date" id="event-end" name="end" />
+					</div>
+					<div>
+						<label for="event-notes">Notes</label>
+						<textarea name="notes" id="event-notes"></textarea>
+					</div>
 				</div>
 				<div class="actions">
 					<button class="btn primary">Create</button>
@@ -114,6 +141,15 @@
 			<li>
 				<h2>{event.title}</h2>
 				<p>{event.description}</p>
+				<button
+					class="btn ghost btn-delete"
+					onclick={async () => {
+						await deleteEvent(event.id);
+						events = await getEvents();
+					}}
+				>
+					Delete
+				</button>
 			</li>
 		{/each}
 	</ul>
@@ -181,7 +217,11 @@
 		display: flex;
 		flex-direction: column;
 	}
+	form h2 {
+		font-weight: bolder;
+	}
 	.actions {
+		margin-block-start: 0.5rem;
 		display: inline-flex;
 		justify-content: end;
 	}
@@ -224,5 +264,26 @@
 			top 0.2s ease,
 			transform 0.2s ease,
 			color 0.2s ease;
+	}
+	label:has(+ input[type='date']),
+	label:has(+ textarea) {
+		margin-block-end: 0.25rem;
+		display: block;
+	}
+	input[type='date'],
+	textarea {
+		margin-block-end: 0.25rem;
+		padding: 12px;
+		width: 100%;
+		outline: transparent;
+	}
+	textarea {
+		min-block-size: calc(3lh + 12px * 2);
+		field-sizing: content;
+		resize: vertical;
+	}
+	.btn-delete {
+		height: 1.5rem;
+		font-size: 0.625rem;
 	}
 </style>
