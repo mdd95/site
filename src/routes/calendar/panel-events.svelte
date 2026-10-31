@@ -125,7 +125,40 @@
 		margin: auto;
 		width: min(18rem, 100%);
 		height: min(12rem, 100dvh - 2rem);
-		background-color: color-mix(in lab, var(--color-base) 80%, var(--color-base-text));
+		max-height: 100dvh;
+		background-color: color-mix(in lab, var(--color-base) 94%, var(--color-base-text));
+		opacity: 0;
+		translate: 0 -16px;
+		transition-property: opacity, translate, display, overlay;
+		transition-duration: 0.1s;
+		transition-timing-function: ease-in-out;
+		transition-behavior: allow-discrete;
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+		&:open {
+			opacity: 1;
+			translate: 0 0;
+			@starting-style {
+				opacity: 0;
+				translate: 0 -16px;
+			}
+		}
+	}
+	dialog::backdrop {
+		background-color: transparent;
+		backdrop-filter: blur(1px);
+		overflow: hidden;
+		transition-property: background-color, display, overlay;
+		transition-duration: 0.1s;
+		transition-timing-function: ease-in-out;
+		transition-behavior: allow-discrete;
+		overscroll-behavior: contain;
+	}
+	dialog:open::backdrop {
+		background-color: rgb(0 0 0 / 0.5);
+		@starting-style {
+			background-color: transparent;
+		}
 	}
 	form {
 		width: 100%;
