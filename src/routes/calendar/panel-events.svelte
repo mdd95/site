@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { nanoid } from 'nanoid';
-
+	import * as v from 'valibot';
 	type CalendarEvents = {
 		id: string;
 		title: string;
@@ -9,58 +9,70 @@
 		start: string;
 		end: string;
 	};
-
+	const DB_NAME = 'Calendar';
+	const DB_VERSION = 1;
+	const STORE_NAME = 'events';
 	let events = $state<CalendarEvents[]>([]);
-
 	function openIndexedDB(): Promise<IDBDatabase> {
 		return new Promise((resolve, reject) => {
-			const req = indexedDB.open('Calendar', 1);
+			const req = window.indexedDB.open(DB_NAME, DB_VERSION);
 			req.onupgradeneeded = () => {
 				const db = req.result;
-				if (!db.objectStoreNames.contains('events')) {
-					db.createObjectStore('events', { keyPath: 'id' });
+				if (!db.objectStoreNames.contains(STORE_NAME)) {
+					db.createObjectStore(STORE_NAME, { keyPath: 'id' });
 				}
 			};
 			req.onsuccess = () => resolve(req.result);
 			req.onerror = () => reject(req.error);
 		});
 	}
-
 	async function getEvents(): Promise<CalendarEvents[]> {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
-			const tr = db.transaction('events', 'readonly');
-			const req = tr.objectStore('events').getAll();
+			const tr = db.transaction(STORE_NAME, 'readonly');
+			const req = tr.objectStore(STORE_NAME).getAll();
 			req.onsuccess = () => resolve(req.result as CalendarEvents[]);
 			req.onerror = () => reject(req.error);
 			tr.oncomplete = () => db.close();
 		});
 	}
-
-	async function insertEvent(data: CalendarEvents) {
+	async function insertEvent(value: CalendarEvents) {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
-			const tr = db.transaction('events', 'readwrite');
-			const store = tr.objectStore('events');
-			const req = store.add(data);
+			const tr = db.transaction(STORE_NAME, 'readwrite');
+			const store = tr.objectStore(STORE_NAME);
+			const req = store.add(value);
 			req.onsuccess = () => resolve(req.result);
 			req.onerror = () => reject(req.error);
 			tr.oncomplete = () => db.close();
 		});
 	}
-
 	async function deleteEvent(id: string) {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
-			const tr = db.transaction('events', 'readwrite');
-			const store = tr.objectStore('events');
+			const tr = db.transaction(STORE_NAME, 'readwrite');
+			const store = tr.objectStore(STORE_NAME);
 			const req = store.delete(id);
 			req.onsuccess = () => resolve(req.result);
 			req.onerror = () => reject(req.error);
 			tr.oncomplete = () => db.close();
 		});
 	}
-
+	const eventSchema = v.object({
+		title: v.pipe(v.string(), v.minLength(1)),
+		description: v.string(),
+		start: v.pipe(v.string(), v.isoDateTime()),
+		end: v.pipe(v.string(), v.isoDateTime())
+	});
+	async function createEvent(e: SubmitEvent) {
+		const formEl = e.target as HTMLFormElement;
+		const formData = Object.fromEntries(new FormData(formEl));
+		const validation = v.safeParse(eventSchema, formData);
+		if (!validation.success) return;
+		await insertEvent({ id: nanoid(), ...validation.output });
+		events = await getEvents();
+		formEl.reset();
+	}
 	onMount(() => {
 		(async () => {
 			events = await getEvents();
@@ -77,22 +89,7 @@
 			class="btn primary">New Event</button
 		>
 		<dialog id="dialog-create-event" closedby="closerequest">
-			<form
-				method="dialog"
-				onsubmit={async (e) => {
-					const el = e.target as HTMLFormElement;
-					const form = new FormData(el);
-					await insertEvent({
-						id: nanoid(),
-						title: form.get('title')?.toString() ?? '',
-						description: form.get('description')?.toString() ?? '',
-						start: new Date(form.get('start')?.toString() ?? '').toLocaleDateString(),
-						end: new Date(form.get('end')?.toString() ?? '').toLocaleDateString()
-					});
-					events = await getEvents();
-					el.reset();
-				}}
-			>
+			<form method="dialog" onsubmit={createEvent}>
 				<div>
 					<h2>Create new event</h2>
 				</div>
@@ -119,11 +116,11 @@
 					</div>
 					<div>
 						<label for="event-start">Event starts</label>
-						<input type="date" id="event-start" name="start" />
+						<input type="datetime-local" id="event-start" name="start" />
 					</div>
 					<div>
 						<label for="event-end">Event ends</label>
-						<input type="date" id="event-end" name="end" />
+						<input type="datetime-local" id="event-end" name="end" />
 					</div>
 					<div>
 						<label for="event-notes">Notes</label>
@@ -131,7 +128,13 @@
 					</div>
 				</div>
 				<div class="actions">
-					<button class="btn primary">Create</button>
+					<button
+						type="button"
+						command="request-close"
+						commandfor="dialog-create-event"
+						class="btn secondary">Cancel</button
+					>
+					<button type="submit" class="btn primary">Create</button>
 				</div>
 			</form>
 		</dialog>
@@ -182,25 +185,31 @@
 	}
 	form h2 {
 		font-weight: bolder;
+		margin-block-end: 1rem;
 	}
 	.actions {
 		margin-block-start: 0.5rem;
 		display: inline-flex;
 		justify-content: end;
+		gap: 0.25rem;
+	}
+	label {
+		color: var(--color-muted-text);
+		font-size: 0.875rem;
 	}
 	.input-group {
 		position: relative;
-		margin: 20px 0;
-		width: 300px;
+		margin: 0 0 0.875rem;
+		width: 100%;
 	}
 	.input-field {
 		box-sizing: border-box;
 		width: 100%;
 		padding: 12px;
-		border: 1px solid color-mix(in lab, var(--color-border) 80%, var(--color-base-text));
-		outline: none;
+		border: 1px solid var(--color-border);
 		background-color: transparent;
 		color: inherit;
+		outline: transparent;
 		transition: border-color 0.2s ease;
 		&:focus {
 			border-color: var(--color-primary);
@@ -220,28 +229,30 @@
 		transform: translateY(-50%);
 		transform-origin: left center;
 		padding: 0 4px;
-		background-color: color-mix(in lab, var(--color-base) 94%, var(--color-base-text));
-		color: #999;
+		background-color: var(--color-dialog);
+		color: var(--color-muted-text);
 		pointer-events: none;
 		transition:
 			top 0.2s ease,
 			transform 0.2s ease,
 			color 0.2s ease;
 	}
-	label:has(+ input[type='date']),
+	label:has(+ input[type='datetime-local']),
 	label:has(+ textarea) {
 		margin-block-end: 0.25rem;
 		display: block;
 	}
-	input[type='date'],
+	input[type='datetime-local'],
 	textarea {
 		margin-block-end: 0.25rem;
 		padding: 12px;
 		width: 100%;
+		background-color: var(--color-dialog);
+		border: 1px solid var(--color-border);
 		outline: transparent;
 	}
 	textarea {
-		min-block-size: calc(3lh + 12px * 2);
+		min-block-size: calc(3lh + 12px * 2 + 1px * 2);
 		field-sizing: content;
 		resize: vertical;
 	}
