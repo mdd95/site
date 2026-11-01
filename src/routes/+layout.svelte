@@ -1,5 +1,6 @@
 <script lang="ts">
-	import '../styles/index.js';
+	import '@fontsource-variable/inter/wght.css';
+	import '../app.css';
 	import 'temporal-polyfill/global';
 	import favicon from '#lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';

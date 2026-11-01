@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { nanoid } from 'nanoid';
 	import * as v from 'valibot';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import TrashIcon from '@lucide/svelte/icons/trash';
 	type CalendarEvents = {
 		id: string;
 		title: string;
@@ -86,8 +88,11 @@
 			type="button"
 			command="show-modal"
 			commandfor="dialog-create-event"
-			class="btn primary">New Event</button
+			class="btn btn-primary"
 		>
+			<PlusIcon />
+			New Event
+		</button>
 		<dialog id="dialog-create-event" closedby="closerequest">
 			<form method="dialog" onsubmit={createEvent}>
 				<div>
@@ -132,12 +137,15 @@
 						type="button"
 						command="request-close"
 						commandfor="dialog-create-event"
-						class="btn secondary">Cancel</button
+						class="btn btn-secondary">Cancel</button
 					>
-					<button type="submit" class="btn primary">Create</button>
+					<button type="submit" class="btn btn-primary">Create</button>
 				</div>
 			</form>
 		</dialog>
+		<button type="button" class="btn btn-secondary btn-icon">
+			<TrashIcon />
+		</button>
 	</div>
 	<ul>
 		{#each events as event (event.id)}
@@ -161,6 +169,9 @@
 <style>
 	.panel {
 		padding: 1rem;
+	}
+	ul {
+		list-style: none;
 	}
 	li {
 		padding: 1rem;
