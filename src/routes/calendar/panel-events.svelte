@@ -93,7 +93,7 @@
 			<PlusIcon />
 			New Event
 		</button>
-		<dialog id="dialog-create-event" closedby="closerequest">
+		<dialog id="dialog-create-event" closedby="closerequest" class="dialog">
 			<form method="dialog" onsubmit={createEvent}>
 				<div>
 					<h2>Create new event</h2>
@@ -195,8 +195,9 @@
 		flex-direction: column;
 	}
 	form h2 {
-		font-weight: bolder;
 		margin-block-end: 1rem;
+		font-size: 1rem;
+		font-weight: bolder;
 	}
 	.actions {
 		margin-block-start: 0.5rem;

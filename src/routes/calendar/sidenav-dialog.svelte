@@ -17,7 +17,7 @@
 >
 	<Menu />
 </button>
-<dialog bind:this={dialog} closedby="any">
+<dialog bind:this={dialog} closedby="any" class="dialog sidebar-left">
 	<nav>
 		<ul>
 			<li><a href="/calendar">Calendar</a></li>
@@ -38,17 +38,7 @@
 
 <style>
 	dialog {
-		margin-left: 0;
 		width: min(18rem, 100%);
-		height: 100dvh;
-		max-height: 100dvh;
-		translate: -16px;
-		&:open {
-			translate: 0;
-			@starting-style {
-				translate: -16px;
-			}
-		}
 	}
 	nav {
 		padding: 1rem;
