@@ -1,43 +1,47 @@
 <script lang="ts">
 	import { beforeNavigate } from '$app/navigation';
+	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '@lucide/svelte/icons/menu';
-
-	let dialog: HTMLDialogElement;
-
+	let propsId = $props.id();
+	let dialog = $state<HTMLDialogElement>();
+	const isMobile = new MediaQuery('(max-width: 600px)');
 	beforeNavigate(() => {
-		dialog.requestClose();
+		dialog?.requestClose();
 	});
 </script>
 
-<button
-	type="button"
-	class="btn btn-icon"
-	aria-label="Open menu"
-	onclick={() => dialog.showModal()}
->
-	<Menu />
-</button>
-<dialog bind:this={dialog} closedby="any" class="dialog sidebar-left">
-	<nav>
-		<ul>
-			<li><a href="/calendar">Calendar</a></li>
-			<li><a href="/calendar?view=events">Events</a></li>
-			<li><a href="/calendar?view=tasks">Tasks</a></li>
-			<li><a href="/calendar?view=today">Today</a></li>
-		</ul>
+{#if isMobile.current}
+	<button
+		type="button"
+		command="show-modal"
+		commandfor="dialog-{propsId}"
+		aria-label="Open menu"
+		class="btn btn-icon"
+	>
+		<Menu />
+	</button>
+	<dialog bind:this={dialog} closedby="any" id="dialog-{propsId}" class="dialog sidebar-left">
+		<nav>
+			<ul>
+				<li><a href="/calendar">Calendar</a></li>
+				<li><a href="/calendar?view=events">Events</a></li>
+				<li><a href="/calendar?view=tasks">Tasks</a></li>
+				<li><a href="/calendar?view=today">Today</a></li>
+			</ul>
 
-		<h2>MY CALENDARS</h2>
-		<ul>
-			<li><a href="/calendar?filter=Personal">Personal</a></li>
-			<li><a href="/calendar?filter=Work">Work</a></li>
-			<li><a href="/calendar?filter=Study">Study</a></li>
-			<li><a href="/calendar?filter=Health">Health</a></li>
-		</ul>
-	</nav>
-</dialog>
+			<h2>MY CALENDARS</h2>
+			<ul>
+				<li><a href="/calendar?filter=Personal">Personal</a></li>
+				<li><a href="/calendar?filter=Work">Work</a></li>
+				<li><a href="/calendar?filter=Study">Study</a></li>
+				<li><a href="/calendar?filter=Health">Health</a></li>
+			</ul>
+		</nav>
+	</dialog>
+{/if}
 
 <style>
-	dialog {
+	.dialog {
 		width: min(18rem, 100%);
 	}
 	nav {

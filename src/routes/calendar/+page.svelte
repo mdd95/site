@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { MediaQuery } from 'svelte/reactivity';
 	import YearView from './view-year.svelte';
 	import MonthView from './view-month.svelte';
 	import HeaderTab from './header-tab.svelte';
 	import SidenavDialog from './sidenav-dialog.svelte';
 	import Sidenav from './sidenav.svelte';
 	import PanelEvents from './panel-events.svelte';
-
 	const params = $derived(Object.fromEntries(page.url.searchParams));
-	const isMobile = new MediaQuery('(max-width: 768px)');
 </script>
 
 <svelte:head>
@@ -18,15 +15,11 @@
 
 <div class="app">
 	<header>
-		<div>
-			{#if isMobile.current}
-				<SidenavDialog />
-			{/if}
-		</div>
+		<SidenavDialog />
 		<HeaderTab />
 	</header>
 	<main>
-		{#if params.view === 'year'}
+		{#if params.month === 'year'}
 			<YearView />
 		{:else if params.view === 'month'}
 			<MonthView />
