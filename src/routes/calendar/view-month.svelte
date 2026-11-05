@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { weekdays } from './utils.js';
+	import { createWeekdayNames } from './page-utils.js';
 
 	const locale = Intl.DateTimeFormat().resolvedOptions().locale;
 
@@ -53,7 +53,7 @@
 </div>
 
 <div class="month-view" aria-label={y.t.toLocaleString(locale, { month: 'long', year: 'numeric' })}>
-	{#each weekdays as weekday, i (i)}
+	{#each createWeekdayNames() as weekday, i (i)}
 		<div class="weekday">{weekday}</div>
 	{/each}
 

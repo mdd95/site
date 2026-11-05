@@ -1,26 +1,17 @@
 <script lang="ts">
+	import { getConfig } from './page-context.js';
+	import { createWeekdayNames } from './page-utils.js';
+
 	const today = Temporal.Now.plainDateISO();
-
-	const weekStartsOn = 0;
-	const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-
-	const sunday = new Date(2023, 0, 1);
-	const weekdays = Array.from({ length: 7 }, (_, i) => {
-		const day = (weekStartsOn + i) % 7;
-		return new Date(
-			sunday.getFullYear(),
-			sunday.getMonth(),
-			sunday.getDate() + day
-		).toLocaleString(locale, { weekday: 'short' });
-	});
+	const { locale, weekStart } = getConfig();
 
 	let year = $state(today.year);
 </script>
 
 <div class="year-view">
-	{#each { length: 12 }, month (month)}
+	{#each { length: 12 }, month}
 		{const first = new Temporal.PlainDate(year, month + 1, 1)}
-		{const offset = ((first.dayOfWeek % 7) - weekStartsOn + 7) % 7}
+		{const offset = ((first.dayOfWeek % 7) - weekStart + 7) % 7}
 		{const days = first.daysInMonth}
 		{const cellCount = Math.ceil((offset + days) / 7) * 7}
 
@@ -30,7 +21,7 @@
 		>
 			<h2 class="header">{first.toLocaleString(locale, { month: 'long' })}</h2>
 
-			{#each weekdays as weekday, i (i)}
+			{#each createWeekdayNames() as weekday, i (i)}
 				<div class="weekday">{weekday}</div>
 			{/each}
 

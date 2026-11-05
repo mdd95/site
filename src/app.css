@@ -13,7 +13,7 @@
 	--color-muted-text: light-dark(oklch(48% 0 0), oklch(58% 0 0));
 	--color-border: light-dark(oklch(92% 0 0), oklch(34% 0 0));
 	--color-outline: alpha(from var(--color-primary) / 0.75);
-	--color-dialog: light-dark(oklch(1 0 0), oklch(0.2 0 0));
+	--color-dialog: light-dark(oklch(1 0 0), oklch(0.3 0 0));
 	--radius: 0;
 	--radius-full: calc(infinity * 1px);
 	--font-sans:
