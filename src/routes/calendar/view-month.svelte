@@ -3,17 +3,9 @@
 	import { page } from '$app/state';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { weekdays } from './utils.js';
 
 	const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-
-	const sunday = new Date(2023, 0, 1);
-	const weekdays = Array.from({ length: 7 }, (_, i) => {
-		return new Date(
-			sunday.getFullYear(),
-			sunday.getMonth(),
-			sunday.getDate() + i
-		).toLocaleString(locale, { weekday: 'short' });
-	});
 
 	const x = $derived.by(() => {
 		const now = new Date();
