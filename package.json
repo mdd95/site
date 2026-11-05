@@ -35,5 +35,17 @@
 		"typescript": "^6.0.3",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "12.16.1",
+			"onFail": "download"
+		},
+		"runtime": {
+			"name": "node",
+			"version": "26.13.0",
+			"onFail": "download"
+		}
 	}
 }
