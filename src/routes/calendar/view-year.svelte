@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getConfig } from './page-context.js';
+	import { getConfig } from './page-context.svelte.js';
 	import { createWeekdayNames } from './page-utils.js';
 
 	const today = Temporal.Now.plainDateISO();

@@ -8,12 +8,9 @@
 	import PanelEvents from './panel-events.svelte';
 	const params = $derived(Object.fromEntries(page.url.searchParams));
 
-	import { setConfig } from './page-context.js';
+	import { Config, setConfig } from './page-context.svelte.js';
 
-	setConfig({
-		weekStart: 0,
-		locale: Intl.DateTimeFormat().resolvedOptions().locale
-	});
+	setConfig(new Config());
 </script>
 
 <svelte:head>
