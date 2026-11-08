@@ -4,17 +4,21 @@
 	import * as v from 'valibot';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
+
 	type CalendarEvents = {
 		id: string;
 		title: string;
 		description: string;
-		start: string;
-		end: string;
+		start?: string;
+		end?: string;
 	};
+
 	const DB_NAME = 'Calendar';
 	const DB_VERSION = 1;
-	const STORE_NAME = 'events';
+	const STORE_NAME = 'Events';
+
 	let events = $state<CalendarEvents[]>([]);
+
 	function openIndexedDB(): Promise<IDBDatabase> {
 		return new Promise((resolve, reject) => {
 			const req = window.indexedDB.open(DB_NAME, DB_VERSION);
@@ -28,6 +32,7 @@
 			req.onerror = () => reject(req.error);
 		});
 	}
+
 	async function getEvents(): Promise<CalendarEvents[]> {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
@@ -38,6 +43,7 @@
 			tr.oncomplete = () => db.close();
 		});
 	}
+
 	async function insertEvent(value: CalendarEvents) {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
@@ -49,6 +55,7 @@
 			tr.oncomplete = () => db.close();
 		});
 	}
+
 	async function deleteEvent(id: string) {
 		const db = await openIndexedDB();
 		return new Promise((resolve, reject) => {
@@ -60,25 +67,30 @@
 			tr.oncomplete = () => db.close();
 		});
 	}
-	const eventSchema = v.object({
-		title: v.pipe(v.string(), v.minLength(1)),
-		description: v.string(),
-		start: v.pipe(v.string(), v.isoDateTime()),
-		end: v.pipe(v.string(), v.isoDateTime())
-	});
+
 	async function createEvent(e: SubmitEvent) {
 		const formEl = e.target as HTMLFormElement;
 		const formData = Object.fromEntries(new FormData(formEl));
-		const validation = v.safeParse(eventSchema, formData);
+
+		const validation = v.safeParse(
+			v.object({
+				title: v.pipe(v.string(), v.minLength(1)),
+				description: v.string(),
+				start: v.optional(v.string()),
+				end: v.optional(v.string())
+			}),
+			formData
+		);
 		if (!validation.success) return;
+
 		await insertEvent({ id: nanoid(), ...validation.output });
 		events = await getEvents();
+
 		formEl.reset();
 	}
+
 	onMount(() => {
-		(async () => {
-			events = await getEvents();
-		})();
+		void getEvents().then((result) => (events = result));
 	});
 </script>
 
