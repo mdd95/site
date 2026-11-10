@@ -17,22 +17,30 @@
 
 <style>
 	nav {
-		padding: 1rem;
+		padding: 1rem 0;
 	}
-	ul:has(+ h2) {
-		padding: 0 0 0.5rem;
-		border-bottom: 1px solid alpha(from var(--color-base-text) / 0.2);
+
+	ul {
+		list-style: none;
+
+		&:has(+ h2) {
+			padding: 0 0 0.5rem;
+			border-bottom: 1px solid alpha(from var(--color-base-text) / 0.2);
+		}
 	}
+
 	h2 {
-		padding: 0.5rem 0;
+		padding: 0.5rem 1rem;
 		color: var(--color-muted-text);
 		font-size: 0.875rem;
 	}
+
 	a {
-		height: 2.5rem;
+		height: 3rem;
 		padding: 0 1rem;
 		display: flex;
 		align-items: center;
+
 		@media (hover: hover) {
 			&:hover {
 				background-color: var(--color-primary);
