@@ -1,14 +1,16 @@
 <script lang="ts">
 	import '../styles/index.js';
 	import favicon from '#lib/assets/favicon.svg';
-	import { ModeWatcher } from 'mode-watcher';
+	import { initTheme, preloadScript } from '#lib/client/theme.svelte.js';
 
 	let { children } = $props();
+
+	initTheme();
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	{@html preloadScript}
 </svelte:head>
 
-<ModeWatcher />
 {@render children()}

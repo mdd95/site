@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Sun, Moon } from 'lucide';
 	import { MorphIcon } from 'morphicons/svelte';
-	import { mode, toggleMode } from 'mode-watcher';
 	import { resolve } from '$app/paths';
+	import { getMode, toggleMode } from '#lib/client/theme.svelte.js';
 </script>
 
 <header>
@@ -17,8 +17,8 @@
 		</ul>
 	</nav>
 	<div class="actions">
-		<button onclick={toggleMode} class="btn icon ghost" aria-label="Toggle theme mode">
-			<MorphIcon icon={mode.current === 'dark' ? Moon : Sun} size="20" />
+		<button onclick={() => toggleMode()} class="btn icon ghost" aria-label="Toggle theme mode">
+			<MorphIcon icon={getMode() === 'dark' ? Moon : Sun} size="20" />
 		</button>
 		<a href="#" class="btn ghost">Sign In</a>
 	</div>
