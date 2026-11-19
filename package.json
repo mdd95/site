@@ -21,10 +21,10 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^6.0.0",
-		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/kit": "^3.3.1",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/node": "^26.6.5",
-		"eslint-plugin-svelte": "^3.19.0",
+		"eslint-plugin-svelte": "^3.24.1",
 		"globals": "^17.6.0",
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.5",
