@@ -1,10 +1,9 @@
 <script lang="ts">
 	import '../styles/index.js';
 	import favicon from '#lib/assets/favicon.svg';
-	import { initTheme, preloadScript } from '#lib/client/theme.svelte.js';
+	import { initTheme, preloadScript } from '#lib/client/theme-preload.js';
 
 	let { children } = $props();
-
 	initTheme();
 </script>
 
