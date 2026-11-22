@@ -23,7 +23,7 @@ export function setMode(value: string, persist: boolean = true) {
 	if (!SET_MODES.has(value)) return;
 
 	mode = value;
-	document.documentElement.style.colorScheme = value;
+	document.documentElement.style.colorScheme = value === 'system' ? getSystemMode() : value;
 	if (persist) window.localStorage.setItem(KEY_MODE, value);
 }
 
