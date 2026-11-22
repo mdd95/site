@@ -1,88 +1,113 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
+
     import ChevronLeft from '@lucide/svelte/icons/chevron-left';
     import ChevronRight from '@lucide/svelte/icons/chevron-right';
+
+    import { getConfig } from './page-context.svelte.js';
     import { createWeekdayNames } from './page-utils.js';
 
-    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    const PARAM_NAME = 'm';
 
-    const x = $derived.by(() => {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-        const p = page.url.searchParams.get('p');
-        const match = /^(\d{4})-(\d{2})$/.exec(p ?? '');
-        if (!match) {
-            return { year: currentYear, month: currentMonth };
+    const today = Temporal.Now.plainDateISO();
+    const { locale } = getConfig();
+
+    const { year, month } = $derived.by(() => {
+        const param = page.url.searchParams.get(PARAM_NAME);
+        const match = /^(\d{4})-(\d{2})$/.exec(param ?? '');
+
+        if (match) {
+            const date = new Date(Number(match.at(1)), Number(match.at(2)) - 1, 1);
+            return { year: date.getFullYear(), month: date.getMonth() + 1 };
         }
-        const year = Number(match[1]);
-        const month = Number(match[2]);
-        if (year < 1 || month < 1 || month > 12) {
-            return { year: currentYear, month: currentMonth };
-        }
-        return { year, month };
-    });
-    const y = $derived.by(() => {
-        const t = new Temporal.PlainDate(x.year, x.month, 1);
-        return {
-            t,
-            dayOfWeek: t.dayOfWeek % 7,
-            daysInMonth: t.daysInMonth
-        };
+
+        return { year: today.year, month: today.month };
     });
 
-    function nav(offset: number) {
-        const date = new Date(x.year, x.month - 1 + offset, 1);
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        goto(`/calendar?view=month&p=${y}-${m}`);
+    const firstDay = $derived(new Temporal.PlainDate(year, month, 1));
+    const dayOfWeek = $derived(firstDay.dayOfWeek % 7);
+    const daysInMonth = $derived(firstDay.daysInMonth);
+
+    async function navigateMonth(offset: number) {
+        const date = new Date(year, month + offset - 1, 1);
+        const url = new URL(page.url.href);
+
+        url.searchParams.set(
+            PARAM_NAME,
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        );
+
+        await goto(url);
     }
 
-    function gotoToday() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        goto(`/calendar?view=month&p=${y}-${m}`);
+    async function gotoCurrentMonth() {
+        const url = new URL(page.url.href);
+        url.searchParams.set(PARAM_NAME, `${today.year}-${String(today.month).padStart(2, '0')}`);
+
+        await goto(url);
     }
 </script>
 
 <div class="header">
     <h1>
-        {y.t.toLocaleString(locale, { month: 'long', year: 'numeric' })}
+        {firstDay.toLocaleString(locale, { month: 'long', year: 'numeric' })}
     </h1>
-    <button onclick={() => nav(-1)} class="btn btn-icon btn-secondary" aria-label="Previous month">
+
+    <button
+        type="button"
+        class="btn btn-secondary btn-icon"
+        aria-label="Previous month"
+        onclick={() => navigateMonth(-1)}
+    >
         <ChevronLeft size={20} />
     </button>
-    <button onclick={() => nav(1)} class="btn btn-icon btn-secondary" aria-label="Next month">
+
+    <button
+        type="button"
+        class="btn btn-secondary btn-icon"
+        aria-label="Next month"
+        onclick={() => navigateMonth(1)}
+    >
         <ChevronRight size={20} />
     </button>
-    <button onclick={() => gotoToday()} class="btn btn-secondary">Today</button>
+
+    <button
+        type="button"
+        class="btn btn-secondary"
+        aria-label="Current month"
+        onclick={() => gotoCurrentMonth()}
+    >
+        Today
+    </button>
 </div>
 
-<div class="month-view" aria-label={y.t.toLocaleString(locale, { month: 'long', year: 'numeric' })}>
-    {#each createWeekdayNames() as weekday, i (i)}
+<div
+    class="month-view"
+    aria-label={firstDay.toLocaleString(locale, { month: 'long', year: 'numeric' })}
+>
+    {#each createWeekdayNames() as weekday}
         <div class="weekday">{weekday}</div>
     {/each}
 
-    {#each { length: 42 } as _, i (i)}
-        {const t = $derived(
-            new Temporal.PlainDate(x.year, x.month, 1).subtract({ days: y.dayOfWeek - i })
+    {#each { length: 42 }, i}
+        {const date = $derived(
+            new Temporal.PlainDate(year, month, 1).subtract({ days: dayOfWeek - i })
         )}
         <!-- {const isCurrentMonth = $derived(i >= dayOfWeek && i < dayOfWeek + daysInMonth)} -->
-        {const isToday = $derived(t.equals(Temporal.Now.plainDateISO()))}
+        {const isToday = $derived(date.equals(today))}
 
         <div
             class={[
                 'day',
-                i < y.dayOfWeek && 'prev-month',
-                i >= y.dayOfWeek + y.daysInMonth && 'next-month',
+                i < dayOfWeek && 'prev-month',
+                i >= dayOfWeek + daysInMonth && 'next-month',
                 isToday && 'today'
             ]}
-            aria-label={t.toLocaleString(locale, { dateStyle: 'full' })}
+            aria-label={date.toLocaleString(locale, { dateStyle: 'full' })}
             aria-current={isToday ? 'date' : undefined}
         >
-            <span class="day-number">{t.day}</span>
+            <span class="day-number">{date.day}</span>
         </div>
     {/each}
 </div>
@@ -126,6 +151,10 @@
 
         &:nth-child(7n + 1) {
             border-left: 1px solid var(--color-border);
+        }
+
+        &:not(.prev-month):not(.next-month) {
+            font-weight: 600;
         }
 
         @media (hover: hover) {
