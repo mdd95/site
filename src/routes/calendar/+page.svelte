@@ -6,11 +6,11 @@
     import SidenavDialog from './sidenav-dialog.svelte';
     import Sidenav from './sidenav.svelte';
     import PanelEvents from './panel-events.svelte';
-    const params = $derived(Object.fromEntries(page.url.searchParams));
 
     import { Config, setConfig } from './page-context.svelte.js';
 
     setConfig(new Config());
+    $inspect(page.url.searchParams.get('y'));
 </script>
 
 <svelte:head>
@@ -22,15 +22,18 @@
         <SidenavDialog />
         <HeaderTab />
     </header>
+
     <main>
-        {#if params.month === 'year'}
+        {#if page.url.searchParams.has('y')}
+            {void console.log('Year view')}
             <YearView />
-        {:else if params.view === 'month'}
+        {:else if page.url.searchParams.has('m')}
             <MonthView />
         {:else}
             <MonthView />
         {/if}
     </main>
+
     <aside class="sidenav">
         <Sidenav />
     </aside>
@@ -69,7 +72,7 @@
 
     @media (width > 1080px) {
         .app {
-            grid-template-columns: 18rem minmax(0, 1fr) 18rem;
+            grid-template-columns: 12rem minmax(0, 1fr) 22rem;
             grid-template-rows: 3.5rem auto auto;
             grid-template-areas:
                 'header  header header'
