@@ -8,48 +8,64 @@
     import { getConfig } from './page-context.svelte.js';
     import { createWeekdayNames } from './page-utils.js';
 
+    const PARAM_NAME = 'y';
+    const MIN_YEAR = 1900;
+    const MAX_YEAR = 2100;
+
     const today = Temporal.Now.plainDateISO();
     const { locale, weekStart } = getConfig();
 
-    function parseYear() {
-        const fromUrl = page.url.searchParams.get('y');
-        const yearInt = parseInt(fromUrl ?? '');
+    const year = $derived.by(() => {
+        const param = Number(page.url.searchParams.get(PARAM_NAME));
+        const validYear = Number.isInteger(param) && param > 0 ? param : today.year;
 
-        // TODO: Add bounds
-        return Number.isNaN(yearInt) ? today.year : yearInt;
+        return Math.min(Math.max(validYear, MIN_YEAR), MAX_YEAR);
+    });
+
+    async function navigateYear(offset: number) {
+        const targetYear = Math.min(Math.max(year + offset, MIN_YEAR), MAX_YEAR);
+        if (targetYear === year) return;
+
+        const url = new URL(page.url.href);
+        url.searchParams.set(PARAM_NAME, String(targetYear));
+
+        await goto(url);
     }
 
-    let year = $derived(parseYear());
+    async function navigateThisYear() {
+        const url = new URL(page.url.href);
+        url.searchParams.set(PARAM_NAME, String(today.year));
+
+        await goto(url);
+    }
 </script>
 
 <div class="header">
     <h1>{year}</h1>
 
     <button
-        onclick={async () => {
-            year -= 1;
-            await goto(`/calendar?y=${year}`);
-        }}
+        type="button"
+        onclick={() => navigateYear(-1)}
         class="btn btn-icon btn-secondary"
-        aria-label="Previous month"
+        aria-label="Previous year"
     >
         <ChevronLeft size={20} />
     </button>
 
     <button
-        onclick={async () => {
-            year += 1;
-            await goto(`/calendar?y=${year}`);
-        }}
+        type="button"
+        onclick={() => navigateYear(1)}
         class="btn btn-icon btn-secondary"
-        aria-label="Next month"
+        aria-label="Next year"
     >
         <ChevronRight size={20} />
     </button>
 
     <button
-        onclick={async () => await goto(`/calendar?y=${new Date().getFullYear()}`)}
+        type="button"
+        onclick={() => navigateThisYear()}
         class="btn btn-secondary"
+        aria-label="Goto currrent year"
     >
         Today
     </button>
@@ -57,28 +73,28 @@
 
 <div class="year-view">
     {#each { length: 12 }, month}
-        {const first = $derived(new Temporal.PlainDate(year, month + 1, 1))}
-        {const offset = $derived(((first.dayOfWeek % 7) - weekStart + 7) % 7)}
-        {const days = $derived(first.daysInMonth)}
-        {const cellCount = $derived(Math.ceil((offset + days) / 7) * 7)}
+        {const firstDay = $derived(new Temporal.PlainDate(year, month + 1, 1))}
+        {const firstDayOffset = $derived(((firstDay.dayOfWeek % 7) - weekStart + 7) % 7)}
+        {const daysInMonth = $derived(firstDay.daysInMonth)}
+        {const cellCount = $derived(Math.ceil((firstDayOffset + daysInMonth) / 7) * 7)}
 
         <section
             class="month"
-            aria-label={first.toLocaleString(locale, { month: 'long', year: 'numeric' })}
+            aria-label={firstDay.toLocaleString(locale, { month: 'long', year: 'numeric' })}
         >
-            <h2 class="year-label">{first.toLocaleString(locale, { month: 'long' })}</h2>
+            <h2 class="year-label">{firstDay.toLocaleString(locale, { month: 'long' })}</h2>
 
-            {#each createWeekdayNames() as weekday, i (i)}
+            {#each createWeekdayNames() as weekday}
                 <div class="weekday">{weekday}</div>
             {/each}
 
-            {#each { length: cellCount } as _, i (i)}
-                {const day = $derived(i - offset + 1)}
+            {#each { length: cellCount }, i}
+                {const day = $derived(i - firstDayOffset + 1)}
 
-                {#if day < 1 || day > days}
+                {#if day < 1 || day > daysInMonth}
                     <div class="day empty" aria-hidden="true"></div>
                 {:else}
-                    {const date = $derived(first.with({ day }))}
+                    {const date = $derived(firstDay.with({ day }))}
 
                     <div
                         class={['day', date.equals(today) && 'today']}
