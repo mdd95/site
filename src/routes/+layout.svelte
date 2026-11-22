@@ -1,17 +1,17 @@
 <script lang="ts">
-	import '@fontsource-variable/inter/wght.css';
-	import '../app.css';
-	import 'temporal-polyfill/global';
-	import favicon from '#lib/assets/favicon.svg';
-	import { initTheme, preloadScript } from '#lib/client/theme-preload.js';
+    import '@fontsource-variable/inter/wght.css';
+    import '../app.css';
+    import 'temporal-polyfill/global';
+    import favicon from '#lib/assets/favicon.svg';
+    import { initTheme, preloadScript } from '#lib/client/theme-preload.js';
 
-	let { children } = $props();
-	initTheme();
+    let { children } = $props();
+    initTheme();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
-	{@html preloadScript}
+    <link rel="icon" href={favicon} />
+    {@html preloadScript}
 </svelte:head>
 
 {@render children()}

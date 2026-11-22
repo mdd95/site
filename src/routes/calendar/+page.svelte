@@ -1,98 +1,98 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import YearView from './view-year.svelte';
-	import MonthView from './view-month.svelte';
-	import HeaderTab from './header-tab.svelte';
-	import SidenavDialog from './sidenav-dialog.svelte';
-	import Sidenav from './sidenav.svelte';
-	import PanelEvents from './panel-events.svelte';
-	const params = $derived(Object.fromEntries(page.url.searchParams));
+    import { page } from '$app/state';
+    import YearView from './view-year.svelte';
+    import MonthView from './view-month.svelte';
+    import HeaderTab from './header-tab.svelte';
+    import SidenavDialog from './sidenav-dialog.svelte';
+    import Sidenav from './sidenav.svelte';
+    import PanelEvents from './panel-events.svelte';
+    const params = $derived(Object.fromEntries(page.url.searchParams));
 
-	import { Config, setConfig } from './page-context.svelte.js';
+    import { Config, setConfig } from './page-context.svelte.js';
 
-	setConfig(new Config());
+    setConfig(new Config());
 </script>
 
 <svelte:head>
-	<title>Calendar</title>
+    <title>Calendar</title>
 </svelte:head>
 
 <div class="app">
-	<header>
-		<SidenavDialog />
-		<HeaderTab />
-	</header>
-	<main>
-		{#if params.month === 'year'}
-			<YearView />
-		{:else if params.view === 'month'}
-			<MonthView />
-		{:else}
-			<MonthView />
-		{/if}
-	</main>
-	<aside class="sidenav">
-		<Sidenav />
-	</aside>
-	<aside class="events">
-		<PanelEvents />
-	</aside>
-	<aside class="tasks"></aside>
+    <header>
+        <SidenavDialog />
+        <HeaderTab />
+    </header>
+    <main>
+        {#if params.month === 'year'}
+            <YearView />
+        {:else if params.view === 'month'}
+            <MonthView />
+        {:else}
+            <MonthView />
+        {/if}
+    </main>
+    <aside class="sidenav">
+        <Sidenav />
+    </aside>
+    <aside class="events">
+        <PanelEvents />
+    </aside>
+    <aside class="tasks"></aside>
 </div>
 
 <style>
-	.app {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: 3.5rem auto auto auto;
-		grid-template-areas:
-			'header'
-			'main'
-			'events'
-			'tasks';
-	}
+    .app {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 3.5rem auto auto auto;
+        grid-template-areas:
+            'header'
+            'main'
+            'events'
+            'tasks';
+    }
 
-	.sidenav {
-		display: none;
-	}
+    .sidenav {
+        display: none;
+    }
 
-	@media (width > 768px) {
-		.app {
-			grid-template-columns: minmax(0, 1fr) 18rem;
-			grid-template-rows: 3.5rem auto auto;
-			grid-template-areas:
-				'header header'
-				'main   events'
-				'main   tasks';
-		}
-	}
+    @media (width > 768px) {
+        .app {
+            grid-template-columns: minmax(0, 1fr) 18rem;
+            grid-template-rows: 3.5rem auto auto;
+            grid-template-areas:
+                'header header'
+                'main   events'
+                'main   tasks';
+        }
+    }
 
-	@media (width > 1080px) {
-		.app {
-			grid-template-columns: 18rem minmax(0, 1fr) 18rem;
-			grid-template-rows: 3.5rem auto auto;
-			grid-template-areas:
-				'header  header header'
-				'sidenav main   events'
-				'sidenav main   tasks';
-		}
+    @media (width > 1080px) {
+        .app {
+            grid-template-columns: 18rem minmax(0, 1fr) 18rem;
+            grid-template-rows: 3.5rem auto auto;
+            grid-template-areas:
+                'header  header header'
+                'sidenav main   events'
+                'sidenav main   tasks';
+        }
 
-		.sidenav {
-			display: block;
-		}
-	}
+        .sidenav {
+            display: block;
+        }
+    }
 
-	header {
-		grid-area: header;
-		height: 4rem;
-		padding: 0 1rem;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
-	}
+    header {
+        grid-area: header;
+        height: 4rem;
+        padding: 0 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
 
-	main {
-		grid-area: main;
-	}
+    main {
+        grid-area: main;
+    }
 </style>
