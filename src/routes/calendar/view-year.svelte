@@ -73,7 +73,7 @@
             {/each}
 
             {#each { length: cellCount } as _, i (i)}
-                {const day = i - offset + 1}
+                {const day = $derived(i - offset + 1)}
 
                 {#if day < 1 || day > days}
                     <div class="day empty" aria-hidden="true"></div>

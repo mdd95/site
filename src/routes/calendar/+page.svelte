@@ -10,7 +10,6 @@
     import { Config, setConfig } from './page-context.svelte.js';
 
     setConfig(new Config());
-    $inspect(page.url.searchParams.get('y'));
 </script>
 
 <svelte:head>
